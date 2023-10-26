@@ -5,9 +5,9 @@ app = Flask(__name__,template_folder="templates/")
 def hello():
   return render_template("login.html")
 
-@app.route("/loanmarketplace")
+@app.route("/loanmanagement")
 def loanmarketplace():
-  return render_template("loanmarketplace.html")
+  return render_template("loanmanagement.html")
 
 if __name__ == "__main__":
   app.run()
