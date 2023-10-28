@@ -68,16 +68,16 @@ class Loan(db.Model):
                 "Status": self.Status
         }
 
-# [GET] Fetch All Loans
-@app.route("/loan")
-def get_all_loans():
-    loanlist = Loan.query.all()
-    if len(loanlist):
+# [GET] Fetch All borrowing loans
+@app.route("/loan/borrowing")
+def get_all_borrowing_loans():
+    loan_list = Loan.query.filter_by(Status="Borrowing").all()
+    if len(loan_list):
         return jsonify(
             {
                 "code": 200,
                 "data": {
-                    "loans": [loan.json() for loan in loanlist]
+                    "loans": [loan.json() for loan in loan_list]
                 }
             }
         )
@@ -85,44 +85,36 @@ def get_all_loans():
     return jsonify(
         {
             "code": 404,
-            "message": "There are no loans."
+            "message": "There are no borrowing loans."
         }
     ), 404
 
-# [GET] Find Loans Using CustomerId
-@app.route("/loan/<string:CustomerId>")
-def find_loans(CustomerId):
-    loans = Loan.query.filter_by(CustomerId=CustomerId).all()
-    if len(loans):
+# [GET] Fetch All lending loans
+@app.route("/loan/lending")
+def get_all_lending_loans():
+    loan_list = Loan.query.filter_by(Status="Lending").all()
+    if len(loan_list):
         return jsonify(
             {
                 "code": 200,
-                "data": loans.json()
+                "data": {
+                    "loans": [loan.json() for loan in loan_list]
+                }
             }
         )
+        
     return jsonify(
         {
             "code": 404,
-            "message": "No loans are found."
+            "message": "There are no lending loans."
         }
     ), 404
 
-# [POST] Create Loan Using CustomerId
-@app.route("/loan/<string:LoanId>", methods=['POST'])
-def create_loan(LoanId):
-    # if (Loan.query.filter_by(LoanId=LoanId).first()):
-    #     return jsonify(
-    #         {
-    #             "code": 400,
-    #             "data": {
-    #                 "LoanId": LoanId
-    #             },
-    #             "message": "Loan already exists."
-    #         }
-    #     ), 400
-
+# [POST] Create borrowing loan based on CustomerId
+@app.route("/loan/borrowing/<string:CustomerId>", methods=['POST'])
+def create_borrowing_loan(CustomerId):
     data = request.get_json()
-    loan = Loan(LoanId, **data)
+    loan = Loan(CustomerId, **data)
 
     try:
         db.session.add(loan)
@@ -131,10 +123,7 @@ def create_loan(LoanId):
         return jsonify(
             {
                 "code": 500,
-                "data": {
-                    "LoanId": LoanId
-                },
-                "message": "An error occurred creating the loan."
+                "message": "An error occurred creating the borrowing loan."
             }
         ), 500
 
@@ -145,93 +134,69 @@ def create_loan(LoanId):
         }
     ), 201
 
-# [GET] Find Loans Using CustomerId based on status
-@app.route("/loan/<string:CustomerId>/<string:Status>")
-def find_loans_status(CustomerId, Status):
-    loans = Loan.query.filter_by(CustomerId=CustomerId, Status=Status).all()
-    if len(loans):
+# [POST] Create lending loan based on CustomerId
+@app.route("/loan/lending/<string:CustomerId>", methods=['POST'])
+def create_lending_loan(CustomerId):
+    data = request.get_json()
+    loan = Loan(CustomerId, **data)
+
+    try:
+        db.session.add(loan)
+        db.session.commit()
+    except:
+        return jsonify(
+            {
+                "code": 500,
+                "message": "An error occurred creating the lending loan."
+            }
+        ), 500
+
+    return jsonify(
+        {
+            "code": 201,
+            "data": loan.json()
+        }
+    ), 201
+
+# [GET] Fetch All borrowing loans based on CustomerId
+@app.route("/loan/borrowing/<string:CustomerId>")
+def get_all_borrowing_loans_by_customer_id(CustomerId):
+    loan_list = Loan.query.filter_by(CustomerId=CustomerId, Status="Borrowing").all()
+    if len(loan_list):
         return jsonify(
             {
                 "code": 200,
-                "data": loans.json()
+                "data": {
+                    "loans": [loan.json() for loan in loan_list]
+                }
             }
         )
+        
     return jsonify(
         {
             "code": 404,
-            "message": "No loans are found."
+            "message": "There are no borrowing loans."
         }
     ), 404
 
-# [PUT] Update Loan Using LoanId
-@app.route("/loan/<string:LoanId>", methods=['PUT'])
-def update_loan(LoanId):
-    loan = Loan.query.filter_by(LoanId=LoanId).first()
-    if loan:
-        data = request.get_json()
-        if data['CollateralAmount']:
-            loan.CollateralAmount = data['CollateralAmount']
-        if data['LoanAmount']:
-            loan.LoanAmount = data['LoanAmount']
-        if data['InvestmentAmount']:
-            loan.InvestmentAmount = data['InvestmentAmount']
-        if data['InterestRate']:
-            loan.InterestRate = data['InterestRate']
-        if data['CurrencyCode']:
-            loan.CurrencyCode = data['CurrencyCode']
-        if data['TotalInterestAmount']:
-            loan.TotalInterestAmount = data['TotalInterestAmount']
-        if data['ServiceFee']:
-            loan.ServiceFee = data['ServiceFee']
-        if data['RepaymentAmount']:
-            loan.RepaymentAmount = data['RepaymentAmount']
-        if data['Revenue']:
-            loan.Revenue = data['Revenue']
-        if data['LoanTerm']:
-            loan.LoanTerm = data['LoanTerm']
-        if data['StartDate']:
-            loan.StartDate = data['StartDate']
-        if data['EndDate']:
-            loan.EndDate = data['EndDate']
-        if data['Status']:
-            loan.Status = data['Status']
-        db.session.commit()
+# [GET] Fetch All lending loans based on CustomerId
+@app.route("/loan/lending/<string:CustomerId>")
+def get_all_lending_loans_by_customer_id(CustomerId):
+    loan_list = Loan.query.filter_by(CustomerId=CustomerId, Status="Lending").all()
+    if len(loan_list):
         return jsonify(
             {
                 "code": 200,
-                "data": loan.json()
+                "data": {
+                    "loans": [loan.json() for loan in loan_list]
+                }
             }
         )
+        
     return jsonify(
         {
             "code": 404,
-            "data": {
-                "LoanId": LoanId
-            },
-            "message": "Loan not found."
-        }
-    ), 404
-
-# [DELETE] Update Loan Using LoanId
-@app.route("/loan/<string:LoanId>", methods=['DELETE'])
-def delete_loan(LoanId):
-    loan = Loan.query.filter_by(LoanId=LoanId).first()
-    if loan:
-        db.session.delete(loan)
-        db.session.commit()
-        return jsonify(
-            {
-                "code": 201,
-                "data": loan.json()
-            }
-        ), 201
-    return jsonify(
-        {
-            "code": 404,
-            "data": {
-                "LoanId": LoanId
-            },
-            "message": "Loan not found."
+            "message": "There are no lending loans."
         }
     ), 404
 
