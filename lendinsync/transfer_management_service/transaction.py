@@ -4,10 +4,30 @@ from flask_cors import CORS
 from os import environ
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://root@localhost:3306/wallet'
+# Code assumes Mac or Windows default settings if 'dbURL' does not exist. URI format: dialect+driver://username:password@host:port/database
+try:
+    app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('dbURL')
+    if app.config['SQLALCHEMY_DATABASE_URI'] == None:
+        if platform == "darwin":
+            app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://root:root@localhost:8889/fap_application'
+        else:
+            app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://root@localhost:3306/fap_application'
+
+except KeyError:
+	if platform == "darwin":
+		app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://root:root@localhost:8889/fap_application'
+	else:
+		app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://root@localhost:3306/fap_application'
+
+# Disable modification tracking if unnecessary as it requires extra memory
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {'pool_recycle': 299}
+
+app.logger.setLevel(logging.DEBUG)
 
 db = SQLAlchemy(app)
+
+CORS(app) 
 
 # Create wallet database
 class Transaction(db.Model):

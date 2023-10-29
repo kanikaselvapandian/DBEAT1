@@ -1,11 +1,34 @@
+import os
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
+import logging
+from sys import platform
+from datetime import datetime
+import json
 from os import environ
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://root@localhost:3306/wallet'
+# Code assumes Mac or Windows default settings if 'dbURL' does not exist. URI format: dialect+driver://username:password@host:port/database
+try:
+    app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('dbURL')
+    if app.config['SQLALCHEMY_DATABASE_URI'] == None:
+        if platform == "darwin":
+            app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://root:root@localhost:3306/lis_wallet'
+        else:
+            app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://root@localhost:3306/lis_wallet'
+
+except KeyError:
+	if platform == "darwin":
+		app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://root:root@localhost:3306/lis_wallet'
+	else:
+		app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://root@localhost:3306/lis_wallet'
+
+# Disable modification tracking if unnecessary as it requires extra memory
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {'pool_recycle': 299}
+
+app.logger.setLevel(logging.DEBUG)
 
 db = SQLAlchemy(app)
 
@@ -15,14 +38,13 @@ class Wallet(db.Model):
 
     # Define database columns
     # CHECK VARIABLES
-    WID = db.Column(db.String(3), primary_key=True)
+    WID = db.Column(db.Integer, primary_key=True)
     CustomerId = db.Column(db.String(128), nullable=False)
     CurrencyCode = db.Column(db.String(128), nullable=False)
-    Amount = db.Column(db.String(10), nullable=True)
+    Amount = db.Column(db.DECIMAL(), nullable=True)
 
     # Initialize wallet variables
-    def __init__(self, WID, CustomerId, CurrencyCode, Amount):
-        self.WID = WID
+    def __init__(self, CustomerId, CurrencyCode, Amount):
         self.CustomerId = CustomerId
         self.CurrencyCode = CurrencyCode
         self.Amount = Amount
@@ -64,7 +86,9 @@ def find_wallets(CustomerId):
         return jsonify(
             {
                 "code": 200,
-                "data": wallets.json()
+                "data": {
+                    "wallet": [wallet.json() for wallet in wallets]
+                } 
             }
         )
     return jsonify(
@@ -75,80 +99,71 @@ def find_wallets(CustomerId):
     ), 404
 
 # [POST] Create Wallet Using CustomerId
-@app.route("/wallet/<string:WID>", methods=['POST'])
-def create_wallet(WID):
-    # if (Wallet.query.filter_by(WID=WID).first()):
-    #     return jsonify(
-    #         {
-    #             "code": 400,
-    #             "data": {
-    #                 "WID": WID
-    #             },
-    #             "message": "Wallet already exists."
-    #         }
-    #     ), 400
-
+@app.route("/wallet", methods=['POST'])
+def create_wallet():
     data = request.get_json()
-    # CHECK if first attribute is PK
-    wallet = Wallet(WID, **data)
+    customer_id = data.get('CustomerId')
+    currency_code = data.get('CurrencyCode')
+    amount = data.get('Amount')
+
+    # Initialize Wallet without WID since it's auto-generated
+    wallet = Wallet(CustomerId=customer_id, CurrencyCode=currency_code, Amount=amount)
 
     try:
         db.session.add(wallet)
         db.session.commit()
-        
-    except:
+        return jsonify(
+                {
+                    "code": 201,
+                    "data": wallet.json(),
+                    "message": "Wallet submitted successfully"
+                }
+            ), 201
+    except Exception as e:
+        print(str(e))  # Log the specific error for debugging purposes
         return jsonify(
             {
                 "code": 500,
-                "data": {
-                    "WID": WID
-                },
-                "message": "An error occurred creating the wallet."
+                "message": "An error occurred creating the wallet"
             }
         ), 500
 
-    return jsonify(
-        {
-            "code": 201,
-            "data": wallet.json()
-        }
-    ), 201
 
-# [PUT] Update Wallet Using WID
+# [PUT] Update Wallet Amount Using WID
 @app.route("/wallet/<string:WID>", methods=['PUT'])
-def update_wallet(WID):
-    if (Wallet.query.filter_by(WID=WID).first()):
+def update_wallet_amount(WID):
+    wallet = Wallet.query.filter_by(WID=WID).first()
 
+    if wallet:
         data = request.get_json()
-        print(type(data))
-        wallet = Wallet(WID, **data)
+        new_amount = data.get('Amount')
 
-        wallet.CustomerId = data['CustomerId']
-        wallet.CurrencyCode = data['CurrencyCode']
-        wallet.Amount = data['Amount']
+        # Update the Amount in the wallet
+        wallet.Amount = new_amount
 
-        db.session.commit()
-
-        return jsonify(
-            {
+        try:
+            db.session.commit()
+            return jsonify({
                 "code": 200,
-                "data": wallet.json()
-            }
-        ), 200
+                "data": wallet.json(),
+                "message": "Wallet amount updated successfully"
+            }), 200
+        except Exception as e:
+            print(str(e))  # Log the specific error for debugging purposes
+            return jsonify({
+                "code": 500,
+                "message": "An error occurred updating the wallet amount"
+            }), 500
 
-    return jsonify(
-        {
-            "code": 404,
-            "data": {
-                "WID": WID
-            },
-            "message": "Wallet not found."
-        }
-    ), 404
+    return jsonify({
+        "code": 404,
+        "data": {"WID": WID},
+        "message": "Wallet not found."
+    }), 404
 
 # [DELETE] Update Wallet Using WID
 @app.route("/wallet/<string:WID>", methods=['DELETE'])
-def delete_walled(WID):
+def delete_wallet(WID):
     if (Wallet.query.filter_by(WID=WID).first()):
 
         wallet = Wallet.query.filter_by(WID=WID).first()
