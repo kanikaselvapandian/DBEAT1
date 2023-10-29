@@ -1,6 +1,11 @@
+import os
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
+import logging
+from sys import platform
+from datetime import datetime
+import json
 from os import environ
 
 app = Flask(__name__)
@@ -9,15 +14,15 @@ try:
     app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('dbURL')
     if app.config['SQLALCHEMY_DATABASE_URI'] == None:
         if platform == "darwin":
-            app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://root:root@localhost:8889/fap_application'
+            app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://root:root@localhost:3306/lis_transaction'
         else:
-            app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://root@localhost:3306/fap_application'
+            app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://root@localhost:3306/lis_transaction'
 
 except KeyError:
 	if platform == "darwin":
-		app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://root:root@localhost:8889/fap_application'
+		app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://root:root@localhost:3306/lis_transaction'
 	else:
-		app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://root@localhost:3306/fap_application'
+		app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://root@localhost:3306/lis_transaction'
 
 # Disable modification tracking if unnecessary as it requires extra memory
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -31,22 +36,20 @@ CORS(app)
 
 # Create wallet database
 class Transaction(db.Model):
-    __tablename__ = 'Transaction'
+    __tablename__ = 'WalletTransaction'
 
     # Define database columns
-    # CHECK VARIABLES
-    TID = db.Column(db.String(3), primary_key=True)
-    SourceWallet = db.Column(db.String(128), nullable=True)
-    DestinationWallet = db.Column(db.String(128), nullable=True)
-    AmountTransferred = db.Column(db.String(10), nullable=True)
+    TID = db.Column(db.Integer, primary_key=True)
+    SourceWallet = db.Column(db.Integer, nullable=True)
+    DestinationWallet = db.Column(db.Integer, nullable=True)
+    AmountTransferred = db.Column(db.DECIMAL(precision=18, scale=2), nullable=True)
     CustomerId = db.Column(db.String(128), nullable=False)
-    WalletTransaction = db.Column(db.String(128), nullable=False) #BOOLEAN
-    ExchangeRate = db.Column(db.String(128), nullable=False)
-    TimeStamp = db.Column(db.String(128), nullable=False)
+    WalletTransaction = db.Column(db.Boolean, nullable=False)
+    ExchangeRate = db.Column(db.DECIMAL(precision=18, scale=5), nullable=False)
+    TimeStamp = db.Column(db.TIMESTAMP, nullable=False)
 
     # Initialize wallet variables
-    def __init__(self, TID, SourceWallet, DestinationWallet, AmountTransferred, CustomerId, WalletTransaction, ExchangeRate, TimeStamp):
-        self.TID = TID
+    def __init__(self, SourceWallet, DestinationWallet, AmountTransferred, CustomerId, WalletTransaction, ExchangeRate, TimeStamp):
         self.SourceWallet = SourceWallet
         self.DestinationWallet = DestinationWallet
         self.AmountTransferred = AmountTransferred
@@ -91,12 +94,14 @@ def get_all_transactions():
 # [GET] Find Transactions Using CustomerId
 @app.route("/transaction/<string:CustomerId>")
 def find_wallets(CustomerId):
-    transactions = Transaction.query.filter_by(CustomerId=CustomerId).all()
-    if len(transactions):
+    transaction_list = Transaction.query.filter_by(CustomerId=CustomerId).all()
+    if len(transaction_list):
         return jsonify(
             {
                 "code": 200,
-                "data": transactions.json()
+                "data": {
+                    "transactions": [transaction.json() for transaction in transaction_list]
+                }
             }
         )
     return jsonify(
@@ -107,33 +112,47 @@ def find_wallets(CustomerId):
     ), 404
 
 # [POST] Create Transactions Using TID
-@app.route("/transaction/<string:TID>", methods=['POST'])
-def create_transaction(TID):
+@app.route("/transaction", methods=['POST'])
+def create_transaction():
     data = request.get_json()
 
-    transaction = Transaction(TID, **data)
+    # Extract the values from the JSON
+    source_wallet = data.get('SourceWallet')
+    destination_wallet = data.get('DestinationWallet')
+    amount_transferred = data.get('AmountTransferred')
+    customer_id = data.get('CustomerId')
+    wallet_transaction = data.get('WalletTransaction')
+    exchange_rate = data.get('ExchangeRate')
+    timestamp = data.get('TimeStamp')
+
+    # Create a new Transaction object
+    transaction = Transaction(
+        SourceWallet=source_wallet,
+        DestinationWallet=destination_wallet,
+        AmountTransferred=amount_transferred,
+        CustomerId=customer_id,
+        WalletTransaction=wallet_transaction,
+        ExchangeRate=exchange_rate,
+        TimeStamp=timestamp
+    )
 
     try:
         db.session.add(transaction)
         db.session.commit()
-        
+        return jsonify(
+            {
+                "code": 201,
+                "data": transaction.json(),
+                "message": "Transaction completed successfully"
+            }
+        ), 201
     except:
         return jsonify(
             {
                 "code": 500,
-                "data": {
-                    "TID": TID
-                },
-                "message": "An error occurred completing the transaction."
+                "message": "An error occurred completing the transaction"
             }
         ), 500
-
-    return jsonify(
-        {
-            "code": 201,
-            "data": transaction.json()
-        }
-    ), 201
 
 if __name__ == '__main__':
     app.run(port=8000, debug=True)
