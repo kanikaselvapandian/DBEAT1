@@ -32,6 +32,8 @@ app.logger.setLevel(logging.DEBUG)
 
 db = SQLAlchemy(app)
 
+CORS(app)
+
 # Create wallet database
 class Wallet(db.Model):
     __tablename__ = 'Wallet'

@@ -1,0 +1,271 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Wallet</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css">
+    <!-- jQuery library -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <!-- Popper JS -->
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <!-- Bootstrap CSS -->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+        <!-- Custom CSS -->
+        <link rel="stylesheet" href="../css/wallet.css">
+        <!-- Latest compiled and minified JavaScript -->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+        <!-- Vue 3 -->
+        <script src='https://cdn.jsdelivr.net/npm/vue@3.0.2/dist/vue.global.js'></script>
+        <script type = "module" src="../js/wallet.js"></script>
+        <title>LendInSync</title>
+    </head>
+    <body>
+        <!-- Add the navigation bar -->
+        <nav class="navbar navbar-expand-lg navbar-dark">
+            <a class="navbar-brand" href="#">LendInSync</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item active">
+                        <a class="nav-link" href="home.html">Wallet</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="loan.html">Loans</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="profile.html">Profile</a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+        <br>
+        <div id = "wallet" class = "container">
+            <div class="row">
+                <h2>My Wallets</h2>
+            </div>
+            <hr>
+            <div class="row">
+                <!-- Add the wallet cards -->
+                <div class="col-md-12">
+                    <div class="card-deck d-flex flex-nowrap overflow-auto">
+                        <div class="card" v-for="wallet in customer_wallets">
+                        <div class="card-body">
+                            <h5 class="card-title">{{wallet.CurrencyCode}}</h5>
+                            <p class="card-text">
+                            Amount: {{ wallet.Amount }} <br>
+                            </p>
+                        </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class = "my-3">
+                <a href="create_wallet.html"><button class="btn btn-secondary" type="button">Create New Wallet</button></a>
+                <a class="btn btn-secondary" data-bs-toggle="modal" href="#transactionModal" role="button">New Transaction</a>
+            </div>
+            <br>
+            <h2>My Transactions</h2>
+            <hr>
+            <!-- Add the transaction table -->
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Timestamp</th>
+                        <th>Source Wallet</th>
+                        <th>Destination Wallet</th>
+                        <th>Amount</th>
+                        <th>Exchange Rate</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="transaction in customer_transactions">
+                        <td>{{transaction.TimeStamp}}</td>
+                        <td>{{transaction.SourceWallet}}</td>
+                        <td>{{transaction.DestinationWallet}}</td>
+                        <td>{{transaction.AmountTransferred}}</td>
+                        <td>{{transaction.ExchangeRate}}</td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="modal fade" id="transactionModal" aria-hidden="true" aria-labelledby="transactionModalLabel" tabindex="-1" data-bs-backdrop="true">
+                <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h1 class="modal-title fs-5" id="transactionModalLabel">Types of Transaction</h1>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body d-flex flex-column align-items-center">
+                        <div class="w-100 mb-2">
+                            <button class="btn btn-secondary w-100" data-bs-target="#walletTransaction" data-bs-toggle="modal">Between Wallets</button>
+                        </div>
+                        <hr class="w-100 mb-2">
+                        <div class="w-100 mb-2">
+                            <button class="btn btn-secondary w-100" data-bs-target="#depositTransaction" data-bs-toggle="modal">Transact to Deposit Account</button>
+                        </div>
+                        <hr class="w-100 mb-2">
+                        <div class="w-100">
+                            <button class="btn btn-secondary w-100" data-bs-target="#withdrawTransaction" data-bs-toggle="modal">Transact from Deposit Account</button>
+                        </div>
+                    </div>                    
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                  </div>
+                </div>
+            </div>
+            <div class="modal fade" id="walletTransaction" aria-hidden="true" aria-labelledby="walletTransactionLabel" tabindex="-1" data-bs-backdrop="true">
+            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="walletTransactionLavel">Transact between Wallets</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class = "container ">
+                        <h2>Wallet Transaction</h2>
+                        <hr>
+                        <form>
+                            <div class="form-group">
+                                <label for="customerid">Customer ID:</label>
+                                <input type="text" class="form-control" :value = customer_id disabled> 
+                            </div>
+                            <div class="form-group">
+                                <label for="currency">Source Wallet:</label>
+                                <select class="form-control" @change="checkWalletsSelection" v-model="sourcewallet">
+                                    <option v-for="wallet in customer_wallets" :value="wallet">
+                                        {{wallet.WID}}. {{ wallet.CurrencyCode }} {{ wallet.Amount }}
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="currency">Destination Wallet:</label>
+                                <select class="form-control" @change="checkWalletsSelection" v-model="destinationwallet">
+                                    <option v-for="wallet in customer_wallets" :value="wallet">
+                                        {{wallet.WID}}. {{ wallet.CurrencyCode }} {{ wallet.Amount }}
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="amount">Amount transferred from source wallet:</label>
+                                <input type="text" class="form-control" v-model="wallet_amount">
+                            </div>
+                            <div class="form-group">
+                                <label for="exchange_rate">Exchange Rate:</label>
+                                <input type="text" class="form-control" :value = exchange_rate disabled>
+                            </div>
+                            <button type="submit" class="btn btn-secondary btn-block" @click="createTransaction(WalletTransaction=true)">Submit</button>
+                        </form>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-primary" data-bs-target="#transactionModal" data-bs-toggle="modal">Go Back</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+                </div>
+            </div>
+            </div>
+            <div class="modal fade" id="depositTransaction" aria-hidden="true" aria-labelledby="depositTransactionLabel" tabindex="-1" data-bs-backdrop="true">
+            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="walletTransactionLavel">Deposit Money</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class = "container ">
+                            <h2>Transfer to Deposit Account</h2>
+                            <hr>
+                            <form>
+                                <div class="form-group">
+                                    <label for="customerid">Deposit Account:</label>
+                                    <input type="text" class="form-control" :value = deposit_account v-model = "destinationwallet" disabled> 
+                                </div>
+                                <div class="form-group">
+                                    <label for="currency">Source Wallet:</label>
+                                    <select class="form-control" v-model="sourcewallet" @change = "getExchangeRate(sourcewallet.CurrencyCode)">
+                                        <option v-for="wallet in customer_wallets" :value="wallet">
+                                            {{wallet.WID}}. {{ wallet.CurrencyCode }} {{ wallet.Amount }}
+                                        </option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="amount">Amount transferred from wallet:</label>
+                                    <input type="text" class="form-control" v-model="wallet_amount">
+                                </div>
+                                <div class="form-group">
+                                    <label for="exchange_rate">Exchange Rate:</label>
+                                    <input type="text" class="form-control" :value = exchange_rate disabled>
+                                </div>
+                                <button type="submit" class="btn btn-secondary btn-block" @click="createTransaction(WalletTransaction=false)">Submit</button>
+                            </form>
+                        </div>
+                    </div>
+                <div class="modal-footer">
+                    <button class="btn btn-primary" data-bs-target="#transactionModal" data-bs-toggle="modal">Go Back</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+                </div>
+            </div>
+            </div>
+            <div class="modal fade" id="withdrawTransaction" aria-hidden="true" aria-labelledby="withdrawTransactionLabel" tabindex="-1" data-bs-backdrop="true">
+            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="walletTransactionLavel">Deposit Money</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class = "container ">
+                            <h2>Transfer to Deposit Account</h2>
+                            <hr>
+                            <form>
+                                <div class="form-group">
+                                    <label for="customerid">Source Account:</label>
+                                    <input type="text" class="form-control" :value = deposit_account v-model = "sourcewallet" disabled> 
+                                </div>
+                                <div class="form-group">
+                                    <label for="currency">Destination Wallet:</label>
+                                    <select class="form-control" v-model="destinationwallet" @change = "getExchangeRate(destinationwallet.CurrencyCode)">
+                                        <option v-for="wallet in customer_wallets" :value="wallet">
+                                            {{wallet.WID}}. {{ wallet.CurrencyCode }} {{ wallet.Amount }}
+                                        </option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="amount">Amount transferred to wallet:</label>
+                                    <input type="text" class="form-control" v-model="wallet_amount">
+                                </div>
+                                <div class="form-group">
+                                    <label for="exchange_rate">Exchange Rate:</label>
+                                    <input type="text" class="form-control" :value = exchange_rate disabled>
+                                </div>
+                                <button type="submit" class="btn btn-secondary btn-block" @click="createTransaction(WalletTransaction=false)">Submit</button>
+                            </form>
+                        </div>
+                    </div>
+                <div class="modal-footer">
+                    <button class="btn btn-primary" data-bs-target="#transactionModal" data-bs-toggle="modal">Go Back</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+                </div>
+            </div>
+            </div>
+        </div>
+        <!-- jQuery -->
+        <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
+        <!-- Bootstrap Javascript -->
+        <script src='https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js'
+        integrity='sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM'
+        crossorigin='anonymous'></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-A3rJD856KowSb7dwlZdYEkO39Gagi7vIsF0jrRAoQmDKKtQBHUuLZ9AsSv4jD4Xa" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js" integrity="sha384-oBqDVmMz9ATKxIep9tiCxS/Z9fNfEXiDAYTujMAeBAsjFuCZSmKbSSUnQlmh/jp3" crossorigin="anonymous"></script>
+    </body>
+    </html>

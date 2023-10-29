@@ -18,6 +18,11 @@
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
         <!-- Custom CSS -->
         <link rel="stylesheet" href="../css/wallet.css">
+        <!-- Latest compiled and minified JavaScript -->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+        <!-- Vue 3 -->
+        <script src='https://cdn.jsdelivr.net/npm/vue@3.0.2/dist/vue.global.js'></script>
+        <script type = "module" src="../js/wallet.js"></script>
         <title>LendInSync</title>
     </head>
     <body>
@@ -30,7 +35,7 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav">
                     <li class="nav-item active">
-                        <a class="nav-link" href="wallet.html">Wallet</a>
+                        <a class="nav-link" href="home.html">Wallet</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="loan.html">Loans</a>
@@ -42,32 +47,31 @@
             </div>
         </nav>
         <br>
-        <div class = "container ">
+        <div class = "container" id = "wallet">
             <h2>Create a Wallet</h2>
             <hr>
             <form>
                 <div class="form-group">
                     <label for="customerid">Customer ID:</label>
-                    <input type="text" class="form-control" id="customerid">
+                    <input type="text" class="form-control" :value = customer_id disabled> 
                 </div>
                 <div class="form-group">
                     <label for="currency">Currency:</label>
-                    <select class="form-control" id="currency">
-                        <option>USD</option>
-                        <option>EUR</option>
-                        <option>GBP</option>
-                        <option>JPY</option>
+                    <select v-model="selectedCurrency" class = "form-control" @change="getExchangeRate(selectedCurrency)">
+                        <option v-for="currency in currency_info" :value="currency.CurrencyCode">
+                          {{currency.CountryName}} ({{ currency.CurrencyCode }})
+                        </option>
                     </select>
                 </div>
                 <div class="form-group">
-                    <label for="amount">Amount:</label>
-                    <input type="text" class="form-control" id="amount">
+                    <label for="amount">Amount transferred from deposit account:</label>
+                    <input type="text" class="form-control" v-model="wallet_amount">
                 </div>
                 <div class="form-group">
                     <label for="exchange_rate">Exchange Rate:</label>
-                    <input type="text" class="form-control" id="exchange_rate">
+                    <input type="text" class="form-control" :value = exchange_rate disabled>
                 </div>
-                <button type="submit" class="btn btn-secondary btn-block">Submit</button>
+                <button class="btn btn-secondary btn-block" @click="createWallet($event)">Submit</button>
             </form>
         </div>
         <!-- jQuery -->
