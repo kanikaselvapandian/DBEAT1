@@ -4,3 +4,9 @@
 .navbar {
     background-color: #491549;
 }
+#myloantab a{
+    color: black;
+}
+#activeloantab a{
+    border-bottom: #491549 solid 3px;
+}
