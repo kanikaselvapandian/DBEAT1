@@ -24,6 +24,14 @@ const loan = Vue.createApp({
             repayment_amount: 0,
             revenue: 0,
             StatusLevel: "",
+            computed:{
+                total_interest_amount(){
+                    return this.investment_amount * (1+(this.interest_rate/100)) * this.loan_term/365;
+                },
+                revenue(){
+                    return this.total_interest_amount + this.investment_amount;
+                }
+            },
             validation_errors: [],
             errorsFound: false
         };
