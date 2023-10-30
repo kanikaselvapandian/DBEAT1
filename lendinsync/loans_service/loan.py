@@ -54,10 +54,10 @@ class Loan(db.Model):
     LoanTerm = db.Column(db.String(128), nullable=False)
     StartDate = db.Column(db.String(128), nullable=False)
     EndDate = db.Column(db.String(128), nullable=False)
-    Status = db.Column(db.String(128), nullable=False)
+    StatusLevel = db.Column(db.String(128), nullable=False)
 
     # Initialize loan variables
-    def __init__(self, LoanId, CustomerId, CollateralAmount, LoanAmount, InvestmentAmount, InterestRate, CurrencyCode, TotalInterestAmount, ServiceFee, RepaymentAmount, Revenue, LoanTerm, StartDate, EndDate, Status):
+    def __init__(self, LoanId, CustomerId, CollateralAmount, LoanAmount, InvestmentAmount, InterestRate, CurrencyCode, TotalInterestAmount, ServiceFee, RepaymentAmount, Revenue, LoanTerm, StartDate, EndDate, StatusLevel):
         self.LoanId = LoanId
         self.CustomerId = CustomerId
         self.CollateralAmount = CollateralAmount
@@ -72,7 +72,7 @@ class Loan(db.Model):
         self.LoanTerm = LoanTerm
         self.StartDate = StartDate
         self.EndDate = EndDate
-        self.Status = Status
+        self.StatusLevel = StatusLevel
 
     def json(self):
         return {
@@ -90,14 +90,14 @@ class Loan(db.Model):
                 "LoanTerm": self.LoanTerm,
                 "StartDate": self.StartDate,
                 "EndDate": self.EndDate,
-                "Status": self.Status
+                "StatusLevel": self.StatusLevel
         }
     
 
 # [GET] Fetch All borrowing loans
 @app.route("/loan/borrowing")
 def get_all_borrowing_loans():
-    loan_list = Loan.query.filter_by(Status="Borrowing").all()
+    loan_list = Loan.query.filter_by(StatusLevel="Borrowing").all()
     if len(loan_list):
         return jsonify(
             {
@@ -118,7 +118,7 @@ def get_all_borrowing_loans():
 # [GET] Fetch All lending loans
 @app.route("/loan/lending")
 def get_all_lending_loans():
-    loan_list = Loan.query.filter_by(Status="Lending").all()
+    loan_list = Loan.query.filter_by(StatusLevel="Lending").all()
     if len(loan_list):
         return jsonify(
             {
