@@ -10,3 +10,15 @@
 #activeloantab a{
     border-bottom: #491549 solid 3px;
 }
+.card-deck-scroll {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: thin; /* Optional: Adjust scrollbar width */
+    width: 100%; /* Ensures full width within the container */
+}
+
+.card {
+    flex: 0 0 250px; /* Fixed width for each card */
+    margin-right: 10px; /* Optional: Adjust the margin between cards */
+}
