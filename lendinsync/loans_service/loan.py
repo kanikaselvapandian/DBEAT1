@@ -187,7 +187,7 @@ def create_lending_loan(CustomerId):
 # [GET] Fetch All borrowing loans based on CustomerId
 @app.route("/loan/borrowing/<string:CustomerId>")
 def get_all_borrowing_loans_by_customer_id(CustomerId):
-    loan_list = Loan.query.filter_by(CustomerId=CustomerId, Status="Borrowing").all()
+    loan_list = Loan.query.filter(Loan.CustomerId == CustomerId, Loan.StatusLevel.in_(["Borrowing", "BMatch"])).all()
     if len(loan_list):
         return jsonify(
             {
@@ -205,10 +205,11 @@ def get_all_borrowing_loans_by_customer_id(CustomerId):
         }
     ), 404
 
+
 # [GET] Fetch All lending loans based on CustomerId
 @app.route("/loan/lending/<string:CustomerId>")
 def get_all_lending_loans_by_customer_id(CustomerId):
-    loan_list = Loan.query.filter_by(CustomerId=CustomerId, Status="Lending").all()
+    loan_list = Loan.query.filter(Loan.CustomerId == CustomerId, Loan.StatusLevel.in_(["Lending", "LMatch"])).all()
     if len(loan_list):
         return jsonify(
             {
