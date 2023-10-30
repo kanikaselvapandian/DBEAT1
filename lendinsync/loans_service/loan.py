@@ -4,7 +4,7 @@ from flask_cors import CORS
 from os import environ
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://root@localhost:3306/loan'
+app.config['SQLALCHEMY_DATABASE_URI'] = environ.get('dbURL') or 'mysql+mysqlconnector://root@localhost:3306/lis_loan'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
@@ -67,6 +67,7 @@ class Loan(db.Model):
                 "EndDate": self.EndDate,
                 "Status": self.Status
         }
+    
 
 # [GET] Fetch All borrowing loans
 @app.route("/loan/borrowing")
@@ -201,4 +202,4 @@ def get_all_lending_loans_by_customer_id(CustomerId):
     ), 404
 
 if __name__ == '__main__':
-    app.run(port=5000, debug=True)
+    app.run(host='0.0.0.0',port = 5000, debug=True)
