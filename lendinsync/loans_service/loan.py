@@ -92,6 +92,7 @@ class Loan(db.Model):
                 "EndDate": self.EndDate,
                 "Status": self.Status
         }
+    
 
 # [GET] Fetch All borrowing loans
 @app.route("/loan/borrowing")
