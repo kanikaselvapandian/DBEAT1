@@ -14,6 +14,55 @@
   .btn-light {
     color: #3b1852; /* dark purple */
   }
+  .form-popup {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border: 3px solid #f1f1f1;
+  z-index: 9;
+  background-color: white;
+  padding: 10px;
+  border-radius: 5px;
+}
+
+.form-container {
+  max-width: 300px;
+  padding: 10px;
+  background-color: white;
+}
+
+.form-container input[type=text] {
+  width: 100%;
+  padding: 15px;
+  margin: 5px 0 22px 0;
+  border: none;
+  background: #f1f1f1;
+}
+
+.form-container button {
+  background-color: darkmagenta;
+  color: white;
+  padding: 16px 20px;
+  border: none;
+  cursor: pointer;
+  width: 100%;
+  margin-bottom:10px;
+  opacity: 0.8;
+}
+
+.form-container .cancel {
+  background-color: red;
+}
+#backdrop {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 8;
+}
 </style>
 </head>
 <body>
@@ -32,7 +81,23 @@
   </div>
   <div class="text-center mt-5 d-flex justify-content-between"> <!-- New div for the flex container -->
     <h2 class="display-4">My Friends</h2> <!-- The label -->
-    <button class="btn btn-dark">Add Friend</button> <!-- New button -->
+    <div id="backdrop" style="display: none;"></div>
+    <button class="btn btn-dark" onclick="openForm()">Add Friend</button>
+
+<div class="form-popup" id="myForm" style="display: none;">
+  <form action="/submit_friend" class="form-container">
+    <h1>Add Friend</h1>
+
+    <label for="name"><b>Name</b></label>
+    <input type="text" placeholder="Enter Name" name="name" required>
+
+    <label for="customer_id"><b>Customer ID</b></label>
+    <input type="text" placeholder="Enter Customer ID" name="customer_id" required>
+
+    <button type="submit" class="btn">Submit</button>
+    <button type="button" class="btn cancel" onclick="closeForm()">Close</button>
+  </form>
+</div>
   </div>
   <div class="row pt-5">
     <div class="col-md-6">
@@ -98,6 +163,17 @@ integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="ano
             })
             .catch(error => console.error(error));
     });
+    </script>
+   <script>
+    function openForm() {
+      document.getElementById("myForm").style.display = "block";
+      document.getElementById("backdrop").style.display = "block";
+    }
+    
+    function closeForm() {
+      document.getElementById("myForm").style.display = "none";
+      document.getElementById("backdrop").style.display = "none";
+    }
     </script>
     <script>
 document.addEventListener('DOMContentLoaded', () => {
