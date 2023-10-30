@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Service Portal</title>
+    <link rel="icon" type="image/x-icon" href="/static/favicon.ico?v=2.11.0">
+    <link href="https://bootswatch.com/4/pulse/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.9.0/css/bulma.min.css">
+    <style>
+        html,
+        body {
+            background-image: url('https://www.mrsmithworldphotography.com/photos/London-Skyscrapers-8.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            height: 100%;
+            width: 100%;
+        }
+
+        .login-form {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        .form-control:focus {
+            border-color: none;
+            box-shadow: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container-fluid">
+        <div class="row justify-content-center">
+            <div class="col-md-4 login-form">
+                <h4 class="text-center mb-4">OTP</h4>
+                <form>
+                    <div class="form-group">
+                      <label for="otp">OTP</label>
+                      <input type="number" class="form-control" id="otp" placeholder="Enter OTP" min="0" max="9999">
+                    </div>
+                    <button id="submit" class="btn btn-primary btn-block">Submit</button>
+                  </form>
+            </div>
+        </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"
+        integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const submitButton = document.getElementById('submit');
+
+            submitButton.addEventListener('click', (event) => {
+                event.preventDefault();
+                const username = localStorage.getItem('username');
+                console.log(username)
+                const pin = localStorage.getItem('pin');
+                const otp =  document.getElementById('otp').value.toString();
+                const url = `http://tbankonline.com/SMUtBank_API/Gateway?Header={"serviceName":"loginCustomer","userID":"${username}","PIN":"${pin}","OTP":"${otp}"}`;
+
+                fetch(url)
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log(data);
+                        const statusOfLogin = data.Content.ServiceResponse.ServiceRespHeader.ErrorDetails;
+                        if(statusOfLogin=="Success"){
+                            // window.location.href = '/dashboard';
+                            console.log('Success')
+                        }
+                        else{
+                            alert('Invalid OTP')
+                        }
+                        
+                    })
+                    .catch(error => console.error(error));
+            });
+        });
+    </script>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"
+        integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI"
+        crossorigin="anonymous"></script>
+</body>
+
+</html>
