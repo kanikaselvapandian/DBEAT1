@@ -157,9 +157,29 @@ const wallet = Vue.createApp({
           }
         }
     },
-    async createTransaction(WalletTransaction) {
+    async createTransaction(WalletTransaction, event) {
+      event.preventDefault();
         if (WalletTransaction){
-            const jsonData = JSON.stringify({
+            this.validation_errors = []
+            this.errorsFound = false;
+            if (this.wallet_amount > this.sourcewallet.Amount) {
+              this.validation_errors.push("Insufficient funds in source wallet");
+            }
+            if (this.wallet_amount <= 0 || this.wallet_amount == "") {
+              this.validation_errors.push("Amount must be greater than 0");
+            }
+            if (this.sourcewallet == null) {  
+              this.validation_errors.push("Please select a source wallet");
+            }
+            if (this.destinationwallet == null) {
+              this.validation_errors.push("Please select a destination wallet");
+            }
+            if (this.validation_errors.length > 0) {
+              this.errorsFound = true
+              return;
+            }
+            else {
+              const jsonData = JSON.stringify({
                 SourceWallet: this.sourcewallet.WID,
                 DestinationWallet: this.destinationwallet.WID,
                 CustomerId: this.customer_id,
@@ -168,6 +188,7 @@ const wallet = Vue.createApp({
                 TimeStamp: new Date(),
                 AmountTransferred: this.wallet_amount * this.exchange_rate
             });
+            };
         }
         else if (WalletTransaction == false && this.sourcewallet == deposit_account) {
             const jsonData = JSON.stringify({
@@ -232,16 +253,11 @@ const wallet = Vue.createApp({
             this.availableSourceWallets = this.customer_wallets;
         }
     },
-    submitForm() {
-      const amountInput = document.getElementById('amount');
-      console.log("made it here")
-      if (this.wallet_amount > this.deposit_account_balance) {
-          amountInput.classList.add('is-invalid');
-      } else {
-          // Proceed with submission or other actions
-          // ...
-      }
-    }
+    updateAmount(event) {
+      // Update the wallet_amount when the input changes
+      const value = parseFloat(event.target.value);
+      this.wallet_amount = isNaN(value) || value < 0 ? 0.1 : value;
+  },
   },
   created() {
     this.get_wallets();
