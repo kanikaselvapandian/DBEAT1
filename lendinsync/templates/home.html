@@ -55,22 +55,26 @@
             <div class="row">
                 <!-- Add the wallet cards -->
                 <div class="col-md-12">
-                    <div class="card-deck d-flex flex-nowrap overflow-auto">
+                    <div class="card-deck-scroll">
                         <div class="card" v-for="wallet in customer_wallets">
-                        <div class="card-body">
-                            <h5 class="card-title">{{wallet.CurrencyCode}}</h5>
-                            <p class="card-text">
-                            Amount: {{ wallet.Amount }} <br>
-                            </p>
-                        </div>
+                            <div class="card-body">
+                                <h5 class="card-title">{{wallet.CurrencyCode}}</h5>
+                                <p class="card-text">
+                                    Amount: {{ wallet.Amount }} <br>
+                                </p>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class = "my-3">
-                <a href="create_wallet.html"><button class="btn btn-secondary" type="button">Create New Wallet</button></a>
-                <a class="btn btn-secondary" data-bs-toggle="modal" href="#transactionModal" role="button">New Transaction</a>
-            </div>
+            <div class="row my-3">
+                <div class="col-6">
+                    <a class="btn btn-dark w-100 mb-3" data-bs-toggle="modal" href="#createWalletModal" role="button">New Wallet</a>
+                </div>
+                <div class="col-6">
+                    <a class="btn btn-dark w-100 mb-3" data-bs-toggle="modal" href="#transactionModal" role="button">New Transaction</a>
+                </div>
+            </div>            
             <br>
             <h2>My Transactions</h2>
             <hr>
@@ -138,17 +142,18 @@
                                 <input type="text" class="form-control" :value = customer_id disabled> 
                             </div>
                             <div class="form-group">
-                                <label for="currency">Source Wallet:</label>
-                                <select class="form-control" @change="checkWalletsSelection" v-model="sourcewallet">
-                                    <option v-for="wallet in customer_wallets" :value="wallet">
+                                <label for="wallet">Source Wallet:</label>
+                                <select class="form-control" @change="updateSourceAndCheck" v-model="sourcewallet">
+                                    <option v-for="wallet in availableSourceWallets" :value="wallet">
                                         {{wallet.WID}}. {{ wallet.CurrencyCode }} {{ wallet.Amount }}
                                     </option>
                                 </select>
                             </div>
+                        
                             <div class="form-group">
-                                <label for="currency">Destination Wallet:</label>
-                                <select class="form-control" @change="checkWalletsSelection" v-model="destinationwallet">
-                                    <option v-for="wallet in customer_wallets" :value="wallet">
+                                <label for="wallet">Destination Wallet:</label>
+                                <select class="form-control" @change="updateSourceAndCheck" v-model="destinationwallet">
+                                    <option v-for="wallet in availableDestinationWallets" :value="wallet">
                                         {{wallet.WID}}. {{ wallet.CurrencyCode }} {{ wallet.Amount }}
                                     </option>
                                 </select>
@@ -257,6 +262,52 @@
                 </div>
                 </div>
             </div>
+            </div>
+            <div class="modal fade" id="createWalletModal" aria-hidden="true" aria-labelledby="createWalletModalLabel" tabindex="-1" data-bs-backdrop="true">
+                <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h1 class="modal-title fs-5" id="createWalletModalLabel">Create Wallet</h1>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body d-flex flex-column align-items-center">
+                        <form>
+                            <div class="form-group">
+                                <label for="customerid">Customer ID:</label>
+                                <input type="text" class="form-control" :value = customer_id disabled> 
+                            </div>
+                            <div class="form-group">
+                                <label for="currency">Currency:</label>
+                                <select v-model="selectedCurrency" class = "form-control" @change="getExchangeRate(selectedCurrency)">
+                                    <option v-for="currency in currency_info" :value="currency.CurrencyCode">
+                                      {{currency.CountryName}} ({{ currency.CurrencyCode }})
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="form-group"> 
+                                <label for="amount" class="form-label">Amount:</label>
+                                <input type="number" class="form-control" id="amount" v-model="wallet_amount" step="0.1">
+                            </div>
+                            <div class="form-group">
+                                <label for="exchange_rate">Exchange Rate:</label>
+                                <input type="text" class="form-control" :value = exchange_rate disabled>
+                            </div>
+                            <button class="btn btn-secondary btn-block" @click="createWallet($event)">Submit</button>
+                        </form>
+                        <div v-if = "errorsFound">
+                            <hr>
+                            <div class="alert alert-danger" role="alert">
+                                <ul>
+                                    <li v-for="error in validation_errors">{{ error }}</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>                    
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                  </div>
+                </div>
             </div>
         </div>
         <!-- jQuery -->

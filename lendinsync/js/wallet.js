@@ -4,6 +4,7 @@ const get_transactions_by_customerid = "http://127.0.0.1:8000/transaction/" + cu
 const create_wallet = "http://127.0.0.1:7000/wallet";
 const create_transaction = "http://127.0.0.1:6100/transfer"
 const deposit_account = "0000010505"
+const deposit_account_balance = "40000"
 
 const wallet = Vue.createApp({
   data() {
@@ -22,6 +23,11 @@ const wallet = Vue.createApp({
       exchange_rate: 0,
       sourcewallet: null,
       destinationwallet: null,
+      availableDestinationWallets: [],
+      availableSourceWallets: [],
+      deposit_account_balance: deposit_account_balance,
+      validation_errors: [],
+      errorsFound: false,
     };
   },
   methods: {
@@ -35,6 +41,8 @@ const wallet = Vue.createApp({
         } else {
           this.customer_wallets = data.data.wallet; 
           this.wallets_received = true;
+          this.availableSourceWallets = this.customer_wallets;
+          this.availableDestinationWallets = this.customer_wallets;
           this.checkDataReceived();
         }
       } catch (error) {
@@ -72,6 +80,10 @@ const wallet = Vue.createApp({
         const data = await response.json();
         this.exchange_rate = data.Content.ServiceResponse["FX_SpotRate_Read-Response"]["Rate"];
     },
+    updateSourceAndCheck() {
+      this.updateSourceWallets();
+      this.checkWalletsSelection();
+    },
     checkWalletsSelection() {
         console.log("checking")
         if (this.sourcewallet && this.destinationwallet) {
@@ -94,38 +106,55 @@ const wallet = Vue.createApp({
     },    
     async createWallet(event) {
         event.preventDefault();
-        const jsonData = JSON.stringify({
-            CustomerId: this.customer_id,
-            CurrencyCode: this.selectedCurrency,
-            Amount: this.wallet_amount * this.exchange_rate
-        });
-    
-        const url = create_wallet;
-        const postMethod = {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: jsonData
-        };
-    
-        try {
-            const response = await fetch(url, postMethod);
-            const data = await response.json();
-    
-            switch (data.code) {
-                case 201:
-                    // Handle success case
-                    break;
-                case 500:
-                    this.message = data.message;
-                    break;
-                default:
-                    throw `${data.code}: ${data.message}`;
-            }
-        } catch (error) {
-            console.error('Error:', error);
-            // Handle other errors or display a general error message
+        this.validation_errors = []
+        if (this.wallet_amount > this.deposit_account_balance) {
+            this.validation_errors.push("Insufficient funds in deposit account");
+        }
+        if (this.wallet_amount <= 0) {
+            this.validation_errors.push("Amount must be greater than 0");
+        }
+        if (this.selectedCurrency == "") {
+            this.validation_errors.push("Please select a currency");
+        }
+        if (this.validation_errors.length > 0) {
+            this.errorsFound = true
+            return;
+        }
+        else {
+            this.validation_errors = [];
+            this.errorsFound = false;
+            const jsonData = JSON.stringify({
+              CustomerId: this.customer_id,
+              CurrencyCode: this.selectedCurrency,
+              Amount: this.wallet_amount * this.exchange_rate
+          });
+      
+          const url = create_wallet;
+          const postMethod = {
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/json'
+              },
+              body: jsonData
+          };
+      
+          try {
+              const response = await fetch(url, postMethod);
+              const data = await response.json();
+      
+              switch (data.code) {
+                  case 201:
+                      // Handle success case
+                      break;
+                  case 500:
+                      this.message = data.message;
+                      break;
+                  default:
+                      throw `${data.code}: ${data.message}`;
+              }
+          } catch (error) {
+              console.error('Error');
+          }
         }
     },
     async createTransaction(WalletTransaction) {
@@ -188,12 +217,36 @@ const wallet = Vue.createApp({
         } catch (error) {
             console.error('Error:', error);
             // Handle other errors or display a general error message
-    }}
-  } ,
+    }},
+    updateDestinationWallets() {
+      if (this.sourcewallet) {
+          this.availableDestinationWallets = this.customer_wallets.filter(wallet => wallet.WID !== this.sourcewallet.WID);
+      } else {
+          this.availableDestinationWallets = this.customer_wallets;
+      }
+    },
+    updateSourceWallets() {
+        if (this.destinationwallet) {
+            this.availableSourceWallets = this.customer_wallets.filter(wallet => wallet.WID !== this.destinationwallet.WID);
+        } else {
+            this.availableSourceWallets = this.customer_wallets;
+        }
+    },
+    submitForm() {
+      const amountInput = document.getElementById('amount');
+      console.log("made it here")
+      if (this.wallet_amount > this.deposit_account_balance) {
+          amountInput.classList.add('is-invalid');
+      } else {
+          // Proceed with submission or other actions
+          // ...
+      }
+    }
+  },
   created() {
     this.get_wallets();
     this.get_transactions();
-    this.getCurrencyCodes()
+    this.getCurrencyCodes();
   },
 });
 
