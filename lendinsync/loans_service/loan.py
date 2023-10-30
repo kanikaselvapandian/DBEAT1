@@ -1,13 +1,38 @@
-from flask import Flask, request, jsonify,render_template
+import os
+from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
+import logging
+from sys import platform
+from datetime import datetime
+import json
 from os import environ
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://root@localhost:3306/loan'
+# Code assumes Mac or Windows default settings if 'dbURL' does not exist. URI format: dialect+driver://username:password@host:port/database
+try:
+    app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('dbURL')
+    if app.config['SQLALCHEMY_DATABASE_URI'] == None:
+        if platform == "darwin":
+            app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://root:root@localhost:3306/lis_loan'
+        else:
+            app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://root@localhost:3306/lis_loan'
+
+except KeyError:
+	if platform == "darwin":
+		app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://root:root@localhost:3306/lis_loan'
+	else:
+		app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://root@localhost:3306/lis_loan'
+
+# Disable modification tracking if unnecessary as it requires extra memory
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {'pool_recycle': 299}
+
+app.logger.setLevel(logging.DEBUG)
 
 db = SQLAlchemy(app)
+
+CORS(app)
 
 #create loan database
 class Loan(db.Model):
@@ -201,4 +226,4 @@ def get_all_lending_loans_by_customer_id(CustomerId):
     ), 404
 
 if __name__ == '__main__':
-    app.run(port=5000, debug=True)
+    app.run(port=5001, debug=True)
