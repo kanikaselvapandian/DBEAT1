@@ -147,3 +147,28 @@ VALUES
 ('20', 'H123123', NULL, NULL, '5000', '12', 'AUD', '600', '20', NULL, '600', '365', '2023-10-12 10:39:37', '2024-10-11 10:39:37', 'Lending');
 COMMIT;
 -- --------------------------------------------------------
+-- Friends
+-- Create database
+CREATE DATABASE IF NOT EXISTS `lis_friends`
+DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
+
+USE `lis_friends`;
+
+-- Table structure for table `wallet`
+DROP TABLE IF EXISTS `Friends`;
+CREATE TABLE IF NOT EXISTS `Friends` 
+(
+    `FId` INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    `friendId` VARCHAR(512),
+    `friendeeId` VARCHAR(512)
+) ENGINE = InnoDB DEFAULT CHARSET=utf8;
+
+-- Insert values for Wallet table
+INSERT INTO `Friends` (FID, friendId, friendeeId) VALUES
+('1', 'H123123', 'S9934651E'),
+('2', 'H123123', 'A123456'),
+('3', 'A123456', 'H123123'),
+('4', 'S9934651E', 'A123456');
+
+COMMIT;
+

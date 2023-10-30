@@ -60,6 +60,15 @@
 
             submitButton.addEventListener('click', (event) => {
                 event.preventDefault();
+                const value = localStorage.getItem('key');
+                    if (value !== null) {
+                    // The value exists in localStorage
+                    alert('hi')
+                    console.log(value)
+
+                    } else {
+                    console.log('value does not exist in localStorage') 
+                    }
                 const username = localStorage.getItem('username');
                 console.log(username)
                 const pin = localStorage.getItem('pin');
@@ -72,7 +81,11 @@
                         console.log(data);
                         const statusOfLogin = data.Content.ServiceResponse.ServiceRespHeader.ErrorDetails;
                         if(statusOfLogin=="Success"){
-                            // window.location.href = '/dashboard';
+                            localStorage.setItem('username', username);
+                            localStorage.setItem('pin', pin);
+                            localStorage.getItem('otp',otp);
+                            // window.location.href = 'http://localhost:5000/DBEAT1/lendinsync/templates/home.html';
+                            window.location.href = '/profile';
                             console.log('Success')
                         }
                         else{

@@ -30,22 +30,25 @@
         <nav class="navbar navbar-expand-lg navbar-dark">
             <a class="navbar-brand" href="#">LendInSync</a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
+              <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav">
-                    <li class="nav-item active">
-                        <a class="nav-link" href="home.html">Wallet</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="loan.html">Loans</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="profile.html">Profile</a>
-                    </li>
-                </ul>
+              <ul class="navbar-nav mr-auto">
+                <li class="nav-item active">
+                  <a class="nav-link" href="home.html">Wallet</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="loan.html">Loans</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="profile.html">Profile</a>
+                </li>
+              </ul>
+              <span class="navbar-text" style="color: #fff;">
+                Welcome, Hui Min
+              </span>
             </div>
-        </nav>
+          </nav>
         <br>
         <div id = "wallet" class = "container">
             <div class="row">
@@ -310,6 +313,28 @@
                 </div>
             </div>
         </div>
+
+        <script>    
+                    const username = localStorage.getItem('username');
+                    console.log(username)
+                    const pin = localStorage.getItem('pin');
+                    console.log(pin)
+                    const otp =   localStorage.getItem('otp');
+                    console.log(otp)
+  // 
+                    const url = `http://tbankonline.com/SMUtBank_API/Gateway?Header={"serviceName":"getCustomerDetails","userID":"${username}","PIN":"${pin}","OTP":"${otp}"}`;
+    
+                    fetch(url)
+                        .then(response => response.json())
+                        .then(data => {
+                            console.log(data);
+                            
+                            
+                        })
+                        .catch(error => console.error(error));
+               
+        
+        </script>
         <!-- jQuery -->
         <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
         <!-- Bootstrap Javascript -->

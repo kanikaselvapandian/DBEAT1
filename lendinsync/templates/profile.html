@@ -1,0 +1,177 @@
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+<style>
+  body {
+    background-color: #fff; /* white background */
+  }
+  .card {
+    background-color: #3b1852; /* a dark shade of purple */
+    color: #fff; /* white text */
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19); /* 3D effect */
+  }
+  h2 {
+    font-family: "Arial", sans-serif; font-size: small;
+  }
+  .btn-light {
+    color: #3b1852; /* dark purple */
+  }
+</style>
+</head>
+<body>
+<div class="container py-5">
+  <div class="card">
+    <div class="card-body">
+      <h1 id='ownName' class="card-title">John Doe</h1>
+      <h6 id='ownCustomerID' class="card-subtitle mb-2 text">john.doe@example.com</h6>
+      <h6 id='ownNationality' class="card-subtitle mb-2 text">john.doe@example.com</h6>
+      <h6 id='ownGender' class="card-subtitle mb-2 text">john.doe@example.com</h6>
+      <h6 id='ownBirthday' class="card-subtitle mb-2 text">john.doe@example.com</h6>
+      <h6 id='ownOccupation' class="card-subtitle mb-2 text">john.doe@example.com</h6>
+      <h6 id='ownEmail' class="card-subtitle mb-2 text">john.doe@example.com</h6>
+      <p id='ownPhoneNo' class="card-text">Phone: 555-555-5555</p>
+    </div>
+  </div>
+  <div class="text-center mt-5 d-flex justify-content-between"> <!-- New div for the flex container -->
+    <h2 class="display-4">My Friends</h2> <!-- The label -->
+    <button class="btn btn-dark">Add Friend</button> <!-- New button -->
+  </div>
+  <div class="row pt-5">
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-body">
+          <h1 class="card-title">John Doe</h1>
+          <h4 class="card-title">CustomerID: H123123</h4>
+          <div class="text-right"> <!-- New div for alignment -->
+          <button class="btn btn-light">Transfer</button> <!-- New button -->
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-body">
+            <h1 class="card-title">John Doe</h1>
+          <h4 class="card-title">CustomerID: H123123</h4>
+          <div class="text-right"> <!-- New div for alignment -->
+            <button class="btn btn-light">Transfer</button> <!-- New button -->
+            </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"
+integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const url = `http://tbankonline.com/SMUtBank_API/Gateway?Header={"serviceName":"getCustomerDetails","userID":"H123123","PIN":"123123","OTP":"999999"}`;
+    
+        fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+
+            // Select the HTML elements
+            const nameElement = document.querySelector('#ownName');
+            const customerIDElement = document.querySelector('#ownCustomerID');
+            const nationalityElement = document.querySelector('#ownNationality');
+            const genderElement = document.querySelector('#ownGender');
+            const birthdayElement = document.querySelector('#ownBirthday');
+            const occupationElement = document.querySelector('#ownOccupation');
+            const emailElement = document.querySelector('#ownEmail');
+            const phoneElement = document.querySelector('#ownPhoneNo');
+            // const interestsElement = document.querySelectorAll('.card-text')[2];
+            const username = localStorage.getItem('username');
+            // Update the content of the HTML elements
+            nameElement.textContent = data.Content.ServiceResponse.CDMCustomer.givenName + ' ' + data.Content.ServiceResponse.CDMCustomer.familyName;
+            customerIDElement.textContent = 'Customer ID: ' + username
+            nationalityElement.textContent = 'Nationality: ' + data.Content.ServiceResponse.CDMCustomer.profile.nationality
+            genderElement.textContent = 'Gender: ' + data.Content.ServiceResponse.CDMCustomer.profile.gender
+            birthdayElement.textContent = 'Birthday: ' + data.Content.ServiceResponse.CDMCustomer.dateOfBirth
+            occupationElement.textContent = 'Occupation: ' + data.Content.ServiceResponse.CDMCustomer.profile.occupation
+            emailElement.textContent = 'Email: ' + data.Content.ServiceResponse.CDMCustomer.profile.email;
+            phoneElement.textContent = 'Mobile Number: ' + data.Content.ServiceResponse.CDMCustomer.cellphone.phoneNumber;
+            // emailElement.textContent = email;
+            // phoneElement.textContent = `Phone: ${phone}`;
+            // addressElement.textContent = `Address: ${address}`;
+            // interestsElement.textContent = `Interests: ${interests}`;
+    
+            })
+            .catch(error => console.error(error));
+    });
+    </script>
+    <script>
+document.addEventListener('DOMContentLoaded', () => {
+
+            // server.js
+const express = require('express');
+const mysql = require('mysql');
+const app = express();
+
+// Create connection
+const db = mysql.createConnection({
+    host: 'localhost',
+    user: 'root',
+    password: 'root',
+    database: 'lis'
+});
+
+// Connect
+db.connect((err) => {
+    if(err) {
+        throw err;
+    }
+    console.log('MySQL Connected...');
+});
+
+// Get all data
+app.get('/api/data', (req, res) => {
+    let sql = 'SELECT * FROM your_table';
+    db.query(sql, (err, results) => {
+        if(err) throw err;
+        res.send(results);
+    });
+});
+
+app.listen('3000', () => {
+    console.log('Server started on port 3000');
+});
+
+    const url = `http://tbankonline.com/SMUtBank_API/Gateway?Header={"serviceName":"getCustomerDetails","userID":"H123123","PIN":"123123","OTP":"999999"}`;
+
+    fetch(url)
+        .then(response => response.json())
+        .then(data => {
+            console.log(data);
+
+            // Select the HTML elements
+            const nameElement = document.querySelector('#ownName');
+            const customerIDElement = document.querySelector('#ownCustomerID');
+            const nationalityElement = document.querySelector('#ownNationality');
+            const genderElement = document.querySelector('#ownGender');
+            const birthdayElement = document.querySelector('#ownBirthday');
+            const occupationElement = document.querySelector('#ownOccupation');
+            const emailElement = document.querySelector('#ownEmail');
+            const phoneElement = document.querySelector('#ownPhoneNo');
+            const username = localStorage.getItem('username');
+
+            // Update the content of the HTML elements
+            nameElement.textContent = data.Content.ServiceResponse.CDMCustomer.givenName + ' ' + data.Content.ServiceResponse.CDMCustomer.familyName;
+            customerIDElement.textContent = 'Customer ID: ' + username
+            nationalityElement.textContent = 'Nationality: ' + data.Content.ServiceResponse.CDMCustomer.profile.nationality
+            genderElement.textContent = 'Gender: ' + data.Content.ServiceResponse.CDMCustomer.profile.gender
+            birthdayElement.textContent = 'Birthday: ' + data.Content.ServiceResponse.CDMCustomer.dateOfBirth
+            occupationElement.textContent = 'Occupation: ' + data.Content.ServiceResponse.CDMCustomer.profile.occupation
+            emailElement.textContent = 'Email: ' + data.Content.ServiceResponse.CDMCustomer.profile.email;
+            phoneElement.textContent = 'Mobile Number: ' + data.Content.ServiceResponse.CDMCustomer.cellphone.phoneNumber;
+        })
+        .catch(error => console.error(error));
+});
+</script>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"
+integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI"
+crossorigin="anonymous"></script>
+</body>
+</html>
