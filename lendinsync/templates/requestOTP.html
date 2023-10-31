@@ -81,6 +81,7 @@
                         console.log(data);
                         const statusOfLogin = data.Content.ServiceResponse.ServiceRespHeader.ErrorDetails;
                         if(statusOfLogin=="Success"){
+
                             localStorage.setItem('username', username);
                             localStorage.setItem('pin', pin);
                             localStorage.getItem('otp',otp);

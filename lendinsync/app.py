@@ -17,13 +17,15 @@ def requestOTP():
     except Exception as e:
         return jsonify({'error': str(e)})
     
+
 @app.route("/profile")
 def profile():
     try:
          return render_template("profile.html")# your code here
     except Exception as e:
         return jsonify({'error': str(e)})
-    
+
+      
 # @app.route("/home")
 # def homePage():
 #     try:
