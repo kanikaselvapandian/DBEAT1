@@ -148,6 +148,7 @@ def create_borrowing_loan(CustomerId):
     currency_code = data.get('CurrencyCode')
     loan_term = data.get('LoanTerm')
     service_fee = data.get('ServiceFee')
+    status_level = data.get('StatusLevel')
 
     # Create a new Loan object
     loan = Loan(
@@ -200,7 +201,7 @@ def create_lending_loan(CustomerId):
     service_fee = data.get('ServiceFee')
     total_interest_amount = data.get('TotalInterestAmount')
     revenue = data.get('Revenue')
-    status_level = "Lending"
+    status_level = data.get('StatusLevel')
 
     # Create a new Loan object
     loan = Loan(

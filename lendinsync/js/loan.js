@@ -116,12 +116,7 @@ const loan = Vue.createApp({
                     LoanAmount: this.loan_amount,
                     CollateralAmount: this.collateral_amount,
                     LoanTerm: this.loan_term,
-                    TotalInterestAmount: this.total_interest_amount,
-                    InterestRate: this.interest_rate,
                     ServiceFee: this.service_fee,
-                    RepaymentAmount: this.repayment_amount,
-                    StartDate: new Date(),
-                    EndDate: "Waiting for lender",
                     StatusLevel: "Borrowing"
                 });
 
@@ -177,11 +172,13 @@ const loan = Vue.createApp({
                 this.errorsFound = false;
                 const jsonData = JSON.stringify({
                     CustomerId: this.customer_id,
+                    InvestmentAmount: this.investment_amount,
+                    InterestRate: this.interest_rate,
+                    LoanTerm: this.loan_term,
+                    CurrencyCode: this.selectedCurrency,
                     TotalInterestAmount: this.total_interest_amount,
                     ServiceFee: this.service_fee,
                     Revenue: this.revenue,
-                    StartDate: new Date(),
-                    EndDate: "Waiting for borrower",
                     StatusLevel: "Lending"
                 });
 
