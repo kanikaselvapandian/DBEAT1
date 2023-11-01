@@ -7,6 +7,7 @@ from sys import platform
 from datetime import datetime
 import json
 from os import environ
+from decimal import Decimal
 
 app = Flask(__name__)
 # Code assumes Mac or Windows default settings if 'dbURL' does not exist. URI format: dialect+driver://username:password@host:port/database
@@ -138,7 +139,11 @@ def update_wallet_amount(WID):
 
     if wallet:
         data = request.get_json()
-        new_amount = data.get('Amount')
+        amount_from_request = Decimal(data.get('Amount'))
+        if(data.get('Type') == "Deposit"):
+            new_amount = wallet.Amount + amount_from_request
+        else:
+            new_amount = wallet.Amount - amount_from_request
 
         # Update the Amount in the wallet
         wallet.Amount = new_amount
