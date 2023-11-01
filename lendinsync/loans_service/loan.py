@@ -45,15 +45,15 @@ class Loan(db.Model):
     CollateralAmount = db.Column(db.String(10), nullable=True)
     LoanAmount = db.Column(db.String(10), nullable=True)
     InvestmentAmount = db.Column(db.String(10), nullable=True)
-    InterestRate = db.Column(db.String(128), nullable=False)
+    InterestRate = db.Column(db.String(128), nullable=True)
     CurrencyCode = db.Column(db.String(128), nullable=False)
-    TotalInterestAmount = db.Column(db.String(10), nullable=False)
+    TotalInterestAmount = db.Column(db.String(10), nullable=True)
     ServiceFee = db.Column(db.String(10), nullable=False)
     RepaymentAmount = db.Column(db.String(10), nullable=True)
     Revenue = db.Column(db.String(10), nullable=True)
     LoanTerm = db.Column(db.String(128), nullable=False)
-    StartDate = db.Column(db.String(128), nullable=False)
-    EndDate = db.Column(db.String(128), nullable=False)
+    StartDate = db.Column(db.String(128), nullable=True)
+    EndDate = db.Column(db.String(128), nullable=True)
     StatusLevel = db.Column(db.String(128), nullable=False)
 
     # Initialize loan variables
@@ -140,7 +140,32 @@ def get_all_lending_loans():
 @app.route("/loan/borrowing/<string:CustomerId>", methods=['POST'])
 def create_borrowing_loan(CustomerId):
     data = request.get_json()
-    loan = Loan(CustomerId, **data)
+    
+    # Extract the values from the JSON
+    customer_id = data.get('CustomerId')
+    collateral_amount = data.get('CollateralAmount')
+    loan_amount = data.get('LoanAmount')
+    currency_code = data.get('CurrencyCode')
+    loan_term = data.get('LoanTerm')
+    service_fee = data.get('ServiceFee')
+
+    # Create a new Loan object
+    loan = Loan(
+        CustomerId=CustomerId,
+        CollateralAmount=collateral_amount,
+        LoanAmount=loan_amount,
+        InvestmentAmount=None,
+        InterestRate=None,
+        CurrencyCode=currency_code,
+        TotalInterestAmount=None,
+        ServiceFee=service_fee,
+        RepaymentAmount=None,
+        Revenue=None,
+        LoanTerm=loan_term,
+        StartDate=None,
+        EndDate=None,
+        StatusLevel="Borrowing"
+    )
 
     try:
         db.session.add(loan)
@@ -156,7 +181,8 @@ def create_borrowing_loan(CustomerId):
     return jsonify(
         {
             "code": 201,
-            "data": loan.json()
+            "data": loan.json(),  # Add a comma here
+            "message": "Borrowing loan created successfully."
         }
     ), 201
 
@@ -164,7 +190,35 @@ def create_borrowing_loan(CustomerId):
 @app.route("/loan/lending/<string:CustomerId>", methods=['POST'])
 def create_lending_loan(CustomerId):
     data = request.get_json()
-    loan = Loan(CustomerId, **data)
+    
+    # Extract the values from the JSON
+    customer_id = data.get('CustomerId')
+    investment_amount = data.get('InvestmentAmount')
+    interest_rate = data.get('InterestRate')
+    currency_code = data.get('CurrencyCode')
+    loan_term = data.get('LoanTerm')
+    service_fee = data.get('ServiceFee')
+    total_interest_amount = data.get('TotalInterestAmount')
+    revenue = data.get('Revenue')
+    status_level = "Lending"
+
+    # Create a new Loan object
+    loan = Loan(
+        CustomerId=CustomerId,
+        CollateralAmount=None,
+        LoanAmount=None,
+        InvestmentAmount=investment_amount,
+        InterestRate=interest_rate,
+        CurrencyCode=currency_code,
+        TotalInterestAmount=total_interest_amount,
+        ServiceFee=service_fee,
+        RepaymentAmount=None,
+        Revenue=revenue,
+        LoanTerm=loan_term,
+        StartDate=None,
+        EndDate=None,
+        StatusLevel=status_level
+    )
 
     try:
         db.session.add(loan)
@@ -180,9 +234,11 @@ def create_lending_loan(CustomerId):
     return jsonify(
         {
             "code": 201,
-            "data": loan.json()
+            "data": loan.json(),
+            "message": "Lending loan created successfully."
         }
     ), 201
+
 
 # [GET] Fetch All borrowing loans based on CustomerId
 @app.route("/loan/borrowing/<string:CustomerId>")
