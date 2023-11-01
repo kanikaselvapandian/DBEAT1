@@ -154,8 +154,7 @@
                         <div class="form-group">
                             <label for="wallet">Source Wallet:</label>
                             <select class="form-control" @change="updateSourceAndCheck" v-model="sourcewallet">
-                                <option v-for="wallet in availableSourceWallets" :value="wallet">
-                                    <vtext :text="wallet.WID + '. ' + wallet.CurrencyCode + ' ' + wallet.Amount"></vtext>
+                                <option v-for="wallet in availableSourceWallets" :value="wallet" v-text ="wallet.WID + '. ' + wallet.CurrencyCode + ' ' + wallet.Amount">
                                 </option>
                             </select>                            
                         </div>
@@ -163,8 +162,7 @@
                         <div class="form-group">
                             <label for="wallet">Destination Wallet:</label>
                             <select class="form-control" @change="updateSourceAndCheck" v-model="destinationwallet">
-                                <option v-for="wallet in availableDestinationWallets" :value="wallet">
-                                    <vtext :text="wallet.WID + '. ' + wallet.CurrencyCode + ' ' + wallet.Amount"></vtext>
+                                <option v-for="wallet in availableDestinationWallets" :value="wallet" v-text ="wallet.WID + '. ' + wallet.CurrencyCode + ' ' + wallet.Amount">
                                 </option>
                             </select>
                         </div>
@@ -214,8 +212,7 @@
                             <div class="form-group">
                                 <label for="currency">Source Wallet:</label>
                                 <select class="form-control" v-model="sourcewallet" @change = "getExchangeRate(sourcewallet.CurrencyCode)">
-                                    <option v-for="wallet in customer_wallets" :value="wallet">
-                                        <vtext :text="wallet.WID + '. ' + wallet.CurrencyCode + ' ' + wallet.Amount"></vtext>
+                                    <option v-for="wallet in customer_wallets" :value="wallet" v-text ="wallet.WID + '. ' + wallet.CurrencyCode + ' ' + wallet.Amount">
                                     </option>
                                 </select>
                             </div>
@@ -257,8 +254,7 @@
                             <div class="form-group">
                                 <label for="currency">Destination Wallet:</label>
                                 <select class="form-control" v-model="destinationwallet" @change = "getExchangeRate(destinationwallet.CurrencyCode)">
-                                    <option v-for="wallet in customer_wallets" :value="wallet">
-                                        <vtext :text="wallet.WID + '. ' + wallet.CurrencyCode + ' ' + wallet.Amount"></vtext>
+                                    <option v-for="wallet in customer_wallets" :value="wallet" v-text ="wallet.WID + '. ' + wallet.CurrencyCode + ' ' + wallet.Amount">
                                     </option>
                                 </select>
                             </div>
@@ -297,8 +293,7 @@
                         <div class="form-group">
                             <label for="currency">Currency:</label>
                             <select v-model="selectedCurrency" class = "form-control" @change="getExchangeRate(selectedCurrency)">
-                                <option v-for="currency in currency_info" :value="currency.CurrencyCode">
-                                    <vtext :text="currency.CountryName + '. ' + currency.CurrencyCode"></vtext>
+                                <option v-for="currency in currency_info" :value="currency.CurrencyCode" v-text ="currency.CountryName + ' (' + currency.CurrencyCode + ')'">
                                 </option>
                             </select>
                         </div>
@@ -327,6 +322,30 @@
               </div>
             </div>
         </div>
+        <div class="modal fade" id="successModal" aria-hidden="true" aria-labelledby="successModalLabel" tabindex="-1" data-bs-backdrop="true">
+            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h1 class="modal-title fs-5" id="successModalLabel">Success!</h1>
+                </div>
+                <div class="modal-body d-flex flex-column align-items-center">
+                    <h5>Successfully Created Wallet!</h5>
+                </div>                    
+              </div>
+            </div>
+        </div>
+        <div class="modal fade" id="unsuccessfulModal" aria-hidden="true" aria-labelledby="unsuccessfulModalLabel" tabindex="-1" data-bs-backdrop="true">
+            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h1 class="modal-title fs-5" id="unsuccessfulModalLabel">Not Successful</h1>
+                </div>
+                <div class="modal-body d-flex flex-column align-items-center">
+                    <h5>Unfortunately, we are unable to create your wallet now, please try again later</h5>
+                </div>                    
+              </div>
+            </div>
+        </div>
     </div>
     <script>
         const customer_id = "A123456";
@@ -336,7 +355,6 @@
         const create_transaction = "http://127.0.0.1:6100/transfer"
         const deposit_account = "0000010505"
         const deposit_account_balance = "40000"
-
 
         const wallet = Vue.createApp({
         data() {
@@ -478,9 +496,26 @@
                     switch (data.code) {
                         case 201:
                             // Handle success case
+                            console.log("Successfully created wallet");
+                            // Close the createWalletModal
+                            $('#createWalletModal').modal('hide');
+                            // Show success modal
+                            $('#successModal').modal('show');
+                            // Reload page after a delay (you can change the delay as needed)
+                            setTimeout(() => {
+                                window.location.reload();
+                            }, 1000); // Example: Reload after 1 second (1000 milliseconds)
                             break;
                         case 500:
                             this.message = data.message;
+                            // Close the createWalletModal
+                            $('#createWalletModal').modal('hide');
+                            // Show unsuccessful modal
+                            $('#unsuccessfulModal').modal('show');
+                            // Reload page after a delay (you can change the delay as needed)
+                            setTimeout(() => {
+                                window.location.reload();
+                            }, 1000); // Example: Reload after 1 seconds (1000 milliseconds)
                             break;
                         default:
                             throw `${data.code}: ${data.message}`;
