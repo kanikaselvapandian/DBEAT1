@@ -673,7 +673,7 @@
                 }
                 }
             },
-            createTransaction(WalletTransaction, PeerTransaction, event) {
+            async createTransaction(WalletTransaction, PeerTransaction, event) {
                 event.preventDefault();
                 this.validation_errors = []
                 this.errorsFound = false;
@@ -701,6 +701,7 @@
                 else if (WalletTransaction == false && this.sourcewallet == null && PeerTransaction == false) {
                     console.log("hereeeeee")
                     if (parseFloat(this.wallet_amount) > parseFloat(this.deposit_account_balance)) {
+                        console.log(parseFloat(this.wallet_amount) - parseFloat(this.deposit_account_balance))
                         this.validation_errors.push("Insufficient funds in deposit account");
                     }
                     if (this.wallet_amount <= 0 || this.wallet_amount == "") {
@@ -714,7 +715,34 @@
                     return;
                     }
                     else {
-                        this.withdrawWalletTransaction()
+                        // Perform wallet transaction
+                            try {
+                                const response = await this.withdrawWalletAndCallAPI();
+                                // Check response and handle success/failure
+                                if (response.walletTransaction.code === 201 && response.apiResponse === 'invocation successful') {
+                                    // Both transactions succeeded
+                                    // Close the createWalletModal
+                                    $('#walletTransaction').modal('hide');
+                                    // Show success modal
+                                    $('#successModalTransaction').modal('show');
+                                    // Reload page after a delay (you can change the delay as needed)
+                                    // setTimeout(() => {
+                                    //     window.location.reload();
+                                    // }, 1000); // Example: Reload after 1 second (1000 milliseconds)
+                                } else {
+                                    // Close the createWalletModal
+                                    $('#walletTransaction').modal('hide');
+                                    // Show unsuccessful modal
+                                    $('#unsuccessfulModalTransaction').modal('show');
+                                    // Reload page after a delay (you can change the delay as needed)
+                                    // setTimeout(() => {
+                                    //     window.location.reload();
+                                    // }, 2000); // Example: Reload after 1 seconds (1000 milliseconds)
+                                }
+                            } catch (error) {
+                                console.error('Error:', error);
+                                // Handle error
+                            }
                     }
                 }
                 else if (PeerTransaction == true){
@@ -757,8 +785,34 @@
                         return;
                     }
                     else {
-                    console.log("here")
-                    this.depositWalletTransaction()
+                    // Perform wallet transaction
+                        try {
+                                const response = await this.depositWalletAndCallAPI();
+                                // Check response and handle success/failure
+                                if (response.walletTransaction.code === 201 && response.apiResponse === 'invocation successful') {
+                                    // Both transactions succeeded
+                                    // Close the createWalletModal
+                                    $('#walletTransaction').modal('hide');
+                                    // Show success modal
+                                    $('#successModalTransaction').modal('show');
+                                    // Reload page after a delay (you can change the delay as needed)
+                                    // setTimeout(() => {
+                                    //     window.location.reload();
+                                    // }, 1000); // Example: Reload after 1 second (1000 milliseconds)
+                                } else {
+                                    // Close the createWalletModal
+                                    $('#walletTransaction').modal('hide');
+                                    // Show unsuccessful modal
+                                    $('#unsuccessfulModalTransaction').modal('show');
+                                    // Reload page after a delay (you can change the delay as needed)
+                                    // setTimeout(() => {
+                                    //     window.location.reload();
+                                    // }, 2000); // Example: Reload after 1 seconds (1000 milliseconds)
+                                }
+                                } catch (error) {
+                                    console.error('Error:', error);
+                                    // Handle error
+                            }
                     }
                 }
             },
@@ -847,32 +901,7 @@
                     const response = await fetch(url, postMethod);
                     const data = await response.json();
                     console.log(data)
-                    switch (data.code) {
-                        case 201:
-                            // Handle success case
-                            // Close the createWalletModal
-                            // $('#walletTransaction').modal('hide');
-                            // Show success modal
-                            $('#successModalTransaction').modal('show');
-                            // Reload page after a delay (you can change the delay as needed)
-                            // setTimeout(() => {
-                            //     window.location.reload();
-                            // }, 1000); // Example: Reload after 1 second (1000 milliseconds)
-                            break;
-                        case 500:
-                            this.message = data.message;
-                            // Close the createWalletModal
-                            // $('#walletTransaction').modal('hide');
-                            // Show unsuccessful modal
-                            $('#unsuccessfulModalTransaction').modal('show');
-                            // Reload page after a delay (you can change the delay as needed)
-                            // setTimeout(() => {
-                            //     window.location.reload();
-                            // }, 2000); // Example: Reload after 1 seconds (1000 milliseconds)
-                            break;
-                        default:
-                            throw `${data.code}: ${data.message}`;
-                    }
+                    return data
                 } 
                 catch (error) {
                     console.error('Error:', error);
@@ -880,7 +909,7 @@
                 }
             },
             async withdrawWalletTransaction() {
-                const currentDate = new Date();  // Your new Date() object
+                const currentDate = new Date();  
                 // Format the date as a string in the desired MySQL DATETIME format
                 const formattedDate = currentDate.toISOString().slice(0, 19).replace('T', ' ');
                 const jsonData = JSON.stringify({
@@ -904,32 +933,7 @@
                     const response = await fetch(url, postMethod);
                     const data = await response.json();
                     console.log(data)
-                    switch (data.code) {
-                        case 201:
-                            // Handle success case
-                            // Close the createWalletModal
-                            $('#walletTransaction').modal('hide');
-                            // Show success modal
-                            $('#successModalTransaction').modal('show');
-                            // Reload page after a delay (you can change the delay as needed)
-                            // setTimeout(() => {
-                            //     window.location.reload();
-                            // }, 1000); // Example: Reload after 1 second (1000 milliseconds)
-                            break;
-                        case 500:
-                            this.message = data.message;
-                            // Close the createWalletModal
-                            $('#walletTransaction').modal('hide');
-                            // Show unsuccessful modal
-                            $('#unsuccessfulModalTransaction').modal('show');
-                            // Reload page after a delay (you can change the delay as needed)
-                            // setTimeout(() => {
-                            //     window.location.reload();
-                            // }, 2000); // Example: Reload after 1 seconds (1000 milliseconds)
-                            break;
-                        default:
-                            throw `${data.code}: ${data.message}`;
-                    }
+                    return data
                 } 
                 catch (error) {
                     console.error('Error:', error);
@@ -1028,8 +1032,66 @@
                 console.error('Error fetching wallets:', error);
                 this.message = 'Error fetching wallet data: ' + error;
             }
+            },
+            async withdrawWalletAndCallAPI() {
+                try {
+                    const walletTransactionResponse = await this.withdrawWalletTransaction();
+                    let apiResponse;
+                    if (walletTransactionResponse.code === 201) {
+                        apiResponse = await this.callExternalAPI(type = "withdraw");
+                    }
+                    return {
+                        walletTransaction: walletTransactionResponse,
+                        apiResponse: apiResponse
+                    };
+                } catch (error) {
+                    console.error('Error:', error);
+                    throw error;
+                }
+            },
+            async depositWalletAndCallAPI() {
+                try {
+                    const walletTransactionResponse = await this.depositWalletTransaction();
+                    let apiResponse;
+                    if (walletTransactionResponse.code === 201) {
+                        apiResponse = await this.callExternalAPI(type = "deposit");
+                    }
+                    return {
+                        walletTransaction: walletTransactionResponse,
+                        apiResponse: apiResponse
+                    };
+                } catch (error) {
+                    console.error('Error:', error);
+                    throw error;
+                }
+            },
+            async callExternalAPI(type) {
+                if(type == "withdraw"){
+                    try {
+                    const externalAPIResponse = await fetch(`http://tbankonline.com/SMUtBank_API/Gateway?Header={"serviceName": "withdrawCash", "userID": "T829103K", "PIN": "1", "OTP": ""}&Content={"accountID": "${this.deposit_account}", "amount": "${this.wallet_amount}", "narrative": "testing"}&ConsumerID=Teller`);
+
+                    const data = await externalAPIResponse.json();
+                    const message = data.Content.ServiceResponse["ServiceRespHeader"]["ErrorText"];
+                    return message; // Return the data from the external API call
+                } catch (error) {
+                    console.error('Error calling external API:', error);
+                    throw error;
+                }
             }
-    },
+            else {
+                try {
+                    const externalAPIResponse = await fetch(`http://tbankonline.com/SMUtBank_API/Gateway?Header={"serviceName": "depositCash", "userID": "T829103K", "PIN": "1", "OTP": ""}&Content={"accountID": "${this.deposit_account}", "amount": "${this.wallet_amount}", "narrative": "testing"}&ConsumerID=Teller`);
+
+                    const data = await externalAPIResponse.json();
+                    const message = data.Content.ServiceResponse["ServiceRespHeader"]["ErrorText"];
+                    return message; // Return the data from the external API call
+                } catch (error) {
+                    console.error('Error calling external API:', error);
+                    throw error;
+                }
+            }
+        }
+        },
         mounted() {
             this.get_wallets();
             this.get_transactions();
