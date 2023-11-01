@@ -146,13 +146,11 @@ def create_transaction():
                 "message": "Transaction completed successfully"
             }
         ), 201
-    except:
-        return jsonify(
-            {
-                "code": 500,
-                "message": "An error occurred completing the transaction"
-            }
-        ), 500
+    except Exception as e:
+        return jsonify({
+            "code": 400,
+            "message": "Unable to complete transaction: " + str(e)
+        }), 400
 
 if __name__ == '__main__':
     app.run(port=8000, debug=True)
