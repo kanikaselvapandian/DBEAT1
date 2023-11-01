@@ -36,9 +36,6 @@ def create_transfer():
                 update_destination_wallet = invoke_http(wallet_update_by_wid_URL + str(transfer['DestinationWallet']), method='PUT', json=new_destination_amount)
                 print("\n\nReceived wallet update result:", update_destination_wallet)
 
-                # transfer['DestinationWallet'] = transfer['SourceWallet']
-                # transfer['SourceWallet'] = 0
-
                 result = invoke_http(transaction_create_URL, method='POST', json=transfer)
                 print("\n\nReceived transaction creation result:", result)
             
@@ -75,6 +72,44 @@ def create_transfer():
         "code": 400,
         "message": "Invalid JSON input: " + str(e)
     }), 400
+
+@app.route("/peer_transfer", methods=['POST'])
+def create_peer_transfer():
+        if request.is_json:
+            try:
+                transfer = request.get_json()
+                transfer['AmountTransferred'] = float(transfer["AmountTransferred"])
+                transfer['ExchangeRate'] = float(transfer["ExchangeRate"])
+                print("\nReceived an order in JSON:", transfer)
+
+                new_source_amount = {
+                    "Amount": float(transfer["AmountTransferred"]),
+                    "Type": "Withdrawal"
+                }
+                update_source_wallet = invoke_http(wallet_update_by_wid_URL + str(transfer['SourceWallet']), method='PUT', json=new_source_amount)
+                print("\n\nReceived wallet update result:", update_source_wallet)
+
+                new_destination_amount = {
+                    "Amount": float(transfer["AmountTransferred"]) * float(transfer["ExchangeRate"]),
+                    "Type": "Deposit"
+                }
+
+                update_destination_wallet = invoke_http(wallet_update_by_wid_URL + str(transfer['DestinationWallet']), method='PUT', json=new_destination_amount)
+                print("\n\nReceived wallet update result:", update_destination_wallet)
+
+                result = invoke_http(transaction_create_URL, method='POST', json=transfer)
+                print("\n\nReceived transaction creation result:", result)
+                
+                return jsonify(result), 200
+
+            except Exception as e:
+                raise e
+                pass
+
+        return jsonify({
+            "code": 400,
+            "message": "Invalid JSON input: " + str(e)
+        }), 400
 
 # Execute this program if it is run as a main script (not by 'import')
 if __name__ == "__main__":
