@@ -33,31 +33,65 @@
         [v-cloak] {
             display: none;
         }
+        .color-white {
+    color: white !important;
+    margin-right: 2% ;
+}
     </style>
 </head>
 <body>
     <!-- Add the navigation bar -->
-    <nav class="navbar navbar-expand-lg navbar-dark">
-        <a class="navbar-brand" href="#">LendInSync</a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav">
-                <li class="nav-item active">
-                    <a class="nav-link" href="home.html">Wallet</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="loan.html">Loans</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="profile.html">Profile</a>
-                </li>
-            </ul>
-        </div>
-    </nav>
+   <nav class="navbar navbar-expand-lg navbar-dark">
+    <!-- Brand Name and Main Nav Links on the Left -->
+    <a class="navbar-brand" href="#" style="margin-left: 2%;">LendInSync</a>
+    <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav">
+            <li class="nav-item active">
+                <a class="nav-link" href="/home">Wallet</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="loan.html">Loans</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/profile">Profile</a>
+            </li>
+        </ul>
+    </div>
+    
+    <!-- Toggle Button for Mobile -->
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <!-- Logout Link on the Right -->
+    <a class="nav-link d-inline-flex ml-auto color-white" href="/" onclick="logout()">Logout</a>
+</nav>
+
+    
+    
     <br>
     <div id = "wallet" v-cloak class = "container">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Deposit Account Details</h5>
+                        <!-- Add your deposit form here -->
+                        <h6 id="account_id"></h6>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Account Balance</h5>
+                        <!-- Add your account balance information here -->
+                        <h6 id="balance"></h6>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <br>
         <div class="row">
             <h2>My Wallets</h2>
         </div>
@@ -451,6 +485,10 @@
         </div>
     </div>
     <script>
+        function logout() {
+    localStorage.clear();
+    window.location.href = "/";
+}
         const customer_id = "A123456";
         const get_wallets_by_customerid = "http://127.0.0.1:7000/wallet/" + customer_id;
         const get_wallets = "http://127.0.0.1:7000/wallet/"
@@ -1101,6 +1139,80 @@
         });
         const vm = wallet.mount('#wallet');
     </script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+     const username = localStorage.getItem('username');
+     const pin = localStorage.getItem('pin');
+     const customer_url = `http://tbankonline.com/SMUtBank_API/Gateway?Header={"serviceName":"getCustomerAccounts","userID":"${username}","PIN":"${pin}","OTP":"999999"}`;;
+     fetch(customer_url)
+         .then(response => response.json())
+         .then(data => {
+            console.log(data);
+            const customer_url = `http://tbankonline.com/SMUtBank_API/Gateway?Header={"serviceName":"getCustomerAccounts","userID":"${username}","PIN":"${pin}","OTP":"999999"}`;
+            let accounts = data.Content.ServiceResponse.AccountList.account;
+let accountIdString = '';
+let balanceString = '';
+
+for (let i = 0; i < accounts.length; i++) {
+    accountIdString += 'Account ID ' + (i+1) + ': ' + accounts[i].accountID + '<br>';
+    balanceString += 'Balance for Account ' + (i+1) + ': ' + accounts[i].currency + " " + accounts[i].balance + '<br>';
+}
+
+document.querySelector('#account_id').innerHTML = accountIdString;
+document.querySelector('#balance').innerHTML = balanceString;
+
+         })
+         .catch(error => {
+             console.error('An error occurred:', error);
+         });
+    });
+</script>
+
+    <script>
+           const submitButton = document.getElementById('submit');
+
+submitButton.addEventListener('click', (event) => {
+    event.preventDefault();
+    const value = localStorage.getItem('key');
+        if (value !== null) {
+        // The value exists in localStorage
+        alert('hi')
+        console.log(value)
+
+        } else {
+        console.log('value does not exist in localStorage') 
+        }
+    const username = localStorage.getItem('username');
+    console.log(username)
+    const pin = localStorage.getItem('pin');
+    const otp =  document.getElementById('otp').value.toString();
+    const url = `http://tbankonline.com/SMUtBank_API/Gateway?Header={"serviceName":"loginCustomer","userID":"${username}","PIN":"${pin}","OTP":"${otp}"}`;
+
+    fetch(url)
+        .then(response => response.json())
+        .then(data => {
+            console.log(data);
+            const statusOfLogin = data.Content.ServiceResponse.ServiceRespHeader.ErrorDetails;
+            if(statusOfLogin=="Success"){
+
+                localStorage.setItem('username', username);
+                localStorage.setItem('pin', pin);
+                localStorage.getItem('otp',otp);
+                window.location.href = '/home';
+                console.log('Success')
+            }
+            else{
+                alert('Invalid OTP')
+            }
+            
+        })
+        .catch(error => console.error(error));
+});
+
+    </script>
+
+    
     <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
     <!-- Bootstrap Javascript -->
