@@ -16,6 +16,7 @@ const loan = Vue.createApp({
             investment_amount: 0,
             revenue: 0,
             loan_term: 0,
+            currency_info: [],
             selectedCurrency: "",
             exchange_rate: 0,
             interest_rate: 0,
@@ -26,7 +27,7 @@ const loan = Vue.createApp({
             StatusLevel: "",
             computed:{
                 total_interest_amount(){
-                    return this.investment_amount * (1+(this.interest_rate/100)) * this.loan_term/365;
+                    return this.investment_amount * (1+(this.interest_rate/100)) * (this.loan_term/365);
                 },
                 revenue(){
                     return this.total_interest_amount + this.investment_amount;
@@ -64,6 +65,16 @@ const loan = Vue.createApp({
             } catch (error) {
                 this.message = "Error fetching my lent loans: " + error;
             }
+        },
+        async getCurrencyCodes(){
+            const response = await fetch('http://tbankonline.com/SMUtBank_API/Gateway?Header={"serviceName": "getCurrencyList", "userID": "", "PIN": "", "OTP": ""}&Content={"baseCurrency": "SGD", "quoteCurrency": "USD"}');
+            const data = await response.json();
+            this.currency_info = data.Content.ServiceResponse.CurrencyList.Currency;
+        },
+        async getExchangeRate(currency_code){
+            const response = await fetch(`http://tbankonline.com/SMUtBank_API/Gateway?Header={"serviceName": "getExchangeRate", "userID": "", "PIN": "", "OTP": ""}&Content={"baseCurrency": "SGD", "quoteCurrency": "${currency_code}"}`);
+            const data = await response.json();
+            this.exchange_rate = data.Content.ServiceResponse["FX_SpotRate_Read-Response"]["Rate"];
         },
         async create_borrow_application(event){
             event.preventDefault();
@@ -197,6 +208,7 @@ const loan = Vue.createApp({
     created() {
         this.get_my_borrowed_loans();
         this.get_my_lent_loans();
+        this.getCurrencyCodes();
     },
 });
 const vm = loan.mount('#loan');
