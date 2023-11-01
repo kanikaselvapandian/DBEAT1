@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request, jsonify
 import requests
 from flask_cors import CORS, cross_origin
-app = Flask(__name__,template_folder="templates/")
+app = Flask(__name__,template_folder="templates/", static_url_path='/DBEAT1/lendinsync/assets', static_folder="assets")
 
 CORS(app)
 
@@ -29,6 +29,13 @@ def profile():
 def homePage():
     try:
          return render_template("home.html")
+    except Exception as e:
+        return jsonify({'error': str(e)})
+    
+@app.route("/ui")
+def homeUI():
+    try:
+         return render_template("hometest.html")
     except Exception as e:
         return jsonify({'error': str(e)})
 
