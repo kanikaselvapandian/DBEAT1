@@ -1086,9 +1086,20 @@
      fetch(customer_url)
          .then(response => response.json())
          .then(data => {
-             console.log(data.Content.ServiceResponse.AccountList.account[0]);
-             document.querySelector('#account_id').textContent = 'Account ID: ' + data.Content.ServiceResponse.AccountList.account[0].accountID;
-             document.querySelector('#balance').textContent = 'Balance: ' + data.Content.ServiceResponse.AccountList.account[0].currency + " " +  data.Content.ServiceResponse.AccountList.account[0].balance; 
+            console.log(data);
+            const customer_url = `http://tbankonline.com/SMUtBank_API/Gateway?Header={"serviceName":"getCustomerAccounts","userID":"${username}","PIN":"${pin}","OTP":"999999"}`;
+            let accounts = data.Content.ServiceResponse.AccountList.account;
+let accountIdString = '';
+let balanceString = '';
+
+for (let i = 0; i < accounts.length; i++) {
+    accountIdString += 'Account ID ' + (i+1) + ': ' + accounts[i].accountID + '<br>';
+    balanceString += 'Balance for Account ' + (i+1) + ': ' + accounts[i].currency + " " + accounts[i].balance + '<br>';
+}
+
+document.querySelector('#account_id').innerHTML = accountIdString;
+document.querySelector('#balance').innerHTML = balanceString;
+
          })
          .catch(error => {
              console.error('An error occurred:', error);
