@@ -42,10 +42,12 @@ def create_transfer():
                 result = invoke_http(transaction_create_URL, method='POST', json=transfer)
                 print("\n\nReceived transaction creation result:", result)
             
-            elif("WalletTransaction" in transfer and not transfer["WalletTransaction"] and transfer.get("SourceWallet") is None):  #transaction is between bank and wallet (deposit)
+            elif(not transfer["WalletTransaction"] and transfer.get("SourceWallet") == ""):  #transaction is between bank and wallet (deposit)
                 new_destination_amount = {
-                    "Amount": float(transfer["AmountTransferred"]) * float(transfer["ExchangeRate"])
+                    "Amount": float(transfer["AmountTransferred"]) * float(transfer["ExchangeRate"]),
+                    "Type": "Deposit"
                 }
+                transfer["SourceWallet"] = None
                 update_destination_wallet = invoke_http(wallet_update_by_wid_URL + str(transfer['DestinationWallet']), method='PUT', json=new_destination_amount)
                 print("\n\nReceived wallet update result:", update_destination_wallet)
 
@@ -53,8 +55,10 @@ def create_transfer():
                 print("\n\nReceived transaction creation result:", result)
             else:
                 new_source_amount = {
-                    "Amount": float(transfer["AmountTransferred"]) * float(transfer["ExchangeRate"])
+                    "Amount": float(transfer["AmountTransferred"]),
+                    "Type": "Withdrawal"
                 }
+                transfer["DestinationWallet"] = None
                 update_source_wallet = invoke_http(wallet_update_by_wid_URL + str(transfer['SourceWallet']), method='PUT', json=new_source_amount)
                 print("\n\nReceived wallet update result:", update_source_wallet)
 

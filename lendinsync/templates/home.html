@@ -207,7 +207,7 @@
                         <form>
                             <div class="form-group">
                                 <label for="customerid">Deposit Account:</label>
-                                <input type="text" class="form-control" :value = deposit_account v-model = "destinationwallet" disabled> 
+                                <input type="text" class="form-control" :value = "deposit_account" disabled> 
                             </div>
                             <div class="form-group">
                                 <label for="currency">Source Wallet:</label>
@@ -224,8 +224,16 @@
                                 <label for="exchange_rate">Exchange Rate:</label>
                                 <input type="text" class="form-control" :value = exchange_rate disabled>
                             </div>
-                            <button type="submit" class="btn btn-secondary btn-block" @click="createTransaction(WalletTransaction=false)">Submit</button>
+                            <button type="submit" class="btn btn-secondary btn-block" @click="createTransaction(WalletTransaction=false, $event)">Submit</button>
                         </form>
+                        <div v-if = "errorsFound">
+                            <hr>
+                            <div class="alert alert-danger" role="alert">
+                                <ul>
+                                    <li v-for="error in validation_errors" v-text = "error"></li>
+                                </ul>
+                            </div>
+                        </div>
                     </div>
                 </div>
             <div class="modal-footer">
@@ -244,12 +252,12 @@
                 </div>
                 <div class="modal-body">
                     <div class = "container ">
-                        <h2>Transfer to Deposit Account</h2>
+                        <h2>Transfer from Deposit Account</h2>
                         <hr>
                         <form>
                             <div class="form-group">
                                 <label for="customerid">Source Account:</label>
-                                <input type="text" class="form-control" :value = deposit_account v-model = "sourcewallet" disabled> 
+                                <input type="text" class="form-control" :value = "deposit_account" disabled> 
                             </div>
                             <div class="form-group">
                                 <label for="currency">Destination Wallet:</label>
@@ -266,8 +274,16 @@
                                 <label for="exchange_rate">Exchange Rate:</label>
                                 <input type="text" class="form-control" :value = exchange_rate disabled>
                             </div>
-                            <button type="submit" class="btn btn-secondary btn-block" @click="createTransaction(WalletTransaction=false)">Submit</button>
+                            <button type="submit" class="btn btn-secondary btn-block" @click="createTransaction(WalletTransaction=false, $event)">Submit</button>
                         </form>
+                        <div v-if = "errorsFound">
+                            <hr>
+                            <div class="alert alert-danger" role="alert">
+                                <ul>
+                                    <li v-for="error in validation_errors" v-text = "error"></li>
+                                </ul>
+                            </div>
+                        </div>
                     </div>
                 </div>
             <div class="modal-footer">
@@ -405,6 +421,14 @@
             };
         },
         methods: {
+            openModal() {
+                this.errorsFound = false;
+                this.sourcewallet = null;
+                this.destinationwallet = null;
+                this.wallet_amount = 0; 
+                this.selectedCurrency = "";
+                this.validation_errors = [];
+            },
             async get_wallets() {
             try {
                 const response = await fetch(get_wallets_by_customerid);
@@ -551,20 +575,22 @@
             },
             createTransaction(WalletTransaction, event) {
             event.preventDefault();
+            console.log(this.deposit_account)
+            console.log(this.destinationwallet)
                 if (WalletTransaction){
                     this.validation_errors = []
                     this.errorsFound = false;
-                    if (this.wallet_amount > this.sourcewallet.Amount) {
-                    this.validation_errors.push("Insufficient funds in source wallet");
-                    }
-                    if (this.wallet_amount <= 0 || this.wallet_amount == "") {
-                    this.validation_errors.push("Amount must be greater than 0");
-                    }
                     if (this.sourcewallet == null) {  
                     this.validation_errors.push("Please select a source wallet");
                     }
                     if (this.destinationwallet == null) {
                     this.validation_errors.push("Please select a destination wallet");
+                    }
+                    if (this.sourcewallet != null && this.wallet_amount > this.sourcewallet.Amount) {
+                    this.validation_errors.push("Insufficient funds in source wallet");
+                    }
+                    if (this.wallet_amount <= 0 || this.wallet_amount == "") {
+                    this.validation_errors.push("Amount must be greater than 0");
                     }
                     if (this.validation_errors.length > 0) {
                     this.errorsFound = true
@@ -574,20 +600,21 @@
                         this.walletWalletTransaction()
                     }
                 }
-                else if (WalletTransaction == false && this.sourcewallet == deposit_account) {
+                else if (WalletTransaction == false && this.sourcewallet == null) {
+                    console.log("hereeeeee")
                     this.validation_errors = []
                     this.errorsFound = false;
-                    if (this.wallet_amount > this.deposit_account_balance) {
-                    this.validation_errors.push("Insufficient funds in deposit account");
+                    if (parseFloat(this.wallet_amount) > parseFloat(this.deposit_account_balance)) {
+                        this.validation_errors.push("Insufficient funds in deposit account");
                     }
                     if (this.wallet_amount <= 0 || this.wallet_amount == "") {
-                    this.validation_errors.push("Amount must be greater than 0");
+                        this.validation_errors.push("Amount must be greater than 0");
                     }
                     if (this.destinationwallet == null) {
-                    this.validation_errors.push("Please select a destination wallet");
+                        this.validation_errors.push("Please select a destination wallet");
                     }
                     if (this.validation_errors.length > 0) {
-                    this.errorsFound = true
+                        this.errorsFound = true
                     return;
                     }
                     else {
@@ -595,22 +622,27 @@
                     }
                 }
                 else {
+                    console.log("here")
                     this.validation_errors = []
                     this.errorsFound = false;
-                    if (this.wallet_amount > this.sourcewallet.Amount) {
-                    this.validation_errors.push("Insufficient funds in source wallet");
+                    if (this.sourcewallet != null && parseFloat(this.wallet_amount) > parseFloat(this.sourcewallet.Amount)) {
+                        this.validation_errors.push("Insufficient funds in source wallet");
                     }
                     if (this.wallet_amount <= 0 || this.wallet_amount == "") {
-                    this.validation_errors.push("Amount must be greater than 0");
+                        this.validation_errors.push("Amount must be greater than 0");
                     }
-                    if (this.destinationwallet == null) {
-                    this.validation_errors.push("Please select a destination wallet");
+                    if (this.sourcewallet == null) {
+                        this.validation_errors.push("Please select a source wallet");
                     }
                     if (this.validation_errors.length > 0) {
-                    this.errorsFound = true
-                    return;
+                        console.log(this.wallet_amount)
+                        console.log(this.sourcewallet.Amount)
+                        console.log(this.validation_errors)
+                        this.errorsFound = true
+                        return;
                     }
                     else {
+                    console.log("here")
                     this.depositWalletTransaction()
                     }
                 }
@@ -626,7 +658,7 @@
                     "WalletTransaction": true,
                     "ExchangeRate": this.exchange_rate,
                     "TimeStamp": formattedDate,
-                    "AmountTransferred": this.wallet_amount * this.exchange_rate
+                    "AmountTransferred": this.wallet_amount
                     });
                     const url = create_transaction;
                     const postMethod = {
@@ -678,13 +710,13 @@
                 // Format the date as a string in the desired MySQL DATETIME format
                 const formattedDate = currentDate.toISOString().slice(0, 19).replace('T', ' ');
                 const jsonData = JSON.stringify({
-                SourceWallet: this.sourcewallet.WID,
-                DestinationWallet: null,
-                CustomerId: this.customer_id,
-                WalletTransaction: false,
-                ExchangeRate: this.exchange_rate,
+                "SourceWallet": this.sourcewallet.WID,
+                "DestinationWallet": "",
+                "CustomerId": this.customer_id,
+                "WalletTransaction": false,
+                "ExchangeRate": this.exchange_rate,
                 "TimeStamp": formattedDate,
-                AmountTransferred: this.wallet_amount * this.exchange_rate
+                "AmountTransferred": this.wallet_amount
                 });
 
                 const url = create_transaction;
@@ -704,24 +736,24 @@
                         case 201:
                             // Handle success case
                             // Close the createWalletModal
-                            $('#walletTransaction').modal('hide');
+                            // $('#walletTransaction').modal('hide');
                             // Show success modal
                             $('#successModalTransaction').modal('show');
                             // Reload page after a delay (you can change the delay as needed)
-                            setTimeout(() => {
-                                window.location.reload();
-                            }, 1000); // Example: Reload after 1 second (1000 milliseconds)
+                            // setTimeout(() => {
+                            //     window.location.reload();
+                            // }, 1000); // Example: Reload after 1 second (1000 milliseconds)
                             break;
                         case 500:
                             this.message = data.message;
                             // Close the createWalletModal
-                            $('#walletTransaction').modal('hide');
+                            // $('#walletTransaction').modal('hide');
                             // Show unsuccessful modal
                             $('#unsuccessfulModalTransaction').modal('show');
                             // Reload page after a delay (you can change the delay as needed)
-                            setTimeout(() => {
-                                window.location.reload();
-                            }, 2000); // Example: Reload after 1 seconds (1000 milliseconds)
+                            // setTimeout(() => {
+                            //     window.location.reload();
+                            // }, 2000); // Example: Reload after 1 seconds (1000 milliseconds)
                             break;
                         default:
                             throw `${data.code}: ${data.message}`;
@@ -737,13 +769,13 @@
                 // Format the date as a string in the desired MySQL DATETIME format
                 const formattedDate = currentDate.toISOString().slice(0, 19).replace('T', ' ');
                 const jsonData = JSON.stringify({
-                SourceWallet: null,
-                DestinationWallet: this.destinationwallet.WID,
-                CustomerId: this.customer_id,
-                WalletTransaction: false,
-                ExchangeRate: this.exchange_rate,
-                TimeStamp: formattedDate,
-                AmountTransferred: this.wallet_amount * this.exchange_rate
+                "SourceWallet": "",
+                "DestinationWallet": this.destinationwallet.WID,
+                "CustomerId": this.customer_id,
+                "WalletTransaction": false,
+                "ExchangeRate": this.exchange_rate,
+                "TimeStamp": formattedDate,
+                "AmountTransferred": this.wallet_amount
                 });
                 const url = create_transaction;
                 const postMethod = {
@@ -765,9 +797,9 @@
                             // Show success modal
                             $('#successModalTransaction').modal('show');
                             // Reload page after a delay (you can change the delay as needed)
-                            setTimeout(() => {
-                                window.location.reload();
-                            }, 1000); // Example: Reload after 1 second (1000 milliseconds)
+                            // setTimeout(() => {
+                            //     window.location.reload();
+                            // }, 1000); // Example: Reload after 1 second (1000 milliseconds)
                             break;
                         case 500:
                             this.message = data.message;
@@ -776,9 +808,9 @@
                             // Show unsuccessful modal
                             $('#unsuccessfulModalTransaction').modal('show');
                             // Reload page after a delay (you can change the delay as needed)
-                            setTimeout(() => {
-                                window.location.reload();
-                            }, 2000); // Example: Reload after 1 seconds (1000 milliseconds)
+                            // setTimeout(() => {
+                            //     window.location.reload();
+                            // }, 2000); // Example: Reload after 1 seconds (1000 milliseconds)
                             break;
                         default:
                             throw `${data.code}: ${data.message}`;
