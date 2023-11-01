@@ -6,7 +6,7 @@ from invokes import invoke_http
 import json
 
 app = Flask(__name__)
-CORS(app, resources={r"/transfer": {"origins": "http://localhost"}})
+cors = CORS(app)
 
 wallet_update_by_wid_URL = "http://localhost:7000/wallet/"
 transaction_create_URL = "http://localhost:8000/transaction"
