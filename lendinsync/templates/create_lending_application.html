@@ -74,16 +74,20 @@
                             <label for="loan_term" class="form-label">Loan Term</label>
                             <input v-model="loan_term" type="number" class="form-control" id="loan_term">
                         </div>
+                        <div class="mb-3">
+                            <label for="lendingServiceFee" class="form-label">Service Fee</label>
+                            <input disabled type="number" v-model="lending_service_fee" class="form-control" id="lendingServiceFee">
+                        </div>
                     </form>
                 </div>
                 <div class="col-6">
                     <form>
                         <legend>Summary</legend>
                           <div class="mb-3">
-                            <p>Total Interest Amount:<span v-if="investment_amount.value && loan_term.value && interest_rate.value"> {{total_interest_amount}}</span></p>
+                            <p>Total Interest Amount: <span>{{ total_interest_amount }}</span></p>
                           </div>
                           <div class="mb-3">
-                            <p>Revenue:<span v-if="investment_amount.value && loan_term.value && interest_rate.value"> {{revenue}}</span></p>
+                            <p>Revenue: <span> {{revenue}} </span></p>
                           </div>
                         <button type="submit" class="btn btn-primary" @click="create_lending_application($event)">Submit</button>
                     </form>

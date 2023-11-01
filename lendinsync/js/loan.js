@@ -14,28 +14,40 @@ const loan = Vue.createApp({
             loan_amount: 0,
             collateral_amount: 0,
             investment_amount: 0,
-            revenue: 0,
             loan_term: 0,
             currency_info: [],
             selectedCurrency: "",
             exchange_rate: 0,
             interest_rate: 0,
-            total_interest_amount: 0,
             service_fee: 0,
             repayment_amount: 0,
-            revenue: 0,
             StatusLevel: "",
-            computed:{
-                total_interest_amount(){
-                    return this.investment_amount * (1+(this.interest_rate/100)) * (this.loan_term/365);
-                },
-                revenue(){
-                    return this.total_interest_amount + this.investment_amount;
-                }
-            },
+            borrowing_service_fee: 0,
+            lending_service_fee: 0,
             validation_errors: [],
             errorsFound: false
         };
+    },
+    computed: {
+        total_interest_amount() {
+            const totalInterest = parseFloat(this.investment_amount) * (this.interest_rate / 100) * (this.loan_term / 365);
+            return parseFloat(totalInterest.toFixed(2)); // Round to 2 decimal places
+        },
+        revenue() {
+            const investmentAmount = parseFloat(this.investment_amount);
+            const revenue = this.total_interest_amount + investmentAmount;
+            return parseFloat(revenue.toFixed(2)); // Round to 2 decimal places
+        },
+    },
+    watch: {
+        loan_amount: function (newLoanAmount, oldLoanAmount) {
+            // Compute the service fee based on the newLoanAmount
+            this.borrowing_service_fee = newLoanAmount * 0.01; 
+        },
+        investment_amount: function (newInvestmentAmount, oldInvestmentAmount) {
+            // Compute the service fee based on the newInvestmentAmount
+            this.lending_service_fee = newInvestmentAmount * 0.01; 
+        },
     },
     methods: {
         async get_my_borrowed_loans(){
@@ -79,20 +91,17 @@ const loan = Vue.createApp({
         async create_borrow_application(event){
             event.preventDefault();
             this.validation_errors = [];
-            if (this.loan_amount <= 0){
+            if (this.loan_amount.value <= 0){
                 this.validation_errors.push("Loan amount must be greater than 0");
             }
-            if (this.loan_amount > this.collateral_amount){
+            if (this.loan_amount.value > this.collateral_amount.value){
                 this.validation_errors.push("Loan amount must be less than the collateral amount");
             }
             if (this.selectedCurrency === ""){
                 this.validation_errors.push("Please select a currency");
             }
-            if(this.loan_term <= 0){
+            if(this.loan_term.value <= 0){
                 this.validation_errors.push("Loan term must be greater than 0");
-            }
-            if(this.interest_rate <= 0){
-                this.validation_errors.push("Interest rate must be greater than 0");
             }
             if (this.validation_errors.length > 0) {
                 this.errorsFound = true;
