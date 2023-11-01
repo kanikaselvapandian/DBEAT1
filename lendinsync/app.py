@@ -24,16 +24,13 @@ def profile():
          return render_template("profile.html")# your code here
     except Exception as e:
         return jsonify({'error': str(e)})
-
       
-# @app.route("/home")
-# def homePage():
-#     try:
-#          return render_template("http://localhost/DBEAT1/lendinsync/templates/home.html")
-#     except Exception as e:
-#         return jsonify({'error': str(e)})
-
-
+@app.route("/home")
+def homePage():
+    try:
+         return render_template("home.html")
+    except Exception as e:
+        return jsonify({'error': str(e)})
 
 if __name__ == "__main__":
-  app.run()
+  app.run(debug=True)
