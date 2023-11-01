@@ -33,7 +33,7 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav">
                     <li class="nav-item">
-                        <a class="nav-link" href="wallet.html">Wallet</a>
+                        <a class="nav-link" href="home.html">Wallet</a>
                     </li>
                     <li class="nav-item active">
                         <a class="nav-link" href="marketplace.html">Marketplace</a>
@@ -50,7 +50,7 @@
         <br>
         
         <div class="container" id="loan">
-            <div class="row">
+            <div class="row" id="myForm">
                 <div class="col-6">
                     <form>
                         <legend>Create Lending Application</legend>
@@ -89,7 +89,7 @@
                           <div class="mb-3">
                             <p>Revenue: <span> {{revenue}} </span></p>
                           </div>
-                        <button type="submit" class="btn btn-primary" @click="create_lending_application($event)">Submit</button>
+                        <button type="submit" id="submit" class="btn btn-primary">Submit</button>
                     </form>
                     <div v-if = "errorsFound">
                             <hr>
@@ -102,6 +102,40 @@
                 </div>
             </div>
         </div>
+        <script>
+            // Get the form
+            let form = document.getElementById('myForm');
+
+            // Get the customer id from local storage
+            let CustomerId = localStorage.getItem('username');
+            
+            // Set the form's action attribute
+            form.action = `http://localhost:5001/loan/lending/${CustomerId}`;
+
+            form.addEventListener('submit',function(event){
+                event.preventDefault();
+                // Get the form data
+                let formData = new FormData(event.target);
+                // Send the form data to the server
+                fetch(form.action,{
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => {
+                    response.json();
+                    console.log(response);
+                })
+                .then(data => {
+                    console.log(data);
+                    console.log(response);
+                    closeForm();
+                    location.reload();
+                    alert("Lending Application Created Successfully");
+                })
+                .catch(error => console.log(error));
+            });
+
+        </script>
     
     <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>

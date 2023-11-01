@@ -1,8 +1,8 @@
-const customer_id = "A123456";
-const get_borrowed_loans_by_customer_id = "http://127.0.0.1:5001/loan/borrowing/" + customer_id;
-const get_lent_loans_by_customer_id = "http://127.0.0.1:5001/loan/lending/" + customer_id;
-const create_borrow_application = "http://127.0.0.1:5001/loan/borrowing/";
-const create_lending_application = "http://127.0.0.1:5001/loan/lending/";
+const customer_id = localStorage.getItem('username');
+const get_borrowed_loans_by_customer_id = "http://localhost:5001/loan/borrowing/" + customer_id;
+const get_lent_loans_by_customer_id = "http://localhost:5001/loan/lending/" + customer_id;
+const create_borrow_application = "http://localhost:5001/loan/borrowing/";
+const create_lending_application = "http://localhost:5001/loan/lending/";
 
 const loan = Vue.createApp({
     data() {

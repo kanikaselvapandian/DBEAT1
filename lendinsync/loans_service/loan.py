@@ -139,106 +139,104 @@ def get_all_lending_loans():
 # [POST] Create borrowing loan based on CustomerId
 @app.route("/loan/borrowing/<string:CustomerId>", methods=['POST'])
 def create_borrowing_loan(CustomerId):
-    data = request.get_json()
-    
-    # Extract the values from the JSON
-    customer_id = data.get('CustomerId')
-    collateral_amount = data.get('CollateralAmount')
-    loan_amount = data.get('LoanAmount')
-    currency_code = data.get('CurrencyCode')
-    loan_term = data.get('LoanTerm')
-    service_fee = data.get('ServiceFee')
-    status_level = data.get('StatusLevel')
-
-    # Create a new Loan object
-    loan = Loan(
-        CustomerId=CustomerId,
-        CollateralAmount=collateral_amount,
-        LoanAmount=loan_amount,
-        InvestmentAmount=None,
-        InterestRate=None,
-        CurrencyCode=currency_code,
-        TotalInterestAmount=None,
-        ServiceFee=service_fee,
-        RepaymentAmount=None,
-        Revenue=None,
-        LoanTerm=loan_term,
-        StartDate=None,
-        EndDate=None,
-        StatusLevel="Borrowing"
-    )
-
     try:
+        data = request.form  # Correctly parse form data
+        CustomerId = CustomerId
+        collateral_amount = data.get('CollateralAmount')
+        loan_amount = data.get('LoanAmount')
+        currency_code = data.get('CurrencyCode')
+        loan_term = data.get('LoanTerm')
+        service_fee = data.get('ServiceFee')
+
+        # Create a new Loan object
+        loan = Loan(
+            CustomerId=CustomerId,
+            CollateralAmount=collateral_amount,
+            LoanAmount=loan_amount,
+            InvestmentAmount=None,
+            InterestRate=None,
+            CurrencyCode=currency_code,
+            TotalInterestAmount=None,
+            ServiceFee=service_fee,
+            RepaymentAmount=None,
+            Revenue=None,
+            LoanTerm=loan_term,
+            StartDate=None,
+            EndDate=None,
+            StatusLevel="Borrowing"
+        )
+
         db.session.add(loan)
         db.session.commit()
-    except:
+
+        return jsonify(
+            {
+                "code": 201,
+                "data": loan.json(), 
+                "message": "Borrowing loan created successfully."
+            }
+        ), 201
+
+    except Exception as e:
+        db.session.rollback()
         return jsonify(
             {
                 "code": 500,
-                "message": "An error occurred creating the borrowing loan."
+                "message": "An error occurred creating the borrowing loan. " + str(e)
             }
         ), 500
-
-    return jsonify(
-        {
-            "code": 201,
-            "data": loan.json(),  # Add a comma here
-            "message": "Borrowing loan created successfully."
-        }
-    ), 201
 
 # [POST] Create lending loan based on CustomerId
 @app.route("/loan/lending/<string:CustomerId>", methods=['POST'])
 def create_lending_loan(CustomerId):
-    data = request.get_json()
-    
-    # Extract the values from the JSON
-    customer_id = data.get('CustomerId')
-    investment_amount = data.get('InvestmentAmount')
-    interest_rate = data.get('InterestRate')
-    currency_code = data.get('CurrencyCode')
-    loan_term = data.get('LoanTerm')
-    service_fee = data.get('ServiceFee')
-    total_interest_amount = data.get('TotalInterestAmount')
-    revenue = data.get('Revenue')
-    status_level = data.get('StatusLevel')
-
-    # Create a new Loan object
-    loan = Loan(
-        CustomerId=CustomerId,
-        CollateralAmount=None,
-        LoanAmount=None,
-        InvestmentAmount=investment_amount,
-        InterestRate=interest_rate,
-        CurrencyCode=currency_code,
-        TotalInterestAmount=total_interest_amount,
-        ServiceFee=service_fee,
-        RepaymentAmount=None,
-        Revenue=revenue,
-        LoanTerm=loan_term,
-        StartDate=None,
-        EndDate=None,
-        StatusLevel=status_level
-    )
-
     try:
+        data = request.form  # Correctly parse form data
+        CustomerId = CustomerId
+        investment_amount = data.get('InvestmentAmount')
+        interest_rate = data.get('InterestRate')
+        currency_code = data.get('CurrencyCode')
+        loan_term = data.get('LoanTerm')
+        service_fee = data.get('ServiceFee')
+        total_interest_amount = data.get('TotalInterestAmount')
+        revenue = data.get('Revenue')
+
+        # Create a new Loan object
+        loan = Loan(
+            CustomerId=CustomerId,
+            CollateralAmount=None,
+            LoanAmount=None,
+            InvestmentAmount=investment_amount,
+            InterestRate=interest_rate,
+            CurrencyCode=currency_code,
+            TotalInterestAmount=total_interest_amount,
+            ServiceFee=service_fee,
+            RepaymentAmount=None,
+            Revenue=revenue,
+            LoanTerm=loan_term,
+            StartDate=None,
+            EndDate=None,
+            StatusLevel="Lending"
+        )
+
         db.session.add(loan)
         db.session.commit()
-    except:
+
+        return jsonify(
+            {
+                "code": 201,
+                "data": loan.json(),
+                "message": "Lending loan created successfully."
+            }
+        ), 201
+
+    except Exception as e:
+        db.session.rollback()
         return jsonify(
             {
                 "code": 500,
-                "message": "An error occurred creating the lending loan."
+                "message": "An error occurred creating the lending loan. " + str(e)
             }
         ), 500
-
-    return jsonify(
-        {
-            "code": 201,
-            "data": loan.json(),
-            "message": "Lending loan created successfully."
-        }
-    ), 201
 
 
 # [GET] Fetch All borrowing loans based on CustomerId
