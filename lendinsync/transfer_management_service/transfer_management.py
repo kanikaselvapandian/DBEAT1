@@ -23,13 +23,15 @@ def create_transfer():
 
             if(transfer.get("WalletTransaction")): #transaction is between wallets
                 new_source_amount = {
-                    "Amount": float(transfer["AmountTransferred"])
+                    "Amount": float(transfer["AmountTransferred"]),
+                    "Type": "Withdrawal"
                 }
                 update_source_wallet = invoke_http(wallet_update_by_wid_URL + str(transfer['SourceWallet']), method='PUT', json=new_source_amount)
                 print("\n\nReceived wallet update result:", update_source_wallet)
 
                 new_destination_amount = {
-                    "Amount": float(transfer["AmountTransferred"]) * float(transfer["ExchangeRate"])
+                    "Amount": float(transfer["AmountTransferred"]) * float(transfer["ExchangeRate"]),
+                    "Type": "Deposit"
                 }
                 update_destination_wallet = invoke_http(wallet_update_by_wid_URL + str(transfer['DestinationWallet']), method='PUT', json=new_destination_amount)
                 print("\n\nReceived wallet update result:", update_destination_wallet)
