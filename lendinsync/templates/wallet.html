@@ -92,7 +92,7 @@
           <div class="icon-box" style="width: 100%;">
             <div class="icon"><i class="bi bi-wallet-fill"></i></div>
             <h4 class="title">Your Deposit Account Details</h4>
-            <p class="description">Account ID:<h6 id="account_id"></h6> </p>
+            <p class="description"><h6 id="account_id"></h6> </p>
           </div>
         </div>
 
@@ -100,7 +100,7 @@
           <div class="icon-box" style="width: 100%;">
             <div class="icon"><i class="bi bi-send-check-fill"></i></div>
             <h4 class="title">Deposit Account Balance</h4>
-            <p class="description">Balance for Account: <h6 id="balance"></h6> </p>
+            <p class="description"><h6 id="balance"></h6> </p>
           </div>
         </div>
       </div>
@@ -577,7 +577,20 @@
 
   <div id="preloader"></div>
   <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+<script>
+    document.addEventListener('DOMContentLoaded', async () => {
+    await checkLocalStorageAndRedirect();
+});
 
+async function checkLocalStorageAndRedirect() {
+    const username = localStorage.getItem('username');
+    if (!username) {
+        window.location.href = '/';
+    }
+    // ... any other async operations
+}
+
+</script>
   <!-- Vendor JS Files -->
   <script src="/DBEAT1/lendinsync/assets/vendor/purecounter/purecounter_vanilla.js"></script>
   <script src="/DBEAT1/lendinsync/assets/vendor/aos/aos.js"></script>
@@ -1249,32 +1262,35 @@
      </script>
 
 <script>
-    document.addEventListener('DOMContentLoaded', () => {
-     const username = localStorage.getItem('username');
-     const pin = localStorage.getItem('pin');
-     const customer_url = `http://tbankonline.com/SMUtBank_API/Gateway?Header={"serviceName":"getCustomerAccounts","userID":"${username}","PIN":"${pin}","OTP":"999999"}`;;
-     fetch(customer_url)
-         .then(response => response.json())
-         .then(data => {
+   document.addEventListener('DOMContentLoaded', () => {
+    const username = localStorage.getItem('username');
+    const pin = localStorage.getItem('pin');
+    const customer_url = `http://tbankonline.com/SMUtBank_API/Gateway?Header={"serviceName":"getCustomerAccounts","userID":"${username}","PIN":"${pin}","OTP":"999999"}`;
+
+    fetch(customer_url)
+        .then(response => response.json())
+        .then(data => {
             console.log(data);
-            const customer_url = `http://tbankonline.com/SMUtBank_API/Gateway?Header={"serviceName":"getCustomerAccounts","userID":"${username}","PIN":"${pin}","OTP":"999999"}`;
             let accounts = data.Content.ServiceResponse.AccountList.account;
-let accountIdString = '';
-let balanceString = '';
+            let accountIdString = '';
+            let balanceString = '';
 
-for (let i = 0; i < accounts.length; i++) {
-    accountIdString += 'Account ID ' + (i+1) + ': ' + accounts[i].accountID + '<br>';
-    balanceString += 'Balance for Account ' + (i+1) + ': ' + accounts[i].currency + " " + accounts[i].balance + '<br>';
-}
+            for (let i = 0; i < accounts.length; i++) {
+                // Check if parentAccountFlag is true for the current account
+                if (accounts[i].parentAccountFlag=='true') {
+                    accountIdString += 'Account ID ' + (i+1) + ': ' + accounts[i].accountID + '<br>';
+                    balanceString += 'Balance for Account ' + (i+1) + ': ' + accounts[i].currency + " " + accounts[i].balance + '<br>';
+                }
+            }
 
-document.querySelector('#account_id').innerHTML = accountIdString;
-document.querySelector('#balance').innerHTML = balanceString;
+            document.querySelector('#account_id').innerHTML = accountIdString;
+            document.querySelector('#balance').innerHTML = balanceString;
+        })
+        .catch(error => {
+            console.error('An error occurred:', error);
+        });
+});
 
-         })
-         .catch(error => {
-             console.error('An error occurred:', error);
-         });
-    });
 </script>
 
 </body>
