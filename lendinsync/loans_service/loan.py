@@ -40,7 +40,7 @@ class Loan(db.Model):
 
     # Define database columns
     # CHECK VARIABLES
-    LoanId = db.Column(db.String(128), primary_key=True)
+    LoanId = db.Column(db.Integer, primary_key=True)
     CustomerId = db.Column(db.String(128), nullable=False)
     OtherPartyId = db.Column(db.String(128), nullable=True)
     CollateralAmount = db.Column(db.String(10), nullable=True)
