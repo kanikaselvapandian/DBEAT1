@@ -57,8 +57,9 @@ class Loan(db.Model):
     StatusLevel = db.Column(db.String(128), nullable=False)
 
     # Initialize loan variables
-    def __init__(self, CustomerId, CollateralAmount, LoanAmount, InvestmentAmount, InterestRate, CurrencyCode, TotalInterestAmount, ServiceFee, RepaymentAmount, Revenue, LoanTerm, StartDate, EndDate, StatusLevel):
+    def __init__(self, CustomerId, OtherPartyId, CollateralAmount, LoanAmount, InvestmentAmount, InterestRate, CurrencyCode, TotalInterestAmount, ServiceFee, RepaymentAmount, Revenue, LoanTerm, StartDate, EndDate, StatusLevel):
         self.CustomerId = CustomerId
+        self.OtherPartyId = OtherPartyId
         self.CollateralAmount = CollateralAmount
         self.LoanAmount = LoanAmount
         self.InvestmentAmount = InvestmentAmount
@@ -77,6 +78,7 @@ class Loan(db.Model):
         return {
                 "LoanId": self.LoanId, 
                 "CustomerId": self.CustomerId,
+                "OtherPartyId": self.OtherPartyId,
                 "CollateralAmount": self.CollateralAmount,
                 "LoanAmount": self.LoanAmount,
                 "InvestmentAmount": self.InvestmentAmount,
@@ -149,6 +151,7 @@ def create_borrowing_loan():
     # Create a new Loan object
     loan = Loan(
         CustomerId=CustomerId,
+        OtherPartyId=None,
         CollateralAmount=collateral_amount,
         LoanAmount=loan_amount,
         InvestmentAmount=None,
@@ -200,6 +203,7 @@ def create_lending_loan():
     # Create a new Loan object
     loan = Loan(
         CustomerId=CustomerId,
+        OtherPartyId=None,
         CollateralAmount=None,
         LoanAmount=None,
         InvestmentAmount=investment_amount,
