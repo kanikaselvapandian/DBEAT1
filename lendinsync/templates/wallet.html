@@ -1277,9 +1277,9 @@ async function checkLocalStorageAndRedirect() {
 
             for (let i = 0; i < accounts.length; i++) {
                 // Check if parentAccountFlag is true for the current account
-                if (accounts[i].parentAccountFlag=='true') {
-                    accountIdString += 'Account ID ' + (i+1) + ': ' + accounts[i].accountID + '<br>';
-                    balanceString += 'Balance for Account ' + (i+1) + ': ' + accounts[i].currency + " " + accounts[i].balance + '<br>';
+                if (accounts[i].parentAccountFlag=='false'&&accounts[i].productID==101) {
+                    accountIdString += 'CASA Account ID: '+ ': ' + accounts[i].accountID + '<br>';
+                    balanceString += 'CASA Account Balance: ' + accounts[i].currency + " " + accounts[i].balance + '<br>';
                 }
             }
 
