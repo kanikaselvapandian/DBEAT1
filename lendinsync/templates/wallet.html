@@ -62,15 +62,16 @@
   <header id="header" class="fixed-top">
     <div class="container d-flex align-items-center justify-content-between">
       <div>
-        <img src="/DBEAT1/lendinsync/assets/img/favicon.jpg" width="50" height="50" style="display: inline-block;"><h1 class="logo" style="display: inline-block;"><a href="index.html">LendInSync</a></h1>
+        <img src="/DBEAT1/lendinsync/assets/img/favicon.jpg" width="50" height="50" style="display: inline-block;"><h1 class="logo" style="display: inline-block;"><a href="/home">LendInSync</a></h1>
       </div>
 
       <nav id="navbar" class="navbar">
         <ul>
-          <li><a class="nav-link scrollto" href="http://127.0.0.1:5000/home">Home</a></li>
-          <li><a class="nav-link scrollto active" href="http://127.0.0.1:5000/wallet">Wallets</a></li>
+          <li><a class="nav-link scrollto active" href="/home">Home</a></li>
+          <li><a class="nav-link scrollto" href="/wallet">Wallets</a></li>
           <li><a class="nav-link scrollto o" href="#services">Loans</a></li>
-          <li><a class="nav-link scrollto" href="http://127.0.0.1:5000/profile">Profile</a></li>
+          <li><a class="nav-link scrollto" href="/profile">Profile</a></li>
+          <li><a class="nav-link scrollto"href="/" onclick="logout()">Logout</a></li>
         </ul>
         <i class="bi bi-list mobile-nav-toggle"></i>
       </nav><!-- .navbar -->
@@ -91,7 +92,7 @@
           <div class="icon-box" style="width: 100%;">
             <div class="icon"><i class="bi bi-wallet-fill"></i></div>
             <h4 class="title">Your Deposit Account Details</h4>
-            <p class="description">Account ID: </p>
+            <p class="description">Account ID:<h6 id="account_id"></h6> </p>
           </div>
         </div>
 
@@ -99,7 +100,7 @@
           <div class="icon-box" style="width: 100%;">
             <div class="icon"><i class="bi bi-send-check-fill"></i></div>
             <h4 class="title">Deposit Account Balance</h4>
-            <p class="description">Balance for Account: </p>
+            <p class="description">Balance for Account: <h6 id="balance"></h6> </p>
           </div>
         </div>
       </div>
@@ -1239,6 +1240,42 @@
     });
     const vm = wallet.mount('#wallet');
     </script>
+    <script>
+        function logout() {
+       localStorage.clear();
+       window.location.href = "/";
+   }
+   
+     </script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+     const username = localStorage.getItem('username');
+     const pin = localStorage.getItem('pin');
+     const customer_url = `http://tbankonline.com/SMUtBank_API/Gateway?Header={"serviceName":"getCustomerAccounts","userID":"${username}","PIN":"${pin}","OTP":"999999"}`;;
+     fetch(customer_url)
+         .then(response => response.json())
+         .then(data => {
+            console.log(data);
+            const customer_url = `http://tbankonline.com/SMUtBank_API/Gateway?Header={"serviceName":"getCustomerAccounts","userID":"${username}","PIN":"${pin}","OTP":"999999"}`;
+            let accounts = data.Content.ServiceResponse.AccountList.account;
+let accountIdString = '';
+let balanceString = '';
+
+for (let i = 0; i < accounts.length; i++) {
+    accountIdString += 'Account ID ' + (i+1) + ': ' + accounts[i].accountID + '<br>';
+    balanceString += 'Balance for Account ' + (i+1) + ': ' + accounts[i].currency + " " + accounts[i].balance + '<br>';
+}
+
+document.querySelector('#account_id').innerHTML = accountIdString;
+document.querySelector('#balance').innerHTML = balanceString;
+
+         })
+         .catch(error => {
+             console.error('An error occurred:', error);
+         });
+    });
+</script>
 
 </body>
 
