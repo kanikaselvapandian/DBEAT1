@@ -71,10 +71,11 @@
 
       <nav id="navbar" class="navbar">
         <ul>
-          <li><a class="nav-link scrollto" href="http://127.0.0.1:5000/home">Home</a></li>
-          <li><a class="nav-link scrollto" href="http://127.0.0.1:5000/wallet">Wallets</a></li>
+          <li><a class="nav-link scrollto active" href="/home">Home</a></li>
+          <li><a class="nav-link scrollto" href="/wallet">Wallets</a></li>
           <li><a class="nav-link scrollto o" href="#services">Loans</a></li>
-          <li><a class="nav-link scrollto active" href="http://127.0.0.1:5000/profile">Profile</a></li>
+          <li><a class="nav-link scrollto" href="/profile">Profile</a></li>
+          <li><a class="nav-link scrollto"href="/" onclick="logout()">Logout</a></li>
         </ul>
         <i class="bi bi-list mobile-nav-toggle"></i>
       </nav><!-- .navbar -->
@@ -178,6 +179,7 @@
   <script>
     document.addEventListener('DOMContentLoaded', () => {
         const username = localStorage.getItem('username');
+        const pin = localStorage.getItem('pin');
         const friends_url = `http://127.0.0.1:8895/friends/${username}`;
         fetch(friends_url)
             .then(response => response.json())
@@ -211,7 +213,7 @@
                 console.error('An error occurred:', error);
             });
 
-        const url = `http://tbankonline.com/SMUtBank_API/Gateway?Header={"serviceName":"getCustomerDetails","userID":"H123123","PIN":"123123","OTP":"999999"}`;
+        const url = `http://tbankonline.com/SMUtBank_API/Gateway?Header={"serviceName":"getCustomerDetails","userID":"${username}","PIN":"${pin}","OTP":"999999"}`;
 
         fetch(url)
             .then(response => response.json())
@@ -284,6 +286,13 @@
             document.getElementById("backdrop").style.display = "none";
         }
     </script>
+     <script>
+      function logout() {
+     localStorage.clear();
+     window.location.href = "/";
+ }
+ 
+   </script>
 </body>
 
 </html>
