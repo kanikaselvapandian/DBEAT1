@@ -75,7 +75,7 @@
                     <input disabled type="number" v-model="borrowing_service_fee" class="form-control" id="borrowingServiceFee">
                     
                 </div>
-                <button type="submit" id="submit" class="btn btn-primary">Submit</button>
+                <button type="submit" id="submit" class="btn btn-primary" @click="create_borrow_application($event)">Submit</button>
             </form>
             <div v-if = "errorsFound">
                 <hr>
@@ -86,7 +86,7 @@
                 </div>
             </div>
         </div>
-        <script>
+        <!-- <script>
             // Get the form
             let form = document.getElementById('myForm');
 
@@ -118,7 +118,7 @@
                 .catch(error => console.log(error));
             });
 
-        </script>
+        </script> -->
     
     <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>

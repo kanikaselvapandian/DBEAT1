@@ -1,8 +1,8 @@
 const customer_id = localStorage.getItem('username');
-const get_borrowed_loans_by_customer_id = "http://localhost:5001/loan/borrowing/" + customer_id;
-const get_lent_loans_by_customer_id = "http://localhost:5001/loan/lending/" + customer_id;
-const create_borrow_application = "http://localhost:5001/loan/borrowing/";
-const create_lending_application = "http://localhost:5001/loan/lending/";
+const get_borrowed_loans_by_customer_id = "http://127.0.0.1:5001/loan/borrowing/" + customer_id;
+const get_lent_loans_by_customer_id = "http://127.0.0.1:5001/loan/lending/" + customer_id;
+const create_borrow_application = "http://127.0.0.1:5001/loan/borrowing/";
+const create_lending_application = "http://127.0.0.1:5001/loan/lending/";
 
 const loan = Vue.createApp({
     data() {
@@ -136,9 +136,18 @@ const loan = Vue.createApp({
                     switch (data.code) {
                         case 201:
                             // Handle success case
+                            console.log("Successfully created borrowing application");
+                            //Reload the page after a delay
+                            setTimeout(() => {
+                                window.location.reload();
+                            }, 1000);
                             break;
                         case 500:
                             this.message = data.message;
+                            //Reload the page after a delay
+                            setTimeout(() => {
+                                window.location.reload();
+                            }, 1000);
                             break;
                         default:
                             throw `${data.code}: ${data.message}`;
@@ -198,9 +207,18 @@ const loan = Vue.createApp({
                     switch (data.code) {
                         case 201:
                             // Handle success case
+                            console.log("Successfully created lending application");
+                            //Reload the page after a delay
+                            setTimeout(() => {
+                                window.location.reload();
+                            }, 1000);
                             break;
                         case 500:
                             this.message = data.message;
+                            //Reload the page after a delay
+                            setTimeout(() => {
+                                window.location.reload();
+                            }, 1000);
                             break;
                         default:
                             throw `${data.code}: ${data.message}`;
