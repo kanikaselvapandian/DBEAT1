@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>My Loans</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <!-- jQuery library -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script type = "module" src="../js/loan.js"></script>
+    <!-- Popper JS -->
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <!-- Bootstrap CSS -->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+        <!-- Custom CSS -->
+        <link rel="stylesheet" href="../css/loan.css">
+        <!-- Latest compiled and minified JavaScript -->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+        <!-- Vue 3 -->
+        <script src='https://cdn.jsdelivr.net/npm/vue@3.0.2/dist/vue.global.js'></script>
+        <script type = "module" src="../js/loan.js"></script>
+        <title>LendInSync</title>
+    </head>
+    <body>
+        <!-- Add the navigation bar -->
+        <nav class="navbar navbar-expand-lg navbar-dark">
+            <a class="navbar-brand" href="#">LendInSync</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="home.html">Wallet</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="marketplace.html">Marketplace</a>
+                    </li>
+                    <li class="nav-item active">
+                        <a class="nav-link" href="my_loans.html">My Loans</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="profile.html">Profile</a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+
+        <div class="container mt-4" id="loan">
+            <!-- Bootstrap Tabs -->
+            <ul class="nav nav-tabs nav-fill" id="myTabs" role="tablist">
+                <li class="nav-item">
+                    <a class="nav-link active" id="tab1-tab" data-toggle="tab" href="#tab1" role="tab" aria-controls="tab1" aria-selected="true">My Borrowed Loans</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="tab2-tab" data-toggle="tab" href="#tab2" role="tab" aria-controls="tab2" aria-selected="false">My Lent Loans</a>
+                </li>
+            </ul>
+    
+            <div class="tab-content" id="myTabsContent">
+                <div class="tab-pane fade show active" id="tab1" role="tabpanel" aria-labelledby="tab1-tab">
+                    <table class="table table-striped text-center">
+                        <thead>
+                            <tr>
+                                <th>Borrowed Amount</th>
+                                <th>Currency</th>
+                                <th>Repayment Amount</th>
+                                <th>Repayment Date</th>
+                                <th>Status</th>
+                                <!-- <th>View Details</th> -->
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="loan in customer_borrowed_loans">
+                                <td>{{loan.LoanAmount}}</td>
+                                <td>{{loan.CurrencyCode}}</td>
+                                <td>{{loan.RepaymentAmount}}</td>
+                                <td>{{loan.EndDate}}</td>
+                                <td>{{loan.StatusLevel}}</td>
+                                <!-- <td>
+                                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#borrowedDetailsModal">
+                                        View Details
+                                    </button>
+                                </td> -->
+                            </tr>
+                        </tbody>
+                    </table>
+                    <!-- Modal for Borrowed Loan Details -->
+                    <!-- <div class="modal fade" id="borrowedDetailsModal" aria-hidden="true" aria-labelledby="borrowedDetailsModalLabel" tabindex="-1" data-bs-backdrop="true">
+                        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                          <div class="modal-content">
+                            <div class="modal-header">
+                              <h1 class="modal-title fs-5" id="borrowedDetailsModalLabel">Borrowed Loan Details</h1>
+                            </div>
+                            <div class="modal-body d-flex flex-column align-items-center">
+                                <form>
+                                    <div class="form-group">
+
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            </div>
+                          </div>
+                        </div>
+                    </div> -->
+                </div>
+                <div class="tab-pane fade" id="tab2" role="tabpanel" aria-labelledby="tab2-tab">
+                    <table class="table table-striped text-center">
+                        <thead>
+                            <tr>
+                                <th>Investment Amount</th>
+                                <th>Currency</th>
+                                <th>Revenue</th>
+                                <th>End Date</th>
+                                <th>Status</th>
+                                <!-- <th>View Details</th> -->
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="loan in customer_lent_loans">
+                                <td>{{loan.InvestmentAmount}}</td>
+                                <td>{{loan.CurrencyCode}}</td>
+                                <td>{{loan.Revenue}}</td>
+                                <td>{{loan.EndDate}}</td>
+                                <td>{{loan.StatusLevel}}</td>
+                                <!-- <td>
+                                    <div>
+                                        <a class="btn btn-dark w-100 mb-3" data-bs-toggle="modal" href="#mlldetails" role="button">View Details</a>
+                                    </div>
+                                </td> -->
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+
+
+        <!-- jQuery -->
+        <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
+        <!-- Popper.js -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+        <!-- Bootstrap JS -->
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    </body>
+</html>

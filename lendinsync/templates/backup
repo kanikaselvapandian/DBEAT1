@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="../css/wallet.css">
+    <script src="https://cdn.jsdelivr.net/npm/vue@3.0.2/dist/vue.global.js"></script>
+    <script type="module" src="../js/loanall.js"></script>
+    <title>LendInSync</title>
+</head>
+<body>
+    <!-- Add the navigation bar -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <a class="navbar-brand" href="#">LendInSync</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" href="home.html">Wallet</a>
+                </li>
+                <li class="nav-item active">
+                    <a class="nav-link" href="marketplace.html">Marketplace</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="my_loans.html">My Loans</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="profile.html">Profile</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container mt-4" id="loan">
+        <!-- Bootstrap Tabs -->
+        <ul class="nav nav-tabs" id="myTabs" role="tablist">
+            <li class="nav-item">
+                <a class="nav-link active" id="tab1-tab" data-toggle="tab" href="#tab1" role="tab" aria-controls="tab1" aria-selected="true">Available Loans Requested</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="tab2-tab" data-toggle="tab" href="#tab2" role="tab" aria-controls="tab2" aria-selected="false">Lent Loans</a>
+            </li>
+        </ul>
+
+        <div class="tab-content" id="myTabsContent">
+            <div class="tab-pane fade show active" id="tab1" role="tabpanel" aria-labelledby="tab1-tab">
+                <table class="table table-striped">
+                    <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Loan Amount</th>
+                        <th scope="col">Repayment Amount</th>
+                        <th scope="col">Currency</th>
+                        <th scope="col">Interest Rate</th>
+                        <th scope="col">Term</th>
+                        <th scope="col">Collateral</th>
+                    
+                    </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="(loan, index) in borrowed_loans">
+                            <td>{{ index + 1 }}</td>
+                            <td>{{ loan.LoanAmount }}</td>
+                            <td>{{ loan.RepaymentAmount }}</td>
+                            <td>{{ loan.CurrencyCode }}</td>
+                            <td>{{ loan.InterestRate }}</td>
+                            <td>{{ loan.LoanTerm }}</td>
+                            <td>{{ loan.CollateralAmount }}</td>
+                            <td>
+                                <button class="btn btn-primary">Lend Now</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="tab-pane fade" id="tab2" role="tabpanel" aria-labelledby="tab2-tab">
+                <table class="table table-striped">
+                    <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Invested Amount</th>
+                        <th scope="col">Currency</th>
+                        <th scope="col">Interest Rate</th>
+                        <th scope="col">Term</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="(loan, index) in lent_loans">
+                            <td>{{ index + 1 }}</td>
+                            <td>{{ loan.InvestmentAmount }}</td>
+                            <td>{{ loan.CurrencyCode }}</td>
+                            <td>{{ loan.InterestRate }}</td>
+                            <td>{{ loan.LoanTerm }}</td>
+                            <td>
+                                <button class="btn btn-primary">Borrow Now</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
+    <!-- Popper.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <!-- Bootstrap JS -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

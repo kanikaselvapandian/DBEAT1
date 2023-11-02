@@ -4,6 +4,7 @@
 .navbar {
     background-color: #491549;
 }
+
 .card-deck-scroll {
     display: flex;
     flex-wrap: nowrap;
