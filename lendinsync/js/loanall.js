@@ -1,16 +1,12 @@
-const customer_id = localStorage.getItem('username');
-const get_borrowed_loans_by_customer_id = "http://localhost:5001/loan/borrowing/" + customer_id;
-const get_lent_loans_by_customer_id = "http://localhost:5001/loan/lending/" + customer_id;
-const create_borrow_application = "http://localhost:5001/loan/borrowing/";
-const create_lending_application = "http://localhost:5001/loan/lending/";
+const get_all_borrowed_loans = "http://localhost:5001/loan/borrowing";
+const get_all_lent_loans = "http://localhost:5001/loan/lending";
 
 const loan = Vue.createApp({
     data() {
         return {
-            customer_borrowed_loans: [],
-            customer_lent_loans: [],
+            borrowed_loans: [],
+            lent_loans: [],
             message: "",
-            customer_id: customer_id,
             loan_amount: 0,
             collateral_amount: 0,
             investment_amount: 0,
@@ -39,79 +35,68 @@ const loan = Vue.createApp({
             return parseFloat(revenue.toFixed(2)); // Round to 2 decimal places
         },
     },
-    watch: {
-        loan_amount: function (newLoanAmount, oldLoanAmount) {
-            // Compute the service fee based on the newLoanAmount
-            this.borrowing_service_fee = newLoanAmount * 0.01; 
-        },
-        investment_amount: function (newInvestmentAmount, oldInvestmentAmount) {
-            // Compute the service fee based on the newInvestmentAmount
-            this.lending_service_fee = newInvestmentAmount * 0.01; 
-        },
-    },
     methods: {
-        async get_my_borrowed_loans(){
+        async get_all_borrowed_loans() {
             try {
-                const response = await fetch(get_borrowed_loans_by_customer_id);
+                const response = await fetch(get_all_borrowed_loans);
                 const data = await response.json();
 
                 if (data.code === 404) {
                     this.message = data.message;
                 } else {
-                    this.customer_borrowed_loans = data.data.loans;
+                    this.borrowed_loans = data.data.loans;
                 }
             } catch (error) {
-                this.message = "Error fetching my borrowed loans: " + error;
+                this.message = "Error fetching all borrowed loans: " + error;
             }
         },
-        async get_my_lent_loans(){
+        async get_all_lent_loans() {
             try {
-                const response = await fetch(get_lent_loans_by_customer_id);
+                const response = await fetch(get_all_lent_loans);
                 const data = await response.json();
 
                 if (data.code === 404) {
                     this.message = data.message;
                 } else {
-                    this.customer_lent_loans = data.data.loans;
+                    this.lent_loans = data.data.loans;
                 }
             } catch (error) {
-                this.message = "Error fetching my lent loans: " + error;
+                this.message = "Error fetching all lent loans: " + error;
             }
         },
-        async getCurrencyCodes(){
+        async getCurrencyCodes() {
             const response = await fetch('http://tbankonline.com/SMUtBank_API/Gateway?Header={"serviceName": "getCurrencyList", "userID": "", "PIN": "", "OTP": ""}&Content={"baseCurrency": "SGD", "quoteCurrency": "USD"}');
             const data = await response.json();
             this.currency_info = data.Content.ServiceResponse.CurrencyList.Currency;
         },
-        async getExchangeRate(currency_code){
+        async getExchangeRate(currency_code) {
             const response = await fetch(`http://tbankonline.com/SMUtBank_API/Gateway?Header={"serviceName": "getExchangeRate", "userID": "", "PIN": "", "OTP": ""}&Content={"baseCurrency": "SGD", "quoteCurrency": "${currency_code}"}`);
             const data = await response.json();
             this.exchange_rate = data.Content.ServiceResponse["FX_SpotRate_Read-Response"]["Rate"];
         },
-        async create_borrow_application(event){
+        async create_borrow_application(event) {
             event.preventDefault();
             this.validation_errors = [];
-            if (this.loan_amount.value <= 0){
+            if (this.loan_amount.value <= 0) {
                 this.validation_errors.push("Loan amount must be greater than 0");
             }
-            if (this.loan_amount.value > this.collateral_amount.value){
+            if (this.loan_amount.value > this.collateral_amount.value) {
                 this.validation_errors.push("Loan amount must be less than the collateral amount");
             }
-            if (this.selectedCurrency === ""){
+            if (this.selectedCurrency === "") {
                 this.validation_errors.push("Please select a currency");
             }
-            if(this.loan_term.value <= 0){
+            if (this.loan_term.value <= 0) {
                 this.validation_errors.push("Loan term must be greater than 0");
             }
             if (this.validation_errors.length > 0) {
                 this.errorsFound = true;
                 return;
-            }
-            else {
+            } else {
                 this.validation_errors = [];
                 this.errorsFound = false;
                 const jsonData = JSON.stringify({
-                    CustomerId: this.customer_id,
+                    // Remove "CustomerId" and set it on the server side
                     CurrencyCode: this.selectedCurrency,
                     LoanAmount: this.loan_amount,
                     RepaymentAmount: this.repayment_amount,
@@ -150,30 +135,29 @@ const loan = Vue.createApp({
                 }
             }
         },
-        async create_lending_application(event){
+        async create_lending_application(event) {
             event.preventDefault();
             this.validation_errors = [];
-            if (this.investment_amount <= 0){
+            if (this.investment_amount <= 0) {
                 this.validation_errors.push("Investment amount must be greater than 0");
             }
-            if (this.loan_term <= 0){
+            if (this.loan_term <= 0) {
                 this.validation_errors.push("Loan term must be greater than 0");
             }
-            if (this.interest_rate <= 0){
+            if (this.interest_rate <= 0) {
                 this.validation_errors.push("Interest rate must be greater than 0");
             }
-            if (this.selectedCurrency === ""){
+            if (this.selectedCurrency === "") {
                 this.validation_errors.push("Please select a currency");
             }
             if (this.validation_errors.length > 0) {
                 this.errorsFound = true;
                 return;
-            }
-            else {
+            } else {
                 this.validation_errors = [];
                 this.errorsFound = false;
                 const jsonData = JSON.stringify({
-                    CustomerId: this.customer_id,
+                    // Remove "CustomerId" and set it on the server side
                     InvestmentAmount: this.investment_amount,
                     InterestRate: this.interest_rate,
                     RepaymentAmount: this.repayment_amount,
@@ -215,9 +199,10 @@ const loan = Vue.createApp({
         }
     },
     created() {
-        this.get_my_borrowed_loans();
-        this.get_my_lent_loans();
-        this.getCurrencyCodes();
+        this.get_all_borrowed_loans(); // Fetch all borrowed loans
+        this.get_all_lent_loans();     // Fetch all lent loans
+        this.getCurrencyCodes();       // Fetch currency codes
     },
 });
+
 const vm = loan.mount('#loan');
