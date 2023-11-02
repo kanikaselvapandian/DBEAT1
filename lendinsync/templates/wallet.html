@@ -67,9 +67,19 @@
 
       <nav id="navbar" class="navbar">
         <ul>
-          <li><a class="nav-link scrollto active" href="/home">Home</a></li>
-          <li><a class="nav-link scrollto" href="/wallet">Wallets</a></li>
-          <li><a class="nav-link scrollto o" href="#services">Loans</a></li>
+          <li><a class="nav-link scrollto" href="/home">Home</a></li>
+          <li><a class="nav-link scrollto active" href="/wallet">Wallets</a></li>
+          <li><a class="nav-link scrollto" href="/marketplace">Marketplace</a></li>
+          <li><a class="nav-link scrollto" href="/my_loans">My Loans</a></li>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              Create Application
+            </a>
+            <ul class="dropdown-menu">
+              <li><a class="dropdown-item" href="/loan/borrowing/">Create Borrow Application</a></li>
+              <li><a class="dropdown-item" href="/loan/lending/">Create Lending Application</a></li>
+            </ul>
+          </li>
           <li><a class="nav-link scrollto" href="/profile">Profile</a></li>
           <li><a class="nav-link scrollto"href="/" onclick="logout()">Logout</a></li>
         </ul>

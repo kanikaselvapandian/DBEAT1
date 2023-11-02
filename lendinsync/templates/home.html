@@ -71,7 +71,17 @@
         <ul>
           <li><a class="nav-link scrollto active" href="/home">Home</a></li>
           <li><a class="nav-link scrollto" href="/wallet">Wallets</a></li>
-          <li><a class="nav-link scrollto o" href="#services">Loans</a></li>
+          <li><a class="nav-link scrollto" href="/marketplace">Marketplace</a></li>
+          <li><a class="nav-link scrollto" href="/my_loans">My Loans</a></li>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              Create Application
+            </a>
+            <ul class="dropdown-menu">
+              <li><a class="dropdown-item" href="/loan/borrowing/">Create Borrow Application</a></li>
+              <li><a class="dropdown-item" href="/loan/lending/">Create Lending Application</a></li>
+            </ul>
+          </li>
           <li><a class="nav-link scrollto" href="/profile">Profile</a></li>
           <li><a class="nav-link scrollto"href="/" onclick="logout()">Logout</a></li>
         </ul>
@@ -110,7 +120,7 @@
         <div class="col-md-6 col-lg-3 d-flex align-items-stretch mb-5 mb-lg-0" data-aos="zoom-in" data-aos-delay="400">
           <div class="icon-box">
             <div class="icon"><i class="bi bi-cash-coin"></i></div>
-            <h4 class="title"><a href="">Create Loans</a></h4>
+            <h4 class="title"><a href="http://127.0.0.1:5000/loan/lending">Create Loans</a></h4>
             <p class="description">Create loans to enable peer to peer lending</p>
           </div>
         </div>
@@ -118,7 +128,7 @@
         <div class="col-md-6 col-lg-3 d-flex align-items-stretch mb-5 mb-lg-0" data-aos="zoom-in" data-aos-delay="500">
           <div class="icon-box">
             <div class="icon"><i class="bi bi-currency-exchange"></i></i></div>
-            <h4 class="title"><a href="">Borrow a loan</a></h4>
+            <h4 class="title"><a href="http://127.0.0.1:5000/loan/borrowing">Borrow a loan</a></h4>
             <p class="description">Borrow loans from your peers with competitive interest rates</p>
           </div>
         </div>
