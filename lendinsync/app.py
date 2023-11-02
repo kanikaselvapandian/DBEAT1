@@ -25,17 +25,17 @@ def profile():
     except Exception as e:
         return jsonify({'error': str(e)})
       
-@app.route("/home")
+@app.route("/wallet")
 def homePage():
     try:
-         return render_template("home.html")
+         return render_template("wallet.html")
     except Exception as e:
         return jsonify({'error': str(e)})
     
-@app.route("/ui")
+@app.route("/home")
 def homeUI():
     try:
-         return render_template("hometest.html")
+         return render_template("home.html")
     except Exception as e:
         return jsonify({'error': str(e)})
 
