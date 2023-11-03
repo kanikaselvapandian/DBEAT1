@@ -68,4 +68,4 @@ def create_lending_application():
         return jsonify({'error': str(e)})
 
 if __name__ == "__main__":
-  app.run(debug=True)
+  app.run()
