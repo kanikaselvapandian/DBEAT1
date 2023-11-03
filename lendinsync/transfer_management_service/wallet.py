@@ -196,4 +196,4 @@ def delete_wallet(WID):
     ), 404
 
 if __name__ == '__main__':
-    app.run(port=7000, debug=True)
+    app.run(port=7000)

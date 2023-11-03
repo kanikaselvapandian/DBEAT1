@@ -39,5 +39,33 @@ def homeUI():
     except Exception as e:
         return jsonify({'error': str(e)})
 
+@app.route("/marketplace")
+def marketplace():
+    try:
+         return render_template("marketplace.html")
+    except Exception as e:
+        return jsonify({'error': str(e)})
+
+@app.route("/my_loans")
+def my_loans():
+    try:
+         return render_template("my_loans.html")
+    except Exception as e:
+        return jsonify({'error': str(e)})
+
+@app.route("/loan/borrowing/")
+def create_borrow_application():
+    try:
+         return render_template("create_borrow_application.html")
+    except Exception as e:
+        return jsonify({'error': str(e)})
+
+@app.route("/loan/lending/")
+def create_lending_application():
+    try:
+         return render_template("create_lending_application.html")
+    except Exception as e:
+        return jsonify({'error': str(e)})
+
 if __name__ == "__main__":
-  app.run(debug=True)
+  app.run()
