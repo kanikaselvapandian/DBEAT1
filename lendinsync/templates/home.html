@@ -95,7 +95,7 @@
     <div class="container position-relative" data-aos="fade-up" data-aos-delay="100">
       <div class="row justify-content-center">
         <div class="col-xl-7 col-lg-9 text-center">
-          <h1>Welcome</h1>
+          <h1>Welcome, <span id="ownName"></span></h1>
           <h2>Manage your digital wallets and engage in peer loans today!</h2>
         </div>
       </div>
@@ -436,14 +436,30 @@ async function checkLocalStorageAndRedirect() {
       const vm = homePage.mount('#homePage');
 
   </script>
- 
   <script>
-     function logout() {
-    localStorage.clear();
-    window.location.href = "/";
-}
+    document.addEventListener('DOMContentLoaded', () => {
+        // Assuming 'username' and 'pin' are obtained securely, not shown here for security
+        const username = localStorage.getItem('username'); // You should get the username securely, perhaps from a session variable
+        const pin = localStorage.getItem('pin');// PIN should be obtained securely, perhaps through a form with POST method
 
-  </script>
+        const url = `http://tbankonline.com/SMUtBank_API/Gateway?Header={"serviceName":"getCustomerDetails","userID":"${username}","PIN":"${pin}","OTP":"999999"}`;
+
+fetch(url)
+    .then(response => response.json())
+    .then(data => {
+        console.log(data);
+
+        // Select the HTML elements
+        const nameElement = document.querySelector('#ownName');
+        nameElement.textContent = data.Content.ServiceResponse.CDMCustomer.givenName
+      })
+                .catch(error => console.error(error));
+        });
+    function logout() {
+        localStorage.clear();
+        window.location.href = "/";
+    }
+</script>
 
 </body>
 
