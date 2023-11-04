@@ -17,6 +17,8 @@
 
   <!-- Vendor CSS Files -->
   <link href="/DBEAT1/lendinsync/assets/vendor/aos/aos.css" rel="stylesheet">
+  <!-- jQuery -->
+  <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
   <link href="/DBEAT1/lendinsync/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
   <link href="/DBEAT1/lendinsync/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
   <link href="/DBEAT1/lendinsync/assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
@@ -172,7 +174,7 @@
                 </svg>
                 <i class="bi bi-currency-exchange"></i>
               </div>
-              <h4><a href="">Transfer between your wallets</a></h4>
+              <h4>Transfer between your wallets</h4>
               <p>Transact between any of your digital wallets based on current exchange rates</p>
             </div>
           </div>
@@ -185,7 +187,7 @@
                 </svg>
                 <i class="bi bi-person-vcard-fill"></i>
               </div>
-              <h4><a href="">Transfer to Deposit Account</a></h4>
+              <h4>Transfer to Deposit Account</h4>
               <p>Transfer money back to your deposit account if needed</p>
             </div>
           </div>
@@ -198,7 +200,7 @@
                 </svg>
                 <i class="bi bi-cash-coin"></i>
               </div>
-              <h4><a href="">Transact from Deposit Accounts</a></h4>
+              <h4>Transact from Deposit Accounts</h4>
               <p>Top up your digital wallet from your deposit account based on current exchange rates</p>
             </div>
           </div>
@@ -211,7 +213,7 @@
                 </svg>
                 <i class="bi bi-person-add"></i>
               </div>
-              <h4><a href="">Add a Friend!</a></h4>
+              <h4><a href="http://127.0.0.1:5000/profile">Add a Friend!</a></h4>
               <p>Add a friend with their unique user ID to facilitate transactions between your digital wallets</p>
             </div>
           </div>
@@ -224,7 +226,7 @@
                 </svg>
                 <i class="bi bi-people"></i>
               </div>
-              <h4><a href="http://127.0.0.1:5000/profile">Transact to your friend's wallet</a></h4>
+              <h4>Transact to your friend's wallet</h4>
               <p>Transfer money to your friend's digital wallet of your choice</p>
             </div>
           </div>
@@ -245,8 +247,8 @@
                 <thead>
                     <tr>
                         <th>Timestamp</th>
-                        <th>Source Wallet</th>
-                        <th>Destination Wallet</th>
+                        <th>Source Wallet/Account</th>
+                        <th>Destination Wallet/Account</th>
                         <th>Amount</th>
                         <th>Exchange Rate</th>
                     </tr>
@@ -254,8 +256,10 @@
                 <tbody>
                     <tr v-for="transaction in customer_transactions">
                         <td v-text="transaction.TimeStamp"></td>
-                        <td v-text="transaction.SourceWallet"></td>
-                        <td v-text="transaction.DestinationWallet"></td>
+                        <td v-if="transaction.SourceWallet" v-text="transaction.SourceWallet"></td>
+                        <td v-else v-text="deposit_account"></td>
+                        <td v-if="transaction.DestinationWallet" v-text="transaction.DestinationWallet"></td>
+                        <td v-else v-text="deposit_account"></td>
                         <td v-text="transaction.AmountTransferred"></td>
                         <td v-text="transaction.ExchangeRate"></td>
                     </tr>
@@ -612,695 +616,1349 @@ async function checkLocalStorageAndRedirect() {
 
   <!-- Template Main JS File -->
   <script src="/DBEAT1/lendinsync/assets/js/main.js"></script>
-    <script>
-    const customer_id = "A123456";
-    const get_wallets_by_customerid = "http://127.0.0.1:7000/wallet/" + customer_id;
-    const get_wallets = "http://127.0.0.1:7000/wallet/"
-    const get_transactions_by_customerid = "http://127.0.0.1:8000/transaction/" + customer_id;
-    const create_wallet = "http://127.0.0.1:7000/wallet";
-    const create_transaction = "http://127.0.0.1:6100/transfer";
-    const get_friends_by_customerid = "http://localhost:8895/friends/" + customer_id;
-    const create_peer_transaction = "http://127.0.0.1:6100/peer_transfer";
-    const deposit_account = "0000010505"
-    const deposit_account_balance = "40000"
-
-    const wallet = Vue.createApp({
-    data() {
-        return {
-        customer_wallets: [],
-        customer_transactions: [],
-        wallets_received: false,
-        transactions_received: false,
-        message: '', // Define a message property for error handling
-        data_received: false,
-        currency_info: [],
-        selectedCurrency: "",
-        customer_id: customer_id,
-        deposit_account: deposit_account,
-        wallet_amount: 0,
-        exchange_rate: 0,
-        sourcewallet: null,
-        destinationwallet: null,
-        availableDestinationWallets: [],
-        availableSourceWallets: [],
-        deposit_account_balance: deposit_account_balance,
-        validation_errors: [],
-        errorsFound: false,
-        friends_info: [],
-        friends_received: false,
-        destinationfriend: null,
-        friend_wallets: [],
-        friend_wallets_received: false,
-        destination_friend_wallet: null
-        };
-    },
-    methods: {
-        openModal() {
-            this.errorsFound = false;
-            this.sourcewallet = null;
-            this.destinationwallet = null;
-            this.wallet_amount = 0; 
-            this.selectedCurrency = "";
-            this.validation_errors = [];
-        },
-        async get_wallets() {
-        try {
-            const response = await fetch(get_wallets_by_customerid);
-            const data = await response.json();
-
-            if (data.code === 404) {
-            this.message = data.message;
-            } else {
-            this.customer_wallets = data.data.wallet; 
-            this.wallets_received = true;
-            this.availableSourceWallets = this.customer_wallets;
-            this.availableDestinationWallets = this.customer_wallets;
-            this.checkDataReceived();
-            }
-        } catch (error) {
-            console.error('Error fetching wallets:', error);
-            this.message = 'Error fetching wallet data: ' + error;
-        }
-        },
-        async get_transactions() {
-        try {
-            const response = await fetch(get_transactions_by_customerid);
-            const data = await response.json();
-
-            if (data.code === 404) {
-            this.message = data.message;
-            } else {
-            this.customer_transactions = data.data.transactions;
-            this.transactions_received = true;
-            this.checkDataReceived();
-            }
-        } catch (error) {
-            this.message = 'Error fetching transaction data: ' + error;
-        }
-        },
-        async get_friends() {
-        try {
-            const response = await fetch(get_friends_by_customerid);
-            const data = await response.json();
-
-            if (data.code === 404) {
-            this.message = data.message;
-            } else {
-            this.friends_info = data.data.friends;
-            this.friends_received = true;
-            this.checkDataReceived();
-            }
-        } catch (error) {
-            this.message = 'Error fetching transaction data: ' + error;
-        }
-        },
-        checkDataReceived() {
-        if (this.wallets_received && this.transactions_received && friends_received) {
-            this.data_received = true;
-        }
-        },
-        async getCurrencyCodes(){
-            const response = await fetch('http://tbankonline.com/SMUtBank_API/Gateway?Header={"serviceName": "getCurrencyList", "userID": "", "PIN": "", "OTP": ""}&Content={"baseCurrency": "", "quoteCurrency": ""}');
-            const data = await response.json();
-            this.currency_info = data.Content.ServiceResponse.CurrencyList.Currency;
-        },
-        async getExchangeRate(currency_code){
-            const response = await fetch(`http://tbankonline.com/SMUtBank_API/Gateway?Header={"serviceName": "getExchangeRate", "userID": "", "PIN": "", "OTP": ""}&Content={"baseCurrency": "SGD", "quoteCurrency": "${currency_code}"}`);
-            const data = await response.json();
-            this.exchange_rate = data.Content.ServiceResponse["FX_SpotRate_Read-Response"]["Rate"];
-        },
-        updateSourceAndCheck() {
-        this.updateSourceWallets();
-        this.checkWalletsSelection();
-        },
-        checkWalletsSelection() {
-            console.log("checking")
-            if (this.sourcewallet && this.destinationwallet) {
-                console.log("checking!")
-                this.getWalletExchange();
-            }
-            else if (this.sourcewallet && this.destination_friend_wallet){
-                this.getWalletExchange();
-            }
-        },
-        async getWalletExchange() {
-            console.log("here");
-            console.log(this.sourcewallet);
-            console.log(this.destinationwallet);
-            if (this.sourcewallet && this.destinationwallet) {
-                console.log("Both wallets have been selected")
-                const response = await fetch(`http://tbankonline.com/SMUtBank_API/Gateway?Header={"serviceName": "getExchangeRate", "userID": "", "PIN": "", "OTP": ""}&Content={"baseCurrency": "${this.sourcewallet.CurrencyCode}", "quoteCurrency": "${this.destinationwallet.CurrencyCode}"}`);
-                const data = await response.json();
-                console.log(data)
-                this.exchange_rate = data.Content.ServiceResponse["FX_SpotRate_Read-Response"]["Rate"];
-                console.log(this.exchange_rate);
-            } 
-            else if (this.sourcewallet && this.destination_friend_wallet){
-                console.log("Both wallets have been selected");
-                const response = await fetch(`http://tbankonline.com/SMUtBank_API/Gateway?Header={"serviceName": "getExchangeRate", "userID": "", "PIN": "", "OTP": ""}&Content={"baseCurrency": "${this.sourcewallet.CurrencyCode}", "quoteCurrency": "${this.destination_friend_wallet.CurrencyCode}"}`);
-                const data = await response.json();
-                this.exchange_rate = data.Content.ServiceResponse["FX_SpotRate_Read-Response"]["Rate"];
-            }
-            else {
-                console.log("Both source and destination wallets need to be chosen.");
-            }
-        },    
-        async createWallet(event) {
-            event.preventDefault();
-            this.validation_errors = []
-            if (this.wallet_amount > this.deposit_account_balance) {
-                this.validation_errors.push("Insufficient funds in deposit account");
-            }
-            if (this.wallet_amount <= 0) {
-                this.validation_errors.push("Amount must be greater than 0");
-            }
-            if (this.selectedCurrency == "") {
-                this.validation_errors.push("Please select a currency");
-            }
-            if (this.validation_errors.length > 0) {
-                this.errorsFound = true
-                return;
-            }
-            else {
-                this.validation_errors = [];
-                this.errorsFound = false;
-                const jsonData = JSON.stringify({
-                CustomerId: this.customer_id,
-                CurrencyCode: this.selectedCurrency,
-                Amount: this.wallet_amount * this.exchange_rate
-            });
-        
-            const url = create_wallet;
-            const postMethod = {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: jsonData
-            };
-        
-            try {
-                const response = await fetch(url, postMethod);
-                const data = await response.json();
-        
-                switch (data.code) {
-                    case 201:
-                        // Handle success case
-                        console.log("Successfully created wallet");
-                        // Close the createWalletModal
-                        $('#createWalletModal').modal('hide');
-                        // Show success modal
-                        $('#successModal').modal('show');
-                        // Reload page after a delay (you can change the delay as needed)
-                        setTimeout(() => {
-                            window.location.reload();
-                        }, 1000); // Example: Reload after 1 second (1000 milliseconds)
-                        break;
-                    case 500:
-                        this.message = data.message;
-                        // Close the createWalletModal
-                        $('#createWalletModal').modal('hide');
-                        // Show unsuccessful modal
-                        $('#unsuccessfulModal').modal('show');
-                        // Reload page after a delay (you can change the delay as needed)
-                        setTimeout(() => {
-                            window.location.reload();
-                        }, 1000); // Example: Reload after 1 seconds (1000 milliseconds)
-                        break;
-                    default:
-                        throw `${data.code}: ${data.message}`;
-                }
-            } catch (error) {
-                console.error('Error');
-            }
-            }
-        },
-        async createTransaction(WalletTransaction, PeerTransaction, event) {
-            event.preventDefault();
-            this.validation_errors = []
-            this.errorsFound = false;
-            if (WalletTransaction && PeerTransaction == false){
-                if (this.sourcewallet == null) {  
-                this.validation_errors.push("Please select a source wallet");
-                }
-                if (this.destinationwallet == null) {
-                this.validation_errors.push("Please select a destination wallet");
-                }
-                if (this.sourcewallet != null && this.wallet_amount > this.sourcewallet.Amount) {
-                this.validation_errors.push("Insufficient funds in source wallet");
-                }
-                if (this.wallet_amount <= 0 || this.wallet_amount == "") {
-                this.validation_errors.push("Amount must be greater than 0");
-                }
-                if (this.validation_errors.length > 0) {
-                this.errorsFound = true
-                return;
-                }
-                else {
-                    this.walletWalletTransaction()
-                }
-            }
-            else if (WalletTransaction == false && this.sourcewallet == null && PeerTransaction == false) {
-                console.log("hereeeeee")
-                if (parseFloat(this.wallet_amount) > parseFloat(this.deposit_account_balance)) {
-                    console.log(parseFloat(this.wallet_amount) - parseFloat(this.deposit_account_balance))
-                    this.validation_errors.push("Insufficient funds in deposit account");
-                }
-                if (this.wallet_amount <= 0 || this.wallet_amount == "") {
-                    this.validation_errors.push("Amount must be greater than 0");
-                }
-                if (this.destinationwallet == null) {
-                    this.validation_errors.push("Please select a destination wallet");
-                }
-                if (this.validation_errors.length > 0) {
-                    this.errorsFound = true
-                return;
-                }
-                else {
-                    // Perform wallet transaction
-                        try {
-                            const response = await this.withdrawWalletAndCallAPI();
-                            // Check response and handle success/failure
-                            if (response.walletTransaction.code === 201 && response.apiResponse === 'invocation successful') {
-                                // Both transactions succeeded
-                                // Close the createWalletModal
-                                $('#walletTransaction').modal('hide');
-                                // Show success modal
-                                $('#successModalTransaction').modal('show');
-                                // Reload page after a delay (you can change the delay as needed)
-                                // setTimeout(() => {
-                                //     window.location.reload();
-                                // }, 1000); // Example: Reload after 1 second (1000 milliseconds)
-                            } else {
-                                // Close the createWalletModal
-                                $('#walletTransaction').modal('hide');
-                                // Show unsuccessful modal
-                                $('#unsuccessfulModalTransaction').modal('show');
-                                // Reload page after a delay (you can change the delay as needed)
-                                // setTimeout(() => {
-                                //     window.location.reload();
-                                // }, 2000); // Example: Reload after 1 seconds (1000 milliseconds)
-                            }
-                        } catch (error) {
-                            console.error('Error:', error);
-                            // Handle error
-                        }
-                }
-            }
-            else if (PeerTransaction == true){
-                if (this.sourcewallet == null) {  
-                this.validation_errors.push("Please select a source wallet");
-                }
-                if (this.destination_friend_wallet == null) {
-                this.validation_errors.push("Please select a destination wallet");
-                }
-                if (this.sourcewallet != null && this.wallet_amount > this.sourcewallet.Amount) {
-                this.validation_errors.push("Insufficient funds in source wallet");
-                }
-                if (this.wallet_amount <= 0 || this.wallet_amount == "") {
-                this.validation_errors.push("Amount must be greater than 0");
-                }
-                if (this.validation_errors.length > 0) {
-                this.errorsFound = true
-                return;
-                }
-                else {
-                    this.peerWalletTransaction()
-                }
-            }
-            else {
-                console.log("here")
-                if (this.sourcewallet != null && parseFloat(this.wallet_amount) > parseFloat(this.sourcewallet.Amount)) {
-                    this.validation_errors.push("Insufficient funds in source wallet");
-                }
-                if (this.wallet_amount <= 0 || this.wallet_amount == "") {
-                    this.validation_errors.push("Amount must be greater than 0");
-                }
-                if (this.sourcewallet == null) {
-                    this.validation_errors.push("Please select a source wallet");
-                }
-                if (this.validation_errors.length > 0) {
-                    console.log(this.wallet_amount)
-                    console.log(this.sourcewallet.Amount)
-                    console.log(this.validation_errors)
-                    this.errorsFound = true
-                    return;
-                }
-                else {
-                // Perform wallet transaction
-                    try {
-                            const response = await this.depositWalletAndCallAPI();
-                            // Check response and handle success/failure
-                            if (response.walletTransaction.code === 201 && response.apiResponse === 'invocation successful') {
-                                // Both transactions succeeded
-                                // Close the createWalletModal
-                                $('#walletTransaction').modal('hide');
-                                // Show success modal
-                                $('#successModalTransaction').modal('show');
-                                // Reload page after a delay (you can change the delay as needed)
-                                // setTimeout(() => {
-                                //     window.location.reload();
-                                // }, 1000); // Example: Reload after 1 second (1000 milliseconds)
-                            } else {
-                                // Close the createWalletModal
-                                $('#walletTransaction').modal('hide');
-                                // Show unsuccessful modal
-                                $('#unsuccessfulModalTransaction').modal('show');
-                                // Reload page after a delay (you can change the delay as needed)
-                                // setTimeout(() => {
-                                //     window.location.reload();
-                                // }, 2000); // Example: Reload after 1 seconds (1000 milliseconds)
-                            }
-                            } catch (error) {
-                                console.error('Error:', error);
-                                // Handle error
-                        }
-                }
-            }
-        },
-        async walletWalletTransaction() {
-            const currentDate = new Date();  // Your new Date() object
-            // Format the date as a string in the desired MySQL DATETIME format
-            const formattedDate = currentDate.toISOString().slice(0, 19).replace('T', ' ');
-            const jsonData = JSON.stringify({
-                "SourceWallet": this.sourcewallet.WID,
-                "DestinationWallet": this.destinationwallet.WID,
-                "CustomerId": this.customer_id,
-                "WalletTransaction": true,
-                "ExchangeRate": this.exchange_rate,
-                "TimeStamp": formattedDate,
-                "AmountTransferred": this.wallet_amount
-                });
-                const url = create_transaction;
-                const postMethod = {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: jsonData
-            };
-        
-            try {
-                const response = await fetch(url, postMethod);
-                const data = await response.json();
-                console.log(data)
-                switch (data.code) {
-                    case 201:
-                        // Handle success case
-                        // Close the createWalletModal
-                        $('#walletTransaction').modal('hide');
-                        // Show success modal
-                        $('#successModalTransaction').modal('show');
-                        // Reload page after a delay (you can change the delay as needed)
-                        setTimeout(() => {
-                            window.location.reload();
-                        }, 1000); // Example: Reload after 1 second (1000 milliseconds)
-                        break;
-                    case 500:
-                        this.message = data.message;
-                        // Close the createWalletModal
-                        $('#walletTransaction').modal('hide');
-                        // Show unsuccessful modal
-                        $('#unsuccessfulModalTransaction').modal('show');
-                        // Reload page after a delay (you can change the delay as needed)
-                        setTimeout(() => {
-                            window.location.reload();
-                        }, 2000); // Example: Reload after 1 seconds (1000 milliseconds)
-                        break;
-                    default:
-                        throw `${data.code}: ${data.message}`;
-                }
-            } 
-            catch (error) {
-                console.error('Error:', error);
-                // Handle other errors or display a general error message
-            }
-        },
-        async depositWalletTransaction() {
-            const currentDate = new Date();  // Your new Date() object
-            // Format the date as a string in the desired MySQL DATETIME format
-            const formattedDate = currentDate.toISOString().slice(0, 19).replace('T', ' ');
-            const jsonData = JSON.stringify({
-            "SourceWallet": this.sourcewallet.WID,
-            "DestinationWallet": "",
-            "CustomerId": this.customer_id,
-            "WalletTransaction": false,
-            "ExchangeRate": this.exchange_rate,
-            "TimeStamp": formattedDate,
-            "AmountTransferred": this.wallet_amount
-            });
-
-            const url = create_transaction;
-            const postMethod = {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: jsonData
-            };
-        
-            try {
-                const response = await fetch(url, postMethod);
-                const data = await response.json();
-                console.log(data)
-                return data
-            } 
-            catch (error) {
-                console.error('Error:', error);
-                // Handle other errors or display a general error message
-            }
-        },
-        async withdrawWalletTransaction() {
-            const currentDate = new Date();  
-            // Format the date as a string in the desired MySQL DATETIME format
-            const formattedDate = currentDate.toISOString().slice(0, 19).replace('T', ' ');
-            const jsonData = JSON.stringify({
-            "SourceWallet": "",
-            "DestinationWallet": this.destinationwallet.WID,
-            "CustomerId": this.customer_id,
-            "WalletTransaction": false,
-            "ExchangeRate": this.exchange_rate,
-            "TimeStamp": formattedDate,
-            "AmountTransferred": this.wallet_amount
-            });
-            const url = create_transaction;
-            const postMethod = {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: jsonData
-            };
-            try {
-                const response = await fetch(url, postMethod);
-                const data = await response.json();
-                console.log(data)
-                return data
-            } 
-            catch (error) {
-                console.error('Error:', error);
-                // Handle other errors or display a general error message
-            }
-        },
-        async peerWalletTransaction(){
-            const currentDate = new Date();  // Your new Date() object
-            // Format the date as a string in the desired MySQL DATETIME format
-            const formattedDate = currentDate.toISOString().slice(0, 19).replace('T', ' ');
-            const jsonData = JSON.stringify({
-                "SourceWallet": this.sourcewallet.WID,
-                "DestinationWallet": this.destination_friend_wallet.WID,
-                "CustomerId": this.customer_id,
-                "ExchangeRate": this.exchange_rate,
-                "TimeStamp": formattedDate,
-                "AmountTransferred": this.wallet_amount
-                });
-                const url = create_peer_transaction;
-                const postMethod = {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: jsonData
-            };
-            try {
-                const response = await fetch(url, postMethod);
-                const data = await response.json();
-                console.log(data)
-                switch (data.code) {
-                    case 201:
-                        // Handle success case
-                        // Close the createWalletModal
-                        $('#walletTransaction').modal('hide');
-                        // Show success modal
-                        $('#successModalTransaction').modal('show');
-                        // Reload page after a delay (you can change the delay as needed)
-                        setTimeout(() => {
-                            window.location.reload();
-                        }, 1000); // Example: Reload after 1 second (1000 milliseconds)
-                        break;
-                    case 500:
-                        this.message = data.message;
-                        // Close the createWalletModal
-                        $('#walletTransaction').modal('hide');
-                        // Show unsuccessful modal
-                        $('#unsuccessfulModalTransaction').modal('show');
-                        // Reload page after a delay (you can change the delay as needed)
-                        setTimeout(() => {
-                            window.location.reload();
-                        }, 2000); // Example: Reload after 1 seconds (1000 milliseconds)
-                        break;
-                    default:
-                        throw `${data.code}: ${data.message}`;
-                }
-            } 
-            catch (error) {
-                console.error('Error:', error);
-                // Handle other errors or display a general error message
-            }
-        },
-        updateDestinationWallets() {
-        if (this.sourcewallet) {
-            this.availableDestinationWallets = this.customer_wallets.filter(wallet => wallet.WID !== this.sourcewallet.WID);
-        } else {
-            this.availableDestinationWallets = this.customer_wallets;
-        }
-        },
-        updateSourceWallets() {
-            if (this.destinationwallet) {
-                this.availableSourceWallets = this.customer_wallets.filter(wallet => wallet.WID !== this.destinationwallet.WID);
-            } else {
-                this.availableSourceWallets = this.customer_wallets;
-            }
-        },
-        updateAmount(event) {
-        // Update the wallet_amount when the input changes
-        const value = parseFloat(event.target.value);
-        this.wallet_amount = isNaN(value) || value < 0 ? 0.1 : value;
-        },
-        async getFriendsWallets(){
-            this.friend_wallets_received = false;
-            try {
-            const friend_wallet_url = get_wallets + this.destinationfriend.friendee_id;
-            const response = await fetch(friend_wallet_url);
-            const data = await response.json();
-
-            if (data.code === 404) {
-            this.message = data.message;
-            } else {
-            this.friend_wallets = data.data.wallet; 
-            this.friend_wallets_received = true;
-            }
-        } catch (error) {
-            console.error('Error fetching wallets:', error);
-            this.message = 'Error fetching wallet data: ' + error;
-        }
-        },
-        async withdrawWalletAndCallAPI() {
-            try {
-                const walletTransactionResponse = await this.withdrawWalletTransaction();
-                let apiResponse;
-                if (walletTransactionResponse.code === 201) {
-                    apiResponse = await this.callExternalAPI(type = "withdraw");
-                }
-                return {
-                    walletTransaction: walletTransactionResponse,
-                    apiResponse: apiResponse
-                };
-            } catch (error) {
-                console.error('Error:', error);
-                throw error;
-            }
-        },
-        async depositWalletAndCallAPI() {
-            try {
-                const walletTransactionResponse = await this.depositWalletTransaction();
-                let apiResponse;
-                if (walletTransactionResponse.code === 201) {
-                    apiResponse = await this.callExternalAPI(type = "deposit");
-                }
-                return {
-                    walletTransaction: walletTransactionResponse,
-                    apiResponse: apiResponse
-                };
-            } catch (error) {
-                console.error('Error:', error);
-                throw error;
-            }
-        },
-        async callExternalAPI(type) {
-            if(type == "withdraw"){
-                try {
-                const externalAPIResponse = await fetch(`http://tbankonline.com/SMUtBank_API/Gateway?Header={"serviceName": "withdrawCash", "userID": "T829103K", "PIN": "1", "OTP": ""}&Content={"accountID": "${this.deposit_account}", "amount": "${this.wallet_amount}", "narrative": "testing"}&ConsumerID=Teller`);
-
-                const data = await externalAPIResponse.json();
-                const message = data.Content.ServiceResponse["ServiceRespHeader"]["ErrorText"];
-                return message; // Return the data from the external API call
-            } catch (error) {
-                console.error('Error calling external API:', error);
-                throw error;
-            }
-        }
-        else {
-            try {
-                const externalAPIResponse = await fetch(`http://tbankonline.com/SMUtBank_API/Gateway?Header={"serviceName": "depositCash", "userID": "T829103K", "PIN": "1", "OTP": ""}&Content={"accountID": "${this.deposit_account}", "amount": "${this.wallet_amount}", "narrative": "testing"}&ConsumerID=Teller`);
-
-                const data = await externalAPIResponse.json();
-                const message = data.Content.ServiceResponse["ServiceRespHeader"]["ErrorText"];
-                return message; // Return the data from the external API call
-            } catch (error) {
-                console.error('Error calling external API:', error);
-                throw error;
-            }
-        }
+  <script>
+    function logout() {
+    localStorage.clear();
+    window.location.href = "/";
     }
-    },
-    mounted() {
-        this.get_wallets();
-        this.get_transactions();
-        this.getCurrencyCodes();
-        this.get_friends();
-    },
-    });
-    const vm = wallet.mount('#wallet');
-    </script>
-    <script>
-        function logout() {
-       localStorage.clear();
-       window.location.href = "/";
-   }
-   
-     </script>
 
+</script>
 <script>
-   document.addEventListener('DOMContentLoaded', () => {
-    const username = localStorage.getItem('username');
-    const pin = localStorage.getItem('pin');
-    const customer_url = `http://tbankonline.com/SMUtBank_API/Gateway?Header={"serviceName":"getCustomerAccounts","userID":"${username}","PIN":"${pin}","OTP":"999999"}`;
+    let primaryAccount = ''
+    document.addEventListener('DOMContentLoaded', () => {
+     const username = localStorage.getItem('username');
+     const pin = localStorage.getItem('pin');
+     const customer_url = `http://tbankonline.com/SMUtBank_API/Gateway?Header={"serviceName":"getCustomerAccounts","userID":"${username}","PIN":"${pin}","OTP":"999999"}`;
+ 
+     fetch(customer_url)
+         .then(response => response.json())
+         .then(data => {
+             console.log(data);
+             let accounts = data.Content.ServiceResponse.AccountList.account;
+             let accountIdString = '';
+             let balanceString = '';
+ 
+             for (let i = 0; i < accounts.length; i++) {
+                 // Check if parentAccountFlag is true for the current account
+                 if (accounts[i].parentAccountFlag=='false'&&accounts[i].productID==101) {
+                     accountIdString += 'CASA Account ID: '+ ': ' + accounts[i].accountID + '<br>';
+                     balanceString += 'CASA Account Balance: ' + accounts[i].currency + " " + accounts[i].balance + '<br>';
+                     primaryAccount = accounts[i]
+                 }
+             }
+ 
+             document.querySelector('#account_id').innerHTML = accountIdString;
+             document.querySelector('#balance').innerHTML = balanceString;
 
-    fetch(customer_url)
-        .then(response => response.json())
-        .then(data => {
-            console.log(data);
-            let accounts = data.Content.ServiceResponse.AccountList.account;
-            let accountIdString = '';
-            let balanceString = '';
+            const customer_id = username;
+            const get_wallets_by_customerid = "http://127.0.0.1:7000/wallet/" + customer_id;
+            const get_wallets = "http://127.0.0.1:7000/wallet/"
+            const get_transactions_by_customerid = "http://127.0.0.1:8000/transaction/" + customer_id;
+            const create_wallet = "http://127.0.0.1:7000/wallet";
+            const create_transaction = "http://127.0.0.1:6100/transfer";
+            const get_friends_by_customerid = "http://localhost:8895/friends/" + customer_id;
+            const create_peer_transaction = "http://127.0.0.1:6100/peer_transfer";
+            const deposit_account = primaryAccount ? primaryAccount.accountID : 'N/A';
+            const deposit_account_balance = primaryAccount ? primaryAccount.balance : 'N/A';
+            const deposit_account_currency = primaryAccount ? primaryAccount.currency : 'N/A';
 
-            for (let i = 0; i < accounts.length; i++) {
-                // Check if parentAccountFlag is true for the current account
-                if (accounts[i].parentAccountFlag=='false'&&accounts[i].productID==101) {
-                    accountIdString += 'CASA Account ID: '+ ': ' + accounts[i].accountID + '<br>';
-                    balanceString += 'CASA Account Balance: ' + accounts[i].currency + " " + accounts[i].balance + '<br>';
+            const wallet = Vue.createApp({
+            data() {
+                return {
+                customer_wallets: [],
+                customer_transactions: [],
+                wallets_received: false,
+                transactions_received: false,
+                message: '', // Define a message property for error handling
+                data_received: false,
+                currency_info: [],
+                selectedCurrency: "",
+                customer_id: customer_id,
+                deposit_account: deposit_account,
+                wallet_amount: 0,
+                exchange_rate: 0,
+                sourcewallet: null,
+                destinationwallet: null,
+                availableDestinationWallets: [],
+                availableSourceWallets: [],
+                deposit_account_balance: deposit_account_balance,
+                deposit_account_currency: deposit_account_currency,
+                validation_errors: [],
+                errorsFound: false,
+                friends_info: [],
+                friends_received: false,
+                destinationfriend: null,
+                friend_wallets: [],
+                friend_wallets_received: false,
+                destination_friend_wallet: null
+                };
+            },
+            methods: {
+                openModal() {
+                    this.errorsFound = false;
+                    this.sourcewallet = null;
+                    this.destinationwallet = null;
+                    this.wallet_amount = 0; 
+                    this.selectedCurrency = "";
+                    this.validation_errors = [];
+                },
+                async get_wallets() {
+                try {
+                    const response = await fetch(get_wallets_by_customerid);
+                    const data = await response.json();
+
+                    if (data.code === 404) {
+                    this.message = data.message;
+                    } else {
+                    this.customer_wallets = data.data.wallet; 
+                    this.wallets_received = true;
+                    this.availableSourceWallets = this.customer_wallets;
+                    this.availableDestinationWallets = this.customer_wallets;
+                    this.checkDataReceived();
+                    }
+                } catch (error) {
+                    console.error('Error fetching wallets:', error);
+                    this.message = 'Error fetching wallet data: ' + error;
+                }
+                },
+                async get_transactions() {
+                try {
+                    const response = await fetch(get_transactions_by_customerid);
+                    const data = await response.json();
+
+                    if (data.code === 404) {
+                    this.message = data.message;
+                    } else {
+                    this.customer_transactions = data.data.transactions;
+                    this.transactions_received = true;
+                    this.checkDataReceived();
+                    }
+                } catch (error) {
+                    this.message = 'Error fetching transaction data: ' + error;
+                }
+                },
+                async get_friends() {
+                try {
+                    const response = await fetch(get_friends_by_customerid);
+                    const data = await response.json();
+
+                    if (data.code === 404) {
+                    this.message = data.message;
+                    } else {
+                    this.friends_info = data.data.friends;
+                    this.friends_received = true;
+                    this.checkDataReceived();
+                    }
+                } catch (error) {
+                    this.message = 'Error fetching transaction data: ' + error;
+                }
+                },
+                checkDataReceived() {
+                if (this.wallets_received && this.transactions_received && this.friends_received) {
+                    this.data_received = true;
+                }
+                },
+                async getCurrencyCodes(){
+                    const response = await fetch('http://tbankonline.com/SMUtBank_API/Gateway?Header={"serviceName": "getCurrencyList", "userID": "", "PIN": "", "OTP": ""}&Content={"baseCurrency": "", "quoteCurrency": ""}');
+                    const data = await response.json();
+                    this.currency_info = data.Content.ServiceResponse.CurrencyList.Currency;
+                },
+                async getExchangeRate(currency_code){
+                    const response = await fetch(`http://tbankonline.com/SMUtBank_API/Gateway?Header={"serviceName": "getExchangeRate", "userID": "", "PIN": "", "OTP": ""}&Content={"baseCurrency": "${this.deposit_account_currency}", "quoteCurrency": "${currency_code}"}`);
+                    const data = await response.json();
+                    this.exchange_rate = data.Content.ServiceResponse["FX_SpotRate_Read-Response"]["Rate"];
+                },
+                updateSourceAndCheck() {
+                this.updateSourceWallets();
+                this.checkWalletsSelection();
+                },
+                checkWalletsSelection() {
+                    console.log("checking")
+                    if (this.sourcewallet && this.destinationwallet) {
+                        console.log("checking!")
+                        this.getWalletExchange();
+                    }
+                    else if (this.sourcewallet && this.destination_friend_wallet){
+                        this.getWalletExchange();
+                    }
+                },
+                async getWalletExchange() {
+                    console.log("here");
+                    console.log(this.sourcewallet);
+                    console.log(this.destinationwallet);
+                    if (this.sourcewallet && this.destinationwallet) {
+                        console.log("Both wallets have been selected")
+                        const response = await fetch(`http://tbankonline.com/SMUtBank_API/Gateway?Header={"serviceName": "getExchangeRate", "userID": "", "PIN": "", "OTP": ""}&Content={"baseCurrency": "${this.sourcewallet.CurrencyCode}", "quoteCurrency": "${this.destinationwallet.CurrencyCode}"}`);
+                        const data = await response.json();
+                        console.log(data)
+                        this.exchange_rate = data.Content.ServiceResponse["FX_SpotRate_Read-Response"]["Rate"];
+                        console.log(this.exchange_rate);
+                    } 
+                    else if (this.sourcewallet && this.destination_friend_wallet){
+                        console.log("Both wallets have been selected");
+                        const response = await fetch(`http://tbankonline.com/SMUtBank_API/Gateway?Header={"serviceName": "getExchangeRate", "userID": "", "PIN": "", "OTP": ""}&Content={"baseCurrency": "${this.sourcewallet.CurrencyCode}", "quoteCurrency": "${this.destination_friend_wallet.CurrencyCode}"}`);
+                        const data = await response.json();
+                        this.exchange_rate = data.Content.ServiceResponse["FX_SpotRate_Read-Response"]["Rate"];
+                    }
+                    else {
+                        console.log("Both source and destination wallets need to be chosen.");
+                    }
+                },    
+                async createWallet(event) {
+                    event.preventDefault();
+                    this.validation_errors = []
+                    if (this.wallet_amount > this.deposit_account_balance) {
+                        this.validation_errors.push("Insufficient funds in deposit account");
+                    }
+                    if (this.wallet_amount <= 0) {
+                        this.validation_errors.push("Amount must be greater than 0");
+                    }
+                    if (this.selectedCurrency == "") {
+                        this.validation_errors.push("Please select a currency");
+                    }
+                    if (this.validation_errors.length > 0) {
+                        this.errorsFound = true
+                        return;
+                    }
+                    else {
+                        this.validation_errors = [];
+                        this.errorsFound = false;
+                        const jsonData = JSON.stringify({
+                        CustomerId: this.customer_id,
+                        CurrencyCode: this.selectedCurrency,
+                        Amount: this.wallet_amount * this.exchange_rate
+                    });
+                
+                    const url = create_wallet;
+                    const postMethod = {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: jsonData
+                    };
+                
+                    try {
+                        const response = await fetch(url, postMethod);
+                        const data = await response.json();
+                
+                        switch (data.code) {
+                            case 201:
+                                // Handle success case
+                                console.log("Successfully created wallet");
+                                // Close the createWalletModal
+                                $('#createWalletModal').modal('hide');
+                                // Show success modal
+                                $('#successModal').modal('show');
+                                // Reload page after a delay (you can change the delay as needed)
+                                setTimeout(() => {
+                                    window.location.reload();
+                                }, 1000); // Example: Reload after 1 second (1000 milliseconds)
+                                break;
+                            case 500:
+                                this.message = data.message;
+                                // Close the createWalletModal
+                                $('#createWalletModal').modal('hide');
+                                // Show unsuccessful modal
+                                $('#unsuccessfulModal').modal('show');
+                                // Reload page after a delay (you can change the delay as needed)
+                                setTimeout(() => {
+                                    window.location.reload();
+                                }, 1000); // Example: Reload after 1 seconds (1000 milliseconds)
+                                break;
+                            default:
+                                throw `${data.code}: ${data.message}`;
+                        }
+                    } catch (error) {
+                        console.error('Error');
+                    }
+                    }
+                },
+                async createTransaction(WalletTransaction, PeerTransaction, event) {
+                    event.preventDefault();
+                    this.validation_errors = []
+                    this.errorsFound = false;
+                    if (WalletTransaction && PeerTransaction == false){
+                        if (this.sourcewallet == null) {  
+                        this.validation_errors.push("Please select a source wallet");
+                        }
+                        if (this.destinationwallet == null) {
+                        this.validation_errors.push("Please select a destination wallet");
+                        }
+                        if (this.sourcewallet != null && this.wallet_amount > this.sourcewallet.Amount) {
+                        this.validation_errors.push("Insufficient funds in source wallet");
+                        }
+                        if (this.wallet_amount <= 0 || this.wallet_amount == "") {
+                        this.validation_errors.push("Amount must be greater than 0");
+                        }
+                        if (this.validation_errors.length > 0) {
+                        this.errorsFound = true
+                        return;
+                        }
+                        else {
+                            this.walletWalletTransaction()
+                        }
+                    }
+                    else if (WalletTransaction == false && this.sourcewallet == null && PeerTransaction == false) {
+                        console.log("hereeeeee")
+                        if (parseFloat(this.wallet_amount) > parseFloat(this.deposit_account_balance)) {
+                            console.log(parseFloat(this.wallet_amount) - parseFloat(this.deposit_account_balance))
+                            this.validation_errors.push("Insufficient funds in deposit account");
+                        }
+                        if (this.wallet_amount <= 0 || this.wallet_amount == "") {
+                            this.validation_errors.push("Amount must be greater than 0");
+                        }
+                        if (this.destinationwallet == null) {
+                            this.validation_errors.push("Please select a destination wallet");
+                        }
+                        if (this.validation_errors.length > 0) {
+                            this.errorsFound = true
+                        return;
+                        }
+                        else {
+                            // Perform wallet transaction
+                                try {
+                                    const response = await this.withdrawWalletAndCallAPI();
+                                    // Check response and handle success/failure
+                                    if (response.walletTransaction.code === 201 && response.apiResponse === 'invocation successful') {
+                                        // Both transactions succeeded
+                                        // Close the createWalletModal
+                                        $('#withdrawTransaction').modal('hide');
+                                        // Show success modal
+                                        $('#successModalTransaction').modal('show');
+                                        // Reload page after a delay (you can change the delay as needed)
+                                        // setTimeout(() => {
+                                        //     window.location.reload();
+                                        // }, 1000); // Example: Reload after 1 second (1000 milliseconds)
+                                    } else {
+                                        // Close the createWalletModal
+                                        $('#withdrawTransaction').modal('hide');
+                                        // Show unsuccessful modal
+                                        $('#unsuccessfulModalTransaction').modal('show');
+                                        // Reload page after a delay (you can change the delay as needed)
+                                        // setTimeout(() => {
+                                        //     window.location.reload();
+                                        // }, 2000); // Example: Reload after 1 seconds (1000 milliseconds)
+                                    }
+                                } catch (error) {
+                                    console.error('Error:', error);
+                                    // Handle error
+                                }
+                        }
+                    }
+                    else if (PeerTransaction == true){
+                        if (this.sourcewallet == null) {  
+                        this.validation_errors.push("Please select a source wallet");
+                        }
+                        if (this.destination_friend_wallet == null) {
+                        this.validation_errors.push("Please select a destination wallet");
+                        }
+                        if (this.sourcewallet != null && this.wallet_amount > this.sourcewallet.Amount) {
+                        this.validation_errors.push("Insufficient funds in source wallet");
+                        }
+                        if (this.wallet_amount <= 0 || this.wallet_amount == "") {
+                        this.validation_errors.push("Amount must be greater than 0");
+                        }
+                        if (this.validation_errors.length > 0) {
+                        this.errorsFound = true
+                        return;
+                        }
+                        else {
+                            this.peerWalletTransaction()
+                        }
+                    }
+                    else {
+                        console.log("here")
+                        if (this.sourcewallet != null && parseFloat(this.wallet_amount) > parseFloat(this.sourcewallet.Amount)) {
+                            this.validation_errors.push("Insufficient funds in source wallet");
+                        }
+                        if (this.wallet_amount <= 0 || this.wallet_amount == "") {
+                            this.validation_errors.push("Amount must be greater than 0");
+                        }
+                        if (this.sourcewallet == null) {
+                            this.validation_errors.push("Please select a source wallet");
+                        }
+                        if (this.validation_errors.length > 0) {
+                            console.log(this.wallet_amount)
+                            console.log(this.sourcewallet.Amount)
+                            console.log(this.validation_errors)
+                            this.errorsFound = true
+                            return;
+                        }
+                        else {
+                        // Perform wallet transaction
+                            try {
+                                    const response = await this.depositWalletAndCallAPI();
+                                    // Check response and handle success/failure
+                                    if (response.walletTransaction.code === 201 && response.apiResponse === 'invocation successful') {
+                                        // Both transactions succeeded
+                                        // Close the createWalletModal
+                                        $('#depositTransaction').modal('hide');
+                                        // Show success modal
+                                        $('#successModalTransaction').modal('show');
+                                        // Reload page after a delay (you can change the delay as needed)
+                                        // setTimeout(() => {
+                                        //     window.location.reload();
+                                        // }, 1000); // Example: Reload after 1 second (1000 milliseconds)
+                                    } else {
+                                        // Close the createWalletModal
+                                        $('#depositTransaction').modal('hide');
+                                        // Show unsuccessful modal
+                                        $('#unsuccessfulModalTransaction').modal('show');
+                                        // Reload page after a delay (you can change the delay as needed)
+                                        // setTimeout(() => {
+                                        //     window.location.reload();
+                                        // }, 2000); // Example: Reload after 1 seconds (1000 milliseconds)
+                                    }
+                                    } catch (error) {
+                                        console.error('Error:', error);
+                                        // Handle error
+                                }
+                        }
+                    }
+                },
+                async walletWalletTransaction() {
+                    const currentDate = new Date();  // Your new Date() object
+                    // Format the date as a string in the desired MySQL DATETIME format
+                    const formattedDate = currentDate.toISOString().slice(0, 19).replace('T', ' ');
+                    const jsonData = JSON.stringify({
+                        "SourceWallet": this.sourcewallet.WID,
+                        "DestinationWallet": this.destinationwallet.WID,
+                        "CustomerId": this.customer_id,
+                        "WalletTransaction": true,
+                        "ExchangeRate": this.exchange_rate,
+                        "TimeStamp": formattedDate,
+                        "AmountTransferred": this.wallet_amount
+                        });
+                        const url = create_transaction;
+                        const postMethod = {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: jsonData
+                    };
+                
+                    try {
+                        const response = await fetch(url, postMethod);
+                        const data = await response.json();
+                        console.log(data)
+                        switch (data.code) {
+                            case 201:
+                                // Handle success case
+                                // Close the createWalletModal
+                                $('#walletTransaction').modal('hide');
+                                // Show success modal
+                                $('#successModalTransaction').modal('show');
+                                // Reload page after a delay (you can change the delay as needed)
+                                setTimeout(() => {
+                                    window.location.reload();
+                                }, 1000); // Example: Reload after 1 second (1000 milliseconds)
+                                break;
+                            case 500:
+                                this.message = data.message;
+                                // Close the createWalletModal
+                                $('#walletTransaction').modal('hide');
+                                // Show unsuccessful modal
+                                $('#unsuccessfulModalTransaction').modal('show');
+                                // Reload page after a delay (you can change the delay as needed)
+                                setTimeout(() => {
+                                    window.location.reload();
+                                }, 2000); // Example: Reload after 1 seconds (1000 milliseconds)
+                                break;
+                            default:
+                                throw `${data.code}: ${data.message}`;
+                        }
+                    } 
+                    catch (error) {
+                        console.error('Error:', error);
+                        // Handle other errors or display a general error message
+                    }
+                },
+                async depositWalletTransaction() {
+                    const currentDate = new Date();  // Your new Date() object
+                    // Format the date as a string in the desired MySQL DATETIME format
+                    const formattedDate = currentDate.toISOString().slice(0, 19).replace('T', ' ');
+                    const jsonData = JSON.stringify({
+                    "SourceWallet": this.sourcewallet.WID,
+                    "DestinationWallet": "",
+                    "CustomerId": this.customer_id,
+                    "WalletTransaction": false,
+                    "ExchangeRate": this.exchange_rate,
+                    "TimeStamp": formattedDate,
+                    "AmountTransferred": this.wallet_amount
+                    });
+
+                    const url = create_transaction;
+                    const postMethod = {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: jsonData
+                    };
+                
+                    try {
+                        const response = await fetch(url, postMethod);
+                        const data = await response.json();
+                        console.log(data)
+                        return data
+                    } 
+                    catch (error) {
+                        console.error('Error:', error);
+                        // Handle other errors or display a general error message
+                    }
+                },
+                async withdrawWalletTransaction() {
+                    const currentDate = new Date();  
+                    // Format the date as a string in the desired MySQL DATETIME format
+                    const formattedDate = currentDate.toISOString().slice(0, 19).replace('T', ' ');
+                    const jsonData = JSON.stringify({
+                    "SourceWallet": "",
+                    "DestinationWallet": this.destinationwallet.WID,
+                    "CustomerId": this.customer_id,
+                    "WalletTransaction": false,
+                    "ExchangeRate": this.exchange_rate,
+                    "TimeStamp": formattedDate,
+                    "AmountTransferred": this.wallet_amount
+                    });
+                    const url = create_transaction;
+                    const postMethod = {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: jsonData
+                    };
+                    try {
+                        const response = await fetch(url, postMethod);
+                        const data = await response.json();
+                        console.log(data)
+                        return data
+                    } 
+                    catch (error) {
+                        console.error('Error:', error);
+                        // Handle other errors or display a general error message
+                    }
+                },
+                async peerWalletTransaction(){
+                    const currentDate = new Date();  // Your new Date() object
+                    // Format the date as a string in the desired MySQL DATETIME format
+                    const formattedDate = currentDate.toISOString().slice(0, 19).replace('T', ' ');
+                    const jsonData = JSON.stringify({
+                        "SourceWallet": this.sourcewallet.WID,
+                        "DestinationWallet": this.destination_friend_wallet.WID,
+                        "CustomerId": this.customer_id,
+                        "ExchangeRate": this.exchange_rate,
+                        "TimeStamp": formattedDate,
+                        "AmountTransferred": this.wallet_amount
+                        });
+                        const url = create_peer_transaction;
+                        const postMethod = {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: jsonData
+                    };
+                    try {
+                        const response = await fetch(url, postMethod);
+                        const data = await response.json();
+                        console.log(data)
+                        switch (data.code) {
+                            case 201:
+                                // Handle success case
+                                // Close the createWalletModal
+                                $('#peerWalletTransaction').modal('hide');
+                                // Show success modal
+                                $('#successModalTransaction').modal('show');
+                                // Reload page after a delay (you can change the delay as needed)
+                                setTimeout(() => {
+                                    window.location.reload();
+                                }, 1000); // Example: Reload after 1 second (1000 milliseconds)
+                                break;
+                            case 500:
+                                this.message = data.message;
+                                // Close the createWalletModal
+                                $('#peerWalletTransaction').modal('hide');
+                                // Show unsuccessful modal
+                                $('#unsuccessfulModalTransaction').modal('show');
+                                // Reload page after a delay (you can change the delay as needed)
+                                setTimeout(() => {
+                                    window.location.reload();
+                                }, 2000); // Example: Reload after 1 seconds (1000 milliseconds)
+                                break;
+                            default:
+                                throw `${data.code}: ${data.message}`;
+                        }
+                    } 
+                    catch (error) {
+                        console.error('Error:', error);
+                        // Handle other errors or display a general error message
+                    }
+                },
+                updateDestinationWallets() {
+                if (this.sourcewallet) {
+                    this.availableDestinationWallets = this.customer_wallets.filter(wallet => wallet.WID !== this.sourcewallet.WID);
+                } else {
+                    this.availableDestinationWallets = this.customer_wallets;
+                }
+                },
+                updateSourceWallets() {
+                    if (this.destinationwallet) {
+                        this.availableSourceWallets = this.customer_wallets.filter(wallet => wallet.WID !== this.destinationwallet.WID);
+                    } else {
+                        this.availableSourceWallets = this.customer_wallets;
+                    }
+                },
+                updateAmount(event) {
+                // Update the wallet_amount when the input changes
+                const value = parseFloat(event.target.value);
+                this.wallet_amount = isNaN(value) || value < 0 ? 0.1 : value;
+                },
+                async getFriendsWallets(){
+                    this.friend_wallets_received = false;
+                    try {
+                    const friend_wallet_url = get_wallets + this.destinationfriend.friendee_id;
+                    const response = await fetch(friend_wallet_url);
+                    const data = await response.json();
+
+                    if (data.code === 404) {
+                    this.message = data.message;
+                    } else {
+                    this.friend_wallets = data.data.wallet; 
+                    this.friend_wallets_received = true;
+                    }
+                } catch (error) {
+                    console.error('Error fetching wallets:', error);
+                    this.message = 'Error fetching wallet data: ' + error;
+                }
+                },
+                async withdrawWalletAndCallAPI() {
+                    try {
+                        const walletTransactionResponse = await this.withdrawWalletTransaction();
+                        let apiResponse;
+                        if (walletTransactionResponse.code === 201) {
+                            apiResponse = await this.callExternalAPI(type = "withdraw");
+                        }
+                        return {
+                            walletTransaction: walletTransactionResponse,
+                            apiResponse: apiResponse
+                        };
+                    } catch (error) {
+                        console.error('Error:', error);
+                        throw error;
+                    }
+                },
+                async depositWalletAndCallAPI() {
+                    try {
+                        const walletTransactionResponse = await this.depositWalletTransaction();
+                        let apiResponse;
+                        if (walletTransactionResponse.code === 201) {
+                            apiResponse = await this.callExternalAPI(type = "deposit");
+                        }
+                        return {
+                            walletTransaction: walletTransactionResponse,
+                            apiResponse: apiResponse
+                        };
+                    } catch (error) {
+                        console.error('Error:', error);
+                        throw error;
+                    }
+                },
+                async callExternalAPI(type) {
+                    if(type == "withdraw"){
+                        try {
+                        const externalAPIResponse = await fetch(`http://tbankonline.com/SMUtBank_API/Gateway?Header={"serviceName": "withdrawCash", "userID": "T829103K", "PIN": "1", "OTP": ""}&Content={"accountID": "${this.deposit_account}", "amount": "${this.wallet_amount}", "narrative": "testing"}&ConsumerID=Teller`);
+
+                        const data = await externalAPIResponse.json();
+                        const message = data.Content.ServiceResponse["ServiceRespHeader"]["ErrorText"];
+                        return message; // Return the data from the external API call
+                    } catch (error) {
+                        console.error('Error calling external API:', error);
+                        throw error;
+                    }
+                }
+                else {
+                    try {
+                        const externalAPIResponse = await fetch(`http://tbankonline.com/SMUtBank_API/Gateway?Header={"serviceName": "depositCash", "userID": "T829103K", "PIN": "1", "OTP": ""}&Content={"accountID": "${this.deposit_account}", "amount": "${this.wallet_amount}", "narrative": "testing"}&ConsumerID=Teller`);
+
+                        const data = await externalAPIResponse.json();
+                        const message = data.Content.ServiceResponse["ServiceRespHeader"]["ErrorText"];
+                        return message; // Return the data from the external API call
+                    } catch (error) {
+                        console.error('Error calling external API:', error);
+                        throw error;
+                    }
                 }
             }
+            },
+            mounted() {
+                this.get_wallets();
+                this.get_transactions();
+                this.getCurrencyCodes();
+                this.get_friends();
+            },
+            });
+            const vm = wallet.mount('#wallet');
 
-            document.querySelector('#account_id').innerHTML = accountIdString;
-            document.querySelector('#balance').innerHTML = balanceString;
-        })
-        .catch(error => {
-            console.error('An error occurred:', error);
-        });
-});
+         })
+         .catch(error => {
+             console.error('An error occurred:', error);
+         });
+    });
+ 
+ </script>
+<script>
+// const customer_id = "A123456";
+// const get_wallets_by_customerid = "http://127.0.0.1:7000/wallet/" + customer_id;
+// const get_wallets = "http://127.0.0.1:7000/wallet/"
+// const get_transactions_by_customerid = "http://127.0.0.1:8000/transaction/" + customer_id;
+// const create_wallet = "http://127.0.0.1:7000/wallet";
+// const create_transaction = "http://127.0.0.1:6100/transfer";
+// const get_friends_by_customerid = "http://localhost:8895/friends/" + customer_id;
+// const create_peer_transaction = "http://127.0.0.1:6100/peer_transfer";
+// const deposit_account = primaryAccount ? primaryAccount.accountID : 'N/A';
+// const deposit_account_balance = primaryAccount ? primaryAccount.balance : 'N/A';
 
+// const wallet = Vue.createApp({
+// data() {
+//     return {
+//     customer_wallets: [],
+//     customer_transactions: [],
+//     wallets_received: false,
+//     transactions_received: false,
+//     message: '', // Define a message property for error handling
+//     data_received: false,
+//     currency_info: [],
+//     selectedCurrency: "",
+//     customer_id: customer_id,
+//     deposit_account: deposit_account,
+//     wallet_amount: 0,
+//     exchange_rate: 0,
+//     sourcewallet: null,
+//     destinationwallet: null,
+//     availableDestinationWallets: [],
+//     availableSourceWallets: [],
+//     deposit_account_balance: deposit_account_balance,
+//     validation_errors: [],
+//     errorsFound: false,
+//     friends_info: [],
+//     friends_received: false,
+//     destinationfriend: null,
+//     friend_wallets: [],
+//     friend_wallets_received: false,
+//     destination_friend_wallet: null
+//     };
+// },
+// methods: {
+//     openModal() {
+//         this.errorsFound = false;
+//         this.sourcewallet = null;
+//         this.destinationwallet = null;
+//         this.wallet_amount = 0; 
+//         this.selectedCurrency = "";
+//         this.validation_errors = [];
+//     },
+//     async get_wallets() {
+//     try {
+//         const response = await fetch(get_wallets_by_customerid);
+//         const data = await response.json();
+
+//         if (data.code === 404) {
+//         this.message = data.message;
+//         } else {
+//         this.customer_wallets = data.data.wallet; 
+//         this.wallets_received = true;
+//         this.availableSourceWallets = this.customer_wallets;
+//         this.availableDestinationWallets = this.customer_wallets;
+//         this.checkDataReceived();
+//         }
+//     } catch (error) {
+//         console.error('Error fetching wallets:', error);
+//         this.message = 'Error fetching wallet data: ' + error;
+//     }
+//     },
+//     async get_transactions() {
+//     try {
+//         const response = await fetch(get_transactions_by_customerid);
+//         const data = await response.json();
+
+//         if (data.code === 404) {
+//         this.message = data.message;
+//         } else {
+//         this.customer_transactions = data.data.transactions;
+//         this.transactions_received = true;
+//         this.checkDataReceived();
+//         }
+//     } catch (error) {
+//         this.message = 'Error fetching transaction data: ' + error;
+//     }
+//     },
+//     async get_friends() {
+//     try {
+//         const response = await fetch(get_friends_by_customerid);
+//         const data = await response.json();
+
+//         if (data.code === 404) {
+//         this.message = data.message;
+//         } else {
+//         this.friends_info = data.data.friends;
+//         this.friends_received = true;
+//         this.checkDataReceived();
+//         }
+//     } catch (error) {
+//         this.message = 'Error fetching transaction data: ' + error;
+//     }
+//     },
+//     checkDataReceived() {
+//     if (this.wallets_received && this.transactions_received && friends_received) {
+//         this.data_received = true;
+//     }
+//     },
+//     async getCurrencyCodes(){
+//         const response = await fetch('http://tbankonline.com/SMUtBank_API/Gateway?Header={"serviceName": "getCurrencyList", "userID": "", "PIN": "", "OTP": ""}&Content={"baseCurrency": "", "quoteCurrency": ""}');
+//         const data = await response.json();
+//         this.currency_info = data.Content.ServiceResponse.CurrencyList.Currency;
+//     },
+//     async getExchangeRate(currency_code){
+//         const response = await fetch(`http://tbankonline.com/SMUtBank_API/Gateway?Header={"serviceName": "getExchangeRate", "userID": "", "PIN": "", "OTP": ""}&Content={"baseCurrency": "SGD", "quoteCurrency": "${currency_code}"}`);
+//         const data = await response.json();
+//         this.exchange_rate = data.Content.ServiceResponse["FX_SpotRate_Read-Response"]["Rate"];
+//     },
+//     updateSourceAndCheck() {
+//     this.updateSourceWallets();
+//     this.checkWalletsSelection();
+//     },
+//     checkWalletsSelection() {
+//         console.log("checking")
+//         if (this.sourcewallet && this.destinationwallet) {
+//             console.log("checking!")
+//             this.getWalletExchange();
+//         }
+//         else if (this.sourcewallet && this.destination_friend_wallet){
+//             this.getWalletExchange();
+//         }
+//     },
+//     async getWalletExchange() {
+//         console.log("here");
+//         console.log(this.sourcewallet);
+//         console.log(this.destinationwallet);
+//         if (this.sourcewallet && this.destinationwallet) {
+//             console.log("Both wallets have been selected")
+//             const response = await fetch(`http://tbankonline.com/SMUtBank_API/Gateway?Header={"serviceName": "getExchangeRate", "userID": "", "PIN": "", "OTP": ""}&Content={"baseCurrency": "${this.sourcewallet.CurrencyCode}", "quoteCurrency": "${this.destinationwallet.CurrencyCode}"}`);
+//             const data = await response.json();
+//             console.log(data)
+//             this.exchange_rate = data.Content.ServiceResponse["FX_SpotRate_Read-Response"]["Rate"];
+//             console.log(this.exchange_rate);
+//         } 
+//         else if (this.sourcewallet && this.destination_friend_wallet){
+//             console.log("Both wallets have been selected");
+//             const response = await fetch(`http://tbankonline.com/SMUtBank_API/Gateway?Header={"serviceName": "getExchangeRate", "userID": "", "PIN": "", "OTP": ""}&Content={"baseCurrency": "${this.sourcewallet.CurrencyCode}", "quoteCurrency": "${this.destination_friend_wallet.CurrencyCode}"}`);
+//             const data = await response.json();
+//             this.exchange_rate = data.Content.ServiceResponse["FX_SpotRate_Read-Response"]["Rate"];
+//         }
+//         else {
+//             console.log("Both source and destination wallets need to be chosen.");
+//         }
+//     },    
+//     async createWallet(event) {
+//         event.preventDefault();
+//         this.validation_errors = []
+//         if (this.wallet_amount > this.deposit_account_balance) {
+//             this.validation_errors.push("Insufficient funds in deposit account");
+//         }
+//         if (this.wallet_amount <= 0) {
+//             this.validation_errors.push("Amount must be greater than 0");
+//         }
+//         if (this.selectedCurrency == "") {
+//             this.validation_errors.push("Please select a currency");
+//         }
+//         if (this.validation_errors.length > 0) {
+//             this.errorsFound = true
+//             return;
+//         }
+//         else {
+//             this.validation_errors = [];
+//             this.errorsFound = false;
+//             const jsonData = JSON.stringify({
+//             CustomerId: this.customer_id,
+//             CurrencyCode: this.selectedCurrency,
+//             Amount: this.wallet_amount * this.exchange_rate
+//         });
+    
+//         const url = create_wallet;
+//         const postMethod = {
+//             method: 'POST',
+//             headers: {
+//                 'Content-Type': 'application/json'
+//             },
+//             body: jsonData
+//         };
+    
+//         try {
+//             const response = await fetch(url, postMethod);
+//             const data = await response.json();
+    
+//             switch (data.code) {
+//                 case 201:
+//                     // Handle success case
+//                     console.log("Successfully created wallet");
+//                     // Close the createWalletModal
+//                     $('#createWalletModal').modal('hide');
+//                     // Show success modal
+//                     $('#successModal').modal('show');
+//                     // Reload page after a delay (you can change the delay as needed)
+//                     setTimeout(() => {
+//                         window.location.reload();
+//                     }, 1000); // Example: Reload after 1 second (1000 milliseconds)
+//                     break;
+//                 case 500:
+//                     this.message = data.message;
+//                     // Close the createWalletModal
+//                     $('#createWalletModal').modal('hide');
+//                     // Show unsuccessful modal
+//                     $('#unsuccessfulModal').modal('show');
+//                     // Reload page after a delay (you can change the delay as needed)
+//                     setTimeout(() => {
+//                         window.location.reload();
+//                     }, 1000); // Example: Reload after 1 seconds (1000 milliseconds)
+//                     break;
+//                 default:
+//                     throw `${data.code}: ${data.message}`;
+//             }
+//         } catch (error) {
+//             console.error('Error');
+//         }
+//         }
+//     },
+//     async createTransaction(WalletTransaction, PeerTransaction, event) {
+//         event.preventDefault();
+//         this.validation_errors = []
+//         this.errorsFound = false;
+//         if (WalletTransaction && PeerTransaction == false){
+//             if (this.sourcewallet == null) {  
+//             this.validation_errors.push("Please select a source wallet");
+//             }
+//             if (this.destinationwallet == null) {
+//             this.validation_errors.push("Please select a destination wallet");
+//             }
+//             if (this.sourcewallet != null && this.wallet_amount > this.sourcewallet.Amount) {
+//             this.validation_errors.push("Insufficient funds in source wallet");
+//             }
+//             if (this.wallet_amount <= 0 || this.wallet_amount == "") {
+//             this.validation_errors.push("Amount must be greater than 0");
+//             }
+//             if (this.validation_errors.length > 0) {
+//             this.errorsFound = true
+//             return;
+//             }
+//             else {
+//                 this.walletWalletTransaction()
+//             }
+//         }
+//         else if (WalletTransaction == false && this.sourcewallet == null && PeerTransaction == false) {
+//             console.log("hereeeeee")
+//             if (parseFloat(this.wallet_amount) > parseFloat(this.deposit_account_balance)) {
+//                 console.log(parseFloat(this.wallet_amount) - parseFloat(this.deposit_account_balance))
+//                 this.validation_errors.push("Insufficient funds in deposit account");
+//             }
+//             if (this.wallet_amount <= 0 || this.wallet_amount == "") {
+//                 this.validation_errors.push("Amount must be greater than 0");
+//             }
+//             if (this.destinationwallet == null) {
+//                 this.validation_errors.push("Please select a destination wallet");
+//             }
+//             if (this.validation_errors.length > 0) {
+//                 this.errorsFound = true
+//             return;
+//             }
+//             else {
+//                 // Perform wallet transaction
+//                     try {
+//                         const response = await this.withdrawWalletAndCallAPI();
+//                         // Check response and handle success/failure
+//                         if (response.walletTransaction.code === 201 && response.apiResponse === 'invocation successful') {
+//                             // Both transactions succeeded
+//                             // Close the createWalletModal
+//                             $('#walletTransaction').modal('hide');
+//                             // Show success modal
+//                             $('#successModalTransaction').modal('show');
+//                             // Reload page after a delay (you can change the delay as needed)
+//                             // setTimeout(() => {
+//                             //     window.location.reload();
+//                             // }, 1000); // Example: Reload after 1 second (1000 milliseconds)
+//                         } else {
+//                             // Close the createWalletModal
+//                             $('#walletTransaction').modal('hide');
+//                             // Show unsuccessful modal
+//                             $('#unsuccessfulModalTransaction').modal('show');
+//                             // Reload page after a delay (you can change the delay as needed)
+//                             // setTimeout(() => {
+//                             //     window.location.reload();
+//                             // }, 2000); // Example: Reload after 1 seconds (1000 milliseconds)
+//                         }
+//                     } catch (error) {
+//                         console.error('Error:', error);
+//                         // Handle error
+//                     }
+//             }
+//         }
+//         else if (PeerTransaction == true){
+//             if (this.sourcewallet == null) {  
+//             this.validation_errors.push("Please select a source wallet");
+//             }
+//             if (this.destination_friend_wallet == null) {
+//             this.validation_errors.push("Please select a destination wallet");
+//             }
+//             if (this.sourcewallet != null && this.wallet_amount > this.sourcewallet.Amount) {
+//             this.validation_errors.push("Insufficient funds in source wallet");
+//             }
+//             if (this.wallet_amount <= 0 || this.wallet_amount == "") {
+//             this.validation_errors.push("Amount must be greater than 0");
+//             }
+//             if (this.validation_errors.length > 0) {
+//             this.errorsFound = true
+//             return;
+//             }
+//             else {
+//                 this.peerWalletTransaction()
+//             }
+//         }
+//         else {
+//             console.log("here")
+//             if (this.sourcewallet != null && parseFloat(this.wallet_amount) > parseFloat(this.sourcewallet.Amount)) {
+//                 this.validation_errors.push("Insufficient funds in source wallet");
+//             }
+//             if (this.wallet_amount <= 0 || this.wallet_amount == "") {
+//                 this.validation_errors.push("Amount must be greater than 0");
+//             }
+//             if (this.sourcewallet == null) {
+//                 this.validation_errors.push("Please select a source wallet");
+//             }
+//             if (this.validation_errors.length > 0) {
+//                 console.log(this.wallet_amount)
+//                 console.log(this.sourcewallet.Amount)
+//                 console.log(this.validation_errors)
+//                 this.errorsFound = true
+//                 return;
+//             }
+//             else {
+//             // Perform wallet transaction
+//                 try {
+//                         const response = await this.depositWalletAndCallAPI();
+//                         // Check response and handle success/failure
+//                         if (response.walletTransaction.code === 201 && response.apiResponse === 'invocation successful') {
+//                             // Both transactions succeeded
+//                             // Close the createWalletModal
+//                             $('#walletTransaction').modal('hide');
+//                             // Show success modal
+//                             $('#successModalTransaction').modal('show');
+//                             // Reload page after a delay (you can change the delay as needed)
+//                             // setTimeout(() => {
+//                             //     window.location.reload();
+//                             // }, 1000); // Example: Reload after 1 second (1000 milliseconds)
+//                         } else {
+//                             // Close the createWalletModal
+//                             $('#walletTransaction').modal('hide');
+//                             // Show unsuccessful modal
+//                             $('#unsuccessfulModalTransaction').modal('show');
+//                             // Reload page after a delay (you can change the delay as needed)
+//                             // setTimeout(() => {
+//                             //     window.location.reload();
+//                             // }, 2000); // Example: Reload after 1 seconds (1000 milliseconds)
+//                         }
+//                         } catch (error) {
+//                             console.error('Error:', error);
+//                             // Handle error
+//                     }
+//             }
+//         }
+//     },
+//     async walletWalletTransaction() {
+//         const currentDate = new Date();  // Your new Date() object
+//         // Format the date as a string in the desired MySQL DATETIME format
+//         const formattedDate = currentDate.toISOString().slice(0, 19).replace('T', ' ');
+//         const jsonData = JSON.stringify({
+//             "SourceWallet": this.sourcewallet.WID,
+//             "DestinationWallet": this.destinationwallet.WID,
+//             "CustomerId": this.customer_id,
+//             "WalletTransaction": true,
+//             "ExchangeRate": this.exchange_rate,
+//             "TimeStamp": formattedDate,
+//             "AmountTransferred": this.wallet_amount
+//             });
+//             const url = create_transaction;
+//             const postMethod = {
+//                 method: 'POST',
+//                 headers: {
+//                     'Content-Type': 'application/json'
+//                 },
+//                 body: jsonData
+//         };
+    
+//         try {
+//             const response = await fetch(url, postMethod);
+//             const data = await response.json();
+//             console.log(data)
+//             switch (data.code) {
+//                 case 201:
+//                     // Handle success case
+//                     // Close the createWalletModal
+//                     $('#walletTransaction').modal('hide');
+//                     // Show success modal
+//                     $('#successModalTransaction').modal('show');
+//                     // Reload page after a delay (you can change the delay as needed)
+//                     setTimeout(() => {
+//                         window.location.reload();
+//                     }, 1000); // Example: Reload after 1 second (1000 milliseconds)
+//                     break;
+//                 case 500:
+//                     this.message = data.message;
+//                     // Close the createWalletModal
+//                     $('#walletTransaction').modal('hide');
+//                     // Show unsuccessful modal
+//                     $('#unsuccessfulModalTransaction').modal('show');
+//                     // Reload page after a delay (you can change the delay as needed)
+//                     setTimeout(() => {
+//                         window.location.reload();
+//                     }, 2000); // Example: Reload after 1 seconds (1000 milliseconds)
+//                     break;
+//                 default:
+//                     throw `${data.code}: ${data.message}`;
+//             }
+//         } 
+//         catch (error) {
+//             console.error('Error:', error);
+//             // Handle other errors or display a general error message
+//         }
+//     },
+//     async depositWalletTransaction() {
+//         const currentDate = new Date();  // Your new Date() object
+//         // Format the date as a string in the desired MySQL DATETIME format
+//         const formattedDate = currentDate.toISOString().slice(0, 19).replace('T', ' ');
+//         const jsonData = JSON.stringify({
+//         "SourceWallet": this.sourcewallet.WID,
+//         "DestinationWallet": "",
+//         "CustomerId": this.customer_id,
+//         "WalletTransaction": false,
+//         "ExchangeRate": this.exchange_rate,
+//         "TimeStamp": formattedDate,
+//         "AmountTransferred": this.wallet_amount
+//         });
+
+//         const url = create_transaction;
+//         const postMethod = {
+//             method: 'POST',
+//             headers: {
+//                 'Content-Type': 'application/json'
+//             },
+//             body: jsonData
+//         };
+    
+//         try {
+//             const response = await fetch(url, postMethod);
+//             const data = await response.json();
+//             console.log(data)
+//             return data
+//         } 
+//         catch (error) {
+//             console.error('Error:', error);
+//             // Handle other errors or display a general error message
+//         }
+//     },
+//     async withdrawWalletTransaction() {
+//         const currentDate = new Date();  
+//         // Format the date as a string in the desired MySQL DATETIME format
+//         const formattedDate = currentDate.toISOString().slice(0, 19).replace('T', ' ');
+//         const jsonData = JSON.stringify({
+//         "SourceWallet": "",
+//         "DestinationWallet": this.destinationwallet.WID,
+//         "CustomerId": this.customer_id,
+//         "WalletTransaction": false,
+//         "ExchangeRate": this.exchange_rate,
+//         "TimeStamp": formattedDate,
+//         "AmountTransferred": this.wallet_amount
+//         });
+//         const url = create_transaction;
+//         const postMethod = {
+//             method: 'POST',
+//             headers: {
+//                 'Content-Type': 'application/json'
+//             },
+//             body: jsonData
+//         };
+//         try {
+//             const response = await fetch(url, postMethod);
+//             const data = await response.json();
+//             console.log(data)
+//             return data
+//         } 
+//         catch (error) {
+//             console.error('Error:', error);
+//             // Handle other errors or display a general error message
+//         }
+//     },
+//     async peerWalletTransaction(){
+//         const currentDate = new Date();  // Your new Date() object
+//         // Format the date as a string in the desired MySQL DATETIME format
+//         const formattedDate = currentDate.toISOString().slice(0, 19).replace('T', ' ');
+//         const jsonData = JSON.stringify({
+//             "SourceWallet": this.sourcewallet.WID,
+//             "DestinationWallet": this.destination_friend_wallet.WID,
+//             "CustomerId": this.customer_id,
+//             "ExchangeRate": this.exchange_rate,
+//             "TimeStamp": formattedDate,
+//             "AmountTransferred": this.wallet_amount
+//             });
+//             const url = create_peer_transaction;
+//             const postMethod = {
+//                 method: 'POST',
+//                 headers: {
+//                     'Content-Type': 'application/json'
+//                 },
+//                 body: jsonData
+//         };
+//         try {
+//             const response = await fetch(url, postMethod);
+//             const data = await response.json();
+//             console.log(data)
+//             switch (data.code) {
+//                 case 201:
+//                     // Handle success case
+//                     // Close the createWalletModal
+//                     $('#walletTransaction').modal('hide');
+//                     // Show success modal
+//                     $('#successModalTransaction').modal('show');
+//                     // Reload page after a delay (you can change the delay as needed)
+//                     setTimeout(() => {
+//                         window.location.reload();
+//                     }, 1000); // Example: Reload after 1 second (1000 milliseconds)
+//                     break;
+//                 case 500:
+//                     this.message = data.message;
+//                     // Close the createWalletModal
+//                     $('#walletTransaction').modal('hide');
+//                     // Show unsuccessful modal
+//                     $('#unsuccessfulModalTransaction').modal('show');
+//                     // Reload page after a delay (you can change the delay as needed)
+//                     setTimeout(() => {
+//                         window.location.reload();
+//                     }, 2000); // Example: Reload after 1 seconds (1000 milliseconds)
+//                     break;
+//                 default:
+//                     throw `${data.code}: ${data.message}`;
+//             }
+//         } 
+//         catch (error) {
+//             console.error('Error:', error);
+//             // Handle other errors or display a general error message
+//         }
+//     },
+//     updateDestinationWallets() {
+//     if (this.sourcewallet) {
+//         this.availableDestinationWallets = this.customer_wallets.filter(wallet => wallet.WID !== this.sourcewallet.WID);
+//     } else {
+//         this.availableDestinationWallets = this.customer_wallets;
+//     }
+//     },
+//     updateSourceWallets() {
+//         if (this.destinationwallet) {
+//             this.availableSourceWallets = this.customer_wallets.filter(wallet => wallet.WID !== this.destinationwallet.WID);
+//         } else {
+//             this.availableSourceWallets = this.customer_wallets;
+//         }
+//     },
+//     updateAmount(event) {
+//     // Update the wallet_amount when the input changes
+//     const value = parseFloat(event.target.value);
+//     this.wallet_amount = isNaN(value) || value < 0 ? 0.1 : value;
+//     },
+//     async getFriendsWallets(){
+//         this.friend_wallets_received = false;
+//         try {
+//         const friend_wallet_url = get_wallets + this.destinationfriend.friendee_id;
+//         const response = await fetch(friend_wallet_url);
+//         const data = await response.json();
+
+//         if (data.code === 404) {
+//         this.message = data.message;
+//         } else {
+//         this.friend_wallets = data.data.wallet; 
+//         this.friend_wallets_received = true;
+//         }
+//     } catch (error) {
+//         console.error('Error fetching wallets:', error);
+//         this.message = 'Error fetching wallet data: ' + error;
+//     }
+//     },
+//     async withdrawWalletAndCallAPI() {
+//         try {
+//             const walletTransactionResponse = await this.withdrawWalletTransaction();
+//             let apiResponse;
+//             if (walletTransactionResponse.code === 201) {
+//                 apiResponse = await this.callExternalAPI(type = "withdraw");
+//             }
+//             return {
+//                 walletTransaction: walletTransactionResponse,
+//                 apiResponse: apiResponse
+//             };
+//         } catch (error) {
+//             console.error('Error:', error);
+//             throw error;
+//         }
+//     },
+//     async depositWalletAndCallAPI() {
+//         try {
+//             const walletTransactionResponse = await this.depositWalletTransaction();
+//             let apiResponse;
+//             if (walletTransactionResponse.code === 201) {
+//                 apiResponse = await this.callExternalAPI(type = "deposit");
+//             }
+//             return {
+//                 walletTransaction: walletTransactionResponse,
+//                 apiResponse: apiResponse
+//             };
+//         } catch (error) {
+//             console.error('Error:', error);
+//             throw error;
+//         }
+//     },
+//     async callExternalAPI(type) {
+//         if(type == "withdraw"){
+//             try {
+//             const externalAPIResponse = await fetch(`http://tbankonline.com/SMUtBank_API/Gateway?Header={"serviceName": "withdrawCash", "userID": "T829103K", "PIN": "1", "OTP": ""}&Content={"accountID": "${this.deposit_account}", "amount": "${this.wallet_amount}", "narrative": "testing"}&ConsumerID=Teller`);
+
+//             const data = await externalAPIResponse.json();
+//             const message = data.Content.ServiceResponse["ServiceRespHeader"]["ErrorText"];
+//             return message; // Return the data from the external API call
+//         } catch (error) {
+//             console.error('Error calling external API:', error);
+//             throw error;
+//         }
+//     }
+//     else {
+//         try {
+//             const externalAPIResponse = await fetch(`http://tbankonline.com/SMUtBank_API/Gateway?Header={"serviceName": "depositCash", "userID": "T829103K", "PIN": "1", "OTP": ""}&Content={"accountID": "${this.deposit_account}", "amount": "${this.wallet_amount}", "narrative": "testing"}&ConsumerID=Teller`);
+
+//             const data = await externalAPIResponse.json();
+//             const message = data.Content.ServiceResponse["ServiceRespHeader"]["ErrorText"];
+//             return message; // Return the data from the external API call
+//         } catch (error) {
+//             console.error('Error calling external API:', error);
+//             throw error;
+//         }
+//     }
+// }
+// },
+// mounted() {
+//     this.get_wallets();
+//     this.get_transactions();
+//     this.getCurrencyCodes();
+//     this.get_friends();
+// },
+// });
+// const vm = wallet.mount('#wallet');
 </script>
 
 </body>
