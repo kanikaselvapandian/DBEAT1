@@ -145,16 +145,20 @@
                                 <td v-text="loan.LoanTerm"></td>
                                 <td v-text="loan.CollateralAmount"></td>
                                 <td>
-                                    <input type="number" v-model="interestRate">
+                                    <input type="number" v-model="loan.interestRate">
                                 </td>
-                                <td v-text="calculateRepaymentAmount(loan.LoanAmount, interestRate, loan.LoanTerm, loan.ServiceFee)"></td>
+                                <td
+                                    v-text="calculateRepaymentAmount(loan.LoanAmount, loan.interestRate, loan.LoanTerm, loan.ServiceFee)">
+                                </td>
                                 <td>
-                                    <button class="btn btn-primary" @click="lendnow_application(loan.LoanId, loan.LoanAmount, loan.LoanTerm, loan.CollateralAmount, loan.ServiceFee)">
+                                    <button class="btn btn-primary" @click="lendnow_application(loan)">
                                         Lend Now
                                     </button>
                                 </td>
                             </tr>
-                            
+
+
+
                         </tbody>
                     </table>
                 </div>
@@ -179,7 +183,8 @@
                                 <td v-text="loan.InterestRate"></td>
                                 <td v-text="loan.LoanTerm"></td>
                                 <td>
-                                    <button class="btn btn-primary" @click="borrownow_application(loan.LoanId, loan.InvestmentAmount, loan.LoanTerm, loan.InterestRate, loan.ServiceFee)">
+                                    <button class="btn btn-primary"
+                                        @click="borrownow_application(loan.LoanId, loan.InvestmentAmount, loan.LoanTerm, loan.InterestRate, loan.ServiceFee)">
                                         Borrow Now
                                     </button>
                                 </td>
@@ -342,22 +347,27 @@
                         this.message = "Error fetching all lent loans: " + error;
                     }
                 },
-                async lendnow_application(loanId, loanAmount, loanTerm, collateralAmount, ServiceFee) {
+                async lendnow_application(loan) {
                     event.preventDefault();
 
+                    const loanId = loan.LoanId;
+                    const loanAmount = loan.LoanAmount;
+                    const loanTerm = loan.LoanTerm;
+                    const collateralAmount = loan.CollateralAmount;
+                    const ServiceFee = loan.ServiceFee;
+                    console.log(ServiceFee)
 
-                    // Calculate the repayment amount using calculateRepaymentAmount
-                    const repaymentAmount = this.calculateRepaymentAmount(loanAmount, this.interestRate, loanTerm, this.service_fee);
-                    // Make sure "this" refers to the Vue instance
-                    const interestRate = parseFloat(this.interestRate);
+                    const interestRate = parseFloat(loan.interestRate); // Get the interest rate specific to the loan
+
+                    // Rest of your method remains the same
                     const currentDate = new Date().toISOString();
                     const endDate = new Date(currentDate);
                     endDate.setDate(endDate.getDate() + loanTerm); // Add loanTerm days to the current date
                     const formattedEndDate = endDate.toISOString();
-                    // Update the API URL
                     const baseURL = 'http://127.0.0.1:5001';
 
                     try {
+                        const repaymentAmount = this.calculateRepaymentAmount(loanAmount, interestRate, loanTerm, ServiceFee);
                         const response = await fetch(`${baseURL}/loan/update/${loanId}`, {
                             method: 'PUT',
                             headers: {
@@ -369,14 +379,13 @@
                                 OtherPartyId: customer_id,
                                 StartDate: currentDate,
                                 EndDate: formattedEndDate,
-                                TotalInterestAmount : repaymentAmount - loanAmount,
-                                StatusLevel : "BMatch",
+                                TotalInterestAmount: repaymentAmount - loanAmount,
+                                StatusLevel: "BMatch",
                             }),
                         });
 
                         if (response.status === 200) {
                             console.log('Loan updated successfully');
-                            // Reload the page after successful loan update
                             location.reload();
                         } else {
                             console.error('Error updating loan');
@@ -388,12 +397,13 @@
 
 
 
-                async borrownow_application(loanId, InvestmentAmount,LoanTerm, InterestRate , ServiceFee) {
+
+                async borrownow_application(loanId, InvestmentAmount, LoanTerm, InterestRate, ServiceFee) {
                     event.preventDefault();
 
                     loanAmount = InvestmentAmount;
                     const repaymentAmount = this.calculateRepaymentAmount(loanAmount, InterestRate, LoanTerm, ServiceFee);
-                    
+
                     // Make sure "this" refers to the Vue instance
                     const interestRate = parseFloat(this.interestRate);
                     const currentDate = new Date().toISOString();
@@ -414,7 +424,7 @@
                                 StartDate: currentDate,
                                 EndDate: formattedEndDate,
                                 RepaymentAmount: repaymentAmount + ServiceFee,
-                                StatusLevel : "LMatch",
+                                StatusLevel: "LMatch",
                             }),
                         });
 
