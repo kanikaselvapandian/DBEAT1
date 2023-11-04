@@ -286,4 +286,5 @@ def get_all_lending_loans_by_customer_id(CustomerId):
     ), 404
 
 if __name__ == '__main__':
+    app.debug = True
     app.run(port=5001)
