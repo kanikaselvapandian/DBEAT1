@@ -17,6 +17,8 @@
 
   <!-- Vendor CSS Files -->
   <link href="/DBEAT1/lendinsync/assets/vendor/aos/aos.css" rel="stylesheet">
+  <!-- jQuery -->
+  <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
   <link href="/DBEAT1/lendinsync/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
   <link href="/DBEAT1/lendinsync/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
   <link href="/DBEAT1/lendinsync/assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
@@ -921,7 +923,7 @@ async function checkLocalStorageAndRedirect() {
                                     if (response.walletTransaction.code === 201 && response.apiResponse === 'invocation successful') {
                                         // Both transactions succeeded
                                         // Close the createWalletModal
-                                        $('#walletTransaction').modal('hide');
+                                        $('#withdrawTransaction').modal('hide');
                                         // Show success modal
                                         $('#successModalTransaction').modal('show');
                                         // Reload page after a delay (you can change the delay as needed)
@@ -930,7 +932,7 @@ async function checkLocalStorageAndRedirect() {
                                         // }, 1000); // Example: Reload after 1 second (1000 milliseconds)
                                     } else {
                                         // Close the createWalletModal
-                                        $('#walletTransaction').modal('hide');
+                                        $('#withdrawTransaction').modal('hide');
                                         // Show unsuccessful modal
                                         $('#unsuccessfulModalTransaction').modal('show');
                                         // Reload page after a delay (you can change the delay as needed)
@@ -991,7 +993,7 @@ async function checkLocalStorageAndRedirect() {
                                     if (response.walletTransaction.code === 201 && response.apiResponse === 'invocation successful') {
                                         // Both transactions succeeded
                                         // Close the createWalletModal
-                                        $('#walletTransaction').modal('hide');
+                                        $('#depositTransaction').modal('hide');
                                         // Show success modal
                                         $('#successModalTransaction').modal('show');
                                         // Reload page after a delay (you can change the delay as needed)
@@ -1000,7 +1002,7 @@ async function checkLocalStorageAndRedirect() {
                                         // }, 1000); // Example: Reload after 1 second (1000 milliseconds)
                                     } else {
                                         // Close the createWalletModal
-                                        $('#walletTransaction').modal('hide');
+                                        $('#depositTransaction').modal('hide');
                                         // Show unsuccessful modal
                                         $('#unsuccessfulModalTransaction').modal('show');
                                         // Reload page after a delay (you can change the delay as needed)
@@ -1167,7 +1169,7 @@ async function checkLocalStorageAndRedirect() {
                             case 201:
                                 // Handle success case
                                 // Close the createWalletModal
-                                $('#walletTransaction').modal('hide');
+                                $('#peerWalletTransaction').modal('hide');
                                 // Show success modal
                                 $('#successModalTransaction').modal('show');
                                 // Reload page after a delay (you can change the delay as needed)
@@ -1178,7 +1180,7 @@ async function checkLocalStorageAndRedirect() {
                             case 500:
                                 this.message = data.message;
                                 // Close the createWalletModal
-                                $('#walletTransaction').modal('hide');
+                                $('#peerWalletTransaction').modal('hide');
                                 // Show unsuccessful modal
                                 $('#unsuccessfulModalTransaction').modal('show');
                                 // Reload page after a delay (you can change the delay as needed)
