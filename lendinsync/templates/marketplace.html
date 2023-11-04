@@ -163,6 +163,7 @@
                         <thead>
                             <tr>
                                 <th scope="col">#</th>
+                                <th scope="col">Loan ID</th>
                                 <th scope="col">Invested Amount</th>
                                 <th scope="col">Currency</th>
                                 <th scope="col">Interest Rate</th>
@@ -172,12 +173,15 @@
                         <tbody>
                             <tr v-for="(loan, index) in filteredLentLoans" :key="index">
                                 <td v-text="index + 1"></td>
+                                <td v-text="loan.LoanId"></td>
                                 <td v-text="loan.InvestmentAmount"></td>
                                 <td v-text="loan.CurrencyCode"></td>
                                 <td v-text="loan.InterestRate"></td>
                                 <td v-text="loan.LoanTerm"></td>
                                 <td>
-                                    <button class="btn btn-primary">Borrow Now</button>
+                                    <button class="btn btn-primary" @click="borrownow_application(loan.LoanId, loan.InvestmentAmount, loan.LoanTerm, loan.InterestRate, loan.ServiceFee)">
+                                        Borrow Now
+                                    </button>
                                 </td>
                             </tr>
                         </tbody>
@@ -320,7 +324,10 @@
 
                     // Calculate repayment amount based on loan amount, interest rate, loan term (in days), and service fee
                     const dailyInterestRate = rate / 100 / 365; // Convert annual rate to daily rate
-                    const repaymentAmount = amount * (1 + dailyInterestRate * term) + fee;
+                    console.log(dailyInterestRate)
+                    // const repaymentAmount = amount * (1 + dailyInterestRate * term + fee);
+                    const repaymentAmount = (dailyInterestRate * term * amount) + amount + fee;
+                    console.log(repaymentAmount)
 
                     console.log("Repayment Amount:", repaymentAmount);
                     return repaymentAmount.toFixed(2);
@@ -346,6 +353,10 @@
                     // Calculate the repayment amount using calculateRepaymentAmount
                     const repaymentAmount = this.calculateRepaymentAmount(loanAmount, this.interestRate, loanTerm, this.service_fee);
                     console.log(repaymentAmount);
+                    console.log(loanAmount);
+                    console.log(loanTerm);
+                    console.log(this.interestRate);
+                    console.log(this.service_fee);
                     // Make sure "this" refers to the Vue instance
                     const interestRate = parseFloat(this.interestRate);
                     const currentDate = new Date().toISOString();
@@ -375,7 +386,55 @@
                         if (response.status === 200) {
                             console.log('Loan updated successfully');
                             // Reload the page after successful loan update
-                            location.reload();
+                            // location.reload();
+                        } else {
+                            console.error('Error updating loan');
+                        }
+                    } catch (error) {
+                        console.error('Network error:', error);
+                    }
+                },
+
+
+
+                async borrownow_application(loanId, InvestmentAmount,LoanTerm, InterestRate , ServiceFee) {
+                    event.preventDefault();
+
+                    loanAmount = InvestmentAmount;
+                    const repaymentAmount = this.calculateRepaymentAmount(loanAmount, InterestRate, LoanTerm, ServiceFee);
+                    console.log(loanAmount)
+                    console.log(InterestRate)
+                    console.log(LoanTerm)
+                    console.log(ServiceFee)
+                    
+                    // Make sure "this" refers to the Vue instance
+                    const interestRate = parseFloat(this.interestRate);
+                    const currentDate = new Date().toISOString();
+                    const endDate = new Date(currentDate);
+                    endDate.setDate(endDate.getDate() + LoanTerm); // Add loanTerm days to the current date
+                    const formattedEndDate = endDate.toISOString();
+                    // Update the API URL
+                    const baseURL = 'http://127.0.0.1:5001';
+
+                    try {
+                        const response = await fetch(`${baseURL}/loan/update/${loanId}`, {
+                            method: 'PUT',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                OtherPartyId: customer_id,
+                                StartDate: currentDate,
+                                EndDate: formattedEndDate,
+                                RepaymentAmount: repaymentAmount + ServiceFee,
+                                StatusLevel : "LMatch",
+                            }),
+                        });
+
+                        if (response.status === 200) {
+                            console.log('Loan updated successfully');
+                            // Reload the page after successful loan update
+                            // location.reload();
                         } else {
                             console.error('Error updating loan');
                         }
