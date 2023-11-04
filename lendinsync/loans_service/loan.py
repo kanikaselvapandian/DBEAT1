@@ -285,6 +285,51 @@ def get_all_lending_loans_by_customer_id(CustomerId):
         }
     ), 404
 
+
+@app.route("/loan/update/<int:LoanId>", methods=['PUT'])
+def update_loan(LoanId):
+    data = request.get_json()
+    new_interest_rate = data.get('InterestRate')
+    new_repayment_amount = data.get('RepaymentAmount')
+    new_other_party_id = data.get('OtherPartyId')  # Add this line
+
+    try:
+        loan = Loan.query.filter_by(LoanId=LoanId).first()
+        if not loan:
+            return jsonify(
+                {
+                    "code": 404,
+                    "message": "Loan not found."
+                }
+            ), 404
+
+        if new_interest_rate is not None:
+            loan.InterestRate = new_interest_rate
+        if new_repayment_amount is not None:
+            loan.RepaymentAmount = new_repayment_amount
+        if new_other_party_id is not None:  # Add this block
+            loan.OtherPartyId = new_other_party_id
+
+        db.session.commit()
+
+        return jsonify(
+            {
+                "code": 200,
+                "data": loan.json(),
+                "message": "Loan updated successfully."
+            }
+        ), 200
+
+    except Exception as e:
+        print(str(e))
+        return jsonify(
+            {
+                "code": 500,
+                "message": "An error occurred updating the loan. " + str(e)
+            }
+        ), 500
+
+
 if __name__ == '__main__':
     app.debug = True
     app.run(port=5001)

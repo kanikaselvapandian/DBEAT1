@@ -126,6 +126,7 @@
                         <thead>
                             <tr>
                                 <th scope="col">#</th>
+                                <th scope="col">Loan ID</th>
                                 <th scope="col">Loan Amount</th>
                                 <th scope="col">Currency</th>
                                 <th scope="col">Term (Days)</th>
@@ -138,21 +139,26 @@
                         <tbody>
                             <tr v-for="(loan, index) in filteredBorrowedLoans" :key="index">
                                 <td v-text="index + 1"></td>
+                                <td v-text="loan.LoanId"></td>
                                 <td v-text="loan.LoanAmount"></td>
                                 <td v-text="loan.CurrencyCode"></td>
                                 <td v-text="loan.LoanTerm"></td>
                                 <td v-text="loan.CollateralAmount"></td>
                                 <td>
-                                    <input type="number" v-model="loan.InterestRate">
+                                    <input type="number" v-model="interestRate">
                                 </td>
-                                <td v-text="calculateRepaymentAmount(loan.LoanAmount, loan.InterestRate, loan.LoanTerm, loan.ServiceFee)"></td>
+                                <td
+                                    v-text="calculateRepaymentAmount(loan.LoanAmount, interestRate, loan.LoanTerm, loan.ServiceFee)">
+                                </td>
 
                                 <td>
-                                    <button class="btn btn-primary" data-toggle="modal" data-target="#lendNowModal"
-                                        data-loan-amount="loan.LoanAmount" data-loan-term="loan.LoanTerm"
-                                        data-collateral-amount="loan.CollateralAmount">
+                                    <button class="btn btn-primary" data-loan-id="3" data-loan-amount="loan.LoanAmount"
+                                        data-loan-term="loan.LoanTerm" data-collateral-amount="loan.CollateralAmount"
+                                        @click="lendnow_application">
                                         Lend Now
                                     </button>
+
+
                                 </td>
                             </tr>
                         </tbody>
@@ -194,10 +200,6 @@
                     &copy; Copyright <strong><span>LendInSync</span></strong>. All Rights Reserved
                 </div>
                 <div class="credits">
-                    <!-- All the links in the footer should remain intact. -->
-                    <!-- You can delete the links only if you purchased the pro version. -->
-                    <!-- Licensing information: https://bootstrapmade.com/license/ -->
-                    <!-- Purchase the pro version with working PHP/AJAX contact form: https://bootstrapmade.com/onepage-multipurpose-bootstrap-template/ -->
                     Designed by <a href="https://bootstrapmade.com/">BootstrapMade</a>
                 </div>
             </div>
@@ -215,6 +217,7 @@
     <script src="/DBEAT1/lendinsync/assets/js/main.js"></script>
     <script>
         const customer_id = localStorage.getItem('username');
+        console.log(customer_id);
         const get_all_borrowed_loans = "http://localhost:5001/loan/borrowing";
         const get_all_lent_loans = "http://localhost:5001/loan/lending";
 
@@ -238,7 +241,8 @@
                     borrowing_service_fee: 0,
                     lending_service_fee: 0,
                     validation_errors: [],
-                    errorsFound: false
+                    errorsFound: false,
+                    interestRate: 0
                 };
             },
             mounted() {
@@ -264,11 +268,21 @@
                     });
             },
             computed: {
+
+                repaymentAmount() {
+                    if (!isNaN(this.interestRate)) {
+                        return this.calculateRepaymentAmount(this.loan_amount, this.interestRate, this.loan_term, this.service_fee);
+                    } else {
+                        return 0; // Return 0 if interestRate is not a valid number
+                    }
+                },
+
                 filteredBorrowedLoans() {
-                    return this.borrowed_loans.filter(loan => loan.CustomerId !== customer_id);
+                    return this.borrowed_loans.filter(loan => loan.CustomerId !== customer_id && loan.OtherPartyId !== customer_id);
+
                 },
                 filteredLentLoans() {
-                    return this.lent_loans.filter(loan => loan.CustomerId !== customer_id);
+                    return this.lent_loans.filter(loan => loan.CustomerId !== customer_id && loan.OtherPartyId !== customer_id);
                 },
                 total_interest_amount() {
                     const totalInterest = parseFloat(this.investment_amount) * (this.interest_rate / 100) * (this.loan_term / 365);
@@ -281,6 +295,7 @@
                 },
             },
             methods: {
+
                 async get_all_borrowed_loans() {
                     try {
                         const response = await fetch(get_all_borrowed_loans);
@@ -295,12 +310,15 @@
                         this.message = "Error fetching all borrowed loans: " + error;
                     }
                 },
+
                 calculateRepaymentAmount(loanAmount, interestRate, loanTerm, serviceFee) {
                     // Convert input values to numbers
                     const amount = parseFloat(loanAmount);
                     const rate = parseFloat(interestRate);
                     const term = parseFloat(loanTerm);
                     const fee = parseFloat(serviceFee);
+
+                    console.log(amount, rate, term, fee);
 
                     if (isNaN(amount) || isNaN(rate) || isNaN(term) || isNaN(fee)) {
                         return 0; // Return 0 or an appropriate value if any of the inputs are not valid numbers
@@ -309,6 +327,8 @@
                     // Calculate repayment amount based on loan amount, interest rate, loan term (in days), and service fee
                     const dailyInterestRate = rate / 100 / 365; // Convert annual rate to daily rate
                     const repaymentAmount = amount * (1 + dailyInterestRate * term) + fee;
+
+                    console.log("Repayment Amount:", repaymentAmount);
                     return repaymentAmount.toFixed(2);
                 },
                 async get_all_lent_loans() {
@@ -325,144 +345,56 @@
                         this.message = "Error fetching all lent loans: " + error;
                     }
                 },
-                async getCurrencyCodes() {
-                    const response = await fetch('http://tbankonline.com/SMUtBank_API/Gateway?Header={"serviceName": "getCurrencyList", "userID": "", "PIN": "", "OTP": ""}&Content={"baseCurrency": "SGD", "quoteCurrency": "USD"}');
-                    const data = await response.json();
-                    this.currency_info = data.Content.ServiceResponse.CurrencyList.Currency;
-                },
-                async getExchangeRate(currency_code) {
-                    const response = await fetch(`http://tbankonline.com/SMUtBank_API/Gateway?Header={"serviceName": "getExchangeRate", "userID": "", "PIN": "", "OTP": ""}&Content={"baseCurrency": "SGD", "quoteCurrency": "${currency_code}"}`);
-                    const data = await response.json();
-                    this.exchange_rate = data.Content.ServiceResponse["FX_SpotRate_Read-Response"]["Rate"];
-                },
-                async create_borrow_application(event) {
+                async lendnow_application(event) {
                     event.preventDefault();
-                    this.validation_errors = [];
-                    if (this.loan_amount.value <= 0) {
-                        this.validation_errors.push("Loan amount must be greater than 0");
-                    }
-                    if (this.loan_amount.value > this.collateral_amount.value) {
-                        this.validation_errors.push("Loan amount must be less than the collateral amount");
-                    }
-                    if (this.selectedCurrency === "") {
-                        this.validation_errors.push("Please select a currency");
-                    }
-                    if (this.loan_term.value <= 0) {
-                        this.validation_errors.push("Loan term must be greater than 0");
-                    }
-                    if (this.validation_errors.length > 0) {
-                        this.errorsFound = true;
-                        return;
-                    } else {
-                        this.validation_errors = [];
-                        this.errorsFound = false;
-                        const jsonData = JSON.stringify({
-                            // Remove "CustomerId" and set it on the server side
-                            CurrencyCode: this.selectedCurrency,
-                            LoanAmount: this.loan_amount,
-                            RepaymentAmount: this.repayment_amount,
-                            InterestRate: this.interest_rate,
-                            CollateralAmount: this.collateral_amount,
-                            LoanTerm: this.loan_term,
-                            ServiceFee: this.service_fee,
-                            StatusLevel: "Borrowing"
+
+                    // Extract loan information from the clicked button
+                    const loanId = event.target.getAttribute('data-loan-id');
+                    const loanAmount = parseFloat(event.target.getAttribute('data-loan-amount'));
+                    const loanTerm = parseFloat(event.target.getAttribute('data-loan-term'));
+
+                    // Calculate the repayment amount using calculateRepaymentAmount
+                    const repaymentAmount = this.calculateRepaymentAmount(loanAmount, this.interestRate, loanTerm, this.service_fee);
+                    console.log(repaymentAmount);
+                    // Make sure "this" refers to the Vue instance
+                    const interestRate = parseFloat(this.interestRate);
+
+                    // Update the API URL
+                    const baseURL = 'http://127.0.0.1:5001';
+
+                    try {
+                        const response = await fetch(`${baseURL}/loan/update/${loanId}`, {
+                            method: 'PUT',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                InterestRate: interestRate,
+                                RepaymentAmount: repaymentAmount,
+                                OtherPartyId: customer_id,
+                            }),
                         });
 
-                        const url = create_borrow_application;
-                        const postMethod = {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json'
-                            },
-                            body: jsonData
-                        };
-
-                        try {
-                            const response = await fetch(url, postMethod);
-                            const data = await response.json();
-
-                            switch (data.code) {
-                                case 201:
-                                    // Handle success case
-                                    break;
-                                case 500:
-                                    this.message = data.message;
-                                    break;
-                                default:
-                                    throw `${data.code}: ${data.message}`;
-                            }
-                        } catch (error) {
-                            console.error('Error');
+                        if (response.status === 200) {
+                            console.log('Loan updated successfully');
+                            // Reload the page after successful loan update
+                            location.reload();
+                        } else {
+                            console.error('Error updating loan');
                         }
+                    } catch (error) {
+                        console.error('Network error:', error);
                     }
                 },
-                async create_lending_application(event) {
-                    event.preventDefault();
-                    this.validation_errors = [];
-                    if (this.investment_amount <= 0) {
-                        this.validation_errors.push("Investment amount must be greater than 0");
-                    }
-                    if (this.loan_term <= 0) {
-                        this.validation_errors.push("Loan term must be greater than 0");
-                    }
-                    if (this.interest_rate <= 0) {
-                        this.validation_errors.push("Interest rate must be greater than 0");
-                    }
-                    if (this.selectedCurrency === "") {
-                        this.validation_errors.push("Please select a currency");
-                    }
-                    if (this.validation_errors.length > 0) {
-                        this.errorsFound = true;
-                        return;
-                    } else {
-                        this.validation_errors = [];
-                        this.errorsFound = false;
-                        const jsonData = JSON.stringify({
-                            // Remove "CustomerId" and set it on the server side
-                            InvestmentAmount: this.investment_amount,
-                            InterestRate: this.interest_rate,
-                            RepaymentAmount: this.repayment_amount,
-                            LoanTerm: this.loan_term,
-                            CurrencyCode: this.selectedCurrency,
-                            TotalInterestAmount: this.total_interest_amount,
-                            ServiceFee: this.service_fee,
-                            Revenue: this.revenue,
-                            StatusLevel: "Lending"
-                        });
 
-                        const url = create_lending_application;
-                        const postMethod = {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json'
-                            },
-                            body: jsonData
-                        };
 
-                        try {
-                            const response = await fetch(url, postMethod);
-                            const data = await response.json();
 
-                            switch (data.code) {
-                                case 201:
-                                    // Handle success case
-                                    break;
-                                case 500:
-                                    this.message = data.message;
-                                    break;
-                                default:
-                                    throw `${data.code}: ${data.message}`;
-                            }
-                        } catch (error) {
-                            console.error('Error');
-                        }
-                    }
-                }
+
+
             },
             created() {
                 this.get_all_borrowed_loans(); // Fetch all borrowed loans
                 this.get_all_lent_loans();     // Fetch all lent loans
-                this.getCurrencyCodes();       // Fetch currency codes
             },
         });
 
