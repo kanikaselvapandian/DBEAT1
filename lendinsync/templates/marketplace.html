@@ -316,7 +316,7 @@
                     const term = parseFloat(loanTerm);
                     const fee = parseFloat(serviceFee);
 
-                    console.log(amount, rate, term, fee);
+                    // console.log(amount, rate, term, fee);
 
                     if (isNaN(amount) || isNaN(rate) || isNaN(term) || isNaN(fee)) {
                         return 0; // Return 0 or an appropriate value if any of the inputs are not valid numbers
@@ -324,11 +324,7 @@
 
                     // Calculate repayment amount based on loan amount, interest rate, loan term (in days), and service fee
                     const dailyInterestRate = rate / 100 / 365; // Convert annual rate to daily rate
-                    console.log(dailyInterestRate)
-                    // const repaymentAmount = amount * (1 + dailyInterestRate * term + fee);
                     const repaymentAmount = (dailyInterestRate * term * amount) + amount + fee;
-                    console.log(repaymentAmount)
-
                     console.log("Repayment Amount:", repaymentAmount);
                     return repaymentAmount.toFixed(2);
                 },
@@ -352,11 +348,6 @@
 
                     // Calculate the repayment amount using calculateRepaymentAmount
                     const repaymentAmount = this.calculateRepaymentAmount(loanAmount, this.interestRate, loanTerm, this.service_fee);
-                    console.log(repaymentAmount);
-                    console.log(loanAmount);
-                    console.log(loanTerm);
-                    console.log(this.interestRate);
-                    console.log(this.service_fee);
                     // Make sure "this" refers to the Vue instance
                     const interestRate = parseFloat(this.interestRate);
                     const currentDate = new Date().toISOString();
@@ -386,7 +377,7 @@
                         if (response.status === 200) {
                             console.log('Loan updated successfully');
                             // Reload the page after successful loan update
-                            // location.reload();
+                            location.reload();
                         } else {
                             console.error('Error updating loan');
                         }
@@ -402,10 +393,6 @@
 
                     loanAmount = InvestmentAmount;
                     const repaymentAmount = this.calculateRepaymentAmount(loanAmount, InterestRate, LoanTerm, ServiceFee);
-                    console.log(loanAmount)
-                    console.log(InterestRate)
-                    console.log(LoanTerm)
-                    console.log(ServiceFee)
                     
                     // Make sure "this" refers to the Vue instance
                     const interestRate = parseFloat(this.interestRate);
@@ -434,7 +421,7 @@
                         if (response.status === 200) {
                             console.log('Loan updated successfully');
                             // Reload the page after successful loan update
-                            // location.reload();
+                            location.reload();
                         } else {
                             console.error('Error updating loan');
                         }
