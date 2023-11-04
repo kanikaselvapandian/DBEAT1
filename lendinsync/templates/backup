@@ -147,14 +147,20 @@
                                 <td>
                                     <input type="number" v-model="interestRate">
                                 </td>
-                                <td v-text="calculateRepaymentAmount(loan.LoanAmount, interestRate, loan.LoanTerm, loan.ServiceFee)"></td>
+                                <td
+                                    v-text="calculateRepaymentAmount(loan.LoanAmount, interestRate, loan.LoanTerm, loan.ServiceFee)">
+                                </td>
+
                                 <td>
-                                    <button class="btn btn-primary" @click="lendnow_application(loan.LoanId, loan.LoanAmount, loan.LoanTerm, loan.CollateralAmount, loan.ServiceFee)">
+                                    <button class="btn btn-primary" data-loan-id="loan.LoanId" data-loan-amount="loan.LoanAmount"
+                                        data-loan-term="loan.LoanTerm" data-collateral-amount="loan.CollateralAmount"
+                                        @click="lendnow_application">
                                         Lend Now
                                     </button>
+
+
                                 </td>
                             </tr>
-                            
                         </tbody>
                     </table>
                 </div>
@@ -339,19 +345,21 @@
                         this.message = "Error fetching all lent loans: " + error;
                     }
                 },
-                async lendnow_application(loanId, loanAmount, loanTerm, collateralAmount, ServiceFee) {
+                async lendnow_application(event) {
                     event.preventDefault();
 
+                    // Extract loan information from the clicked button
+                    const loanId = parseFloat(event.target.getAttribute('data-loan-id'));
+                    console.log(loanId)
+                    const loanAmount = parseFloat(event.target.getAttribute('data-loan-amount'));
+                    const loanTerm = parseFloat(event.target.getAttribute('data-loan-term'));
 
                     // Calculate the repayment amount using calculateRepaymentAmount
                     const repaymentAmount = this.calculateRepaymentAmount(loanAmount, this.interestRate, loanTerm, this.service_fee);
                     console.log(repaymentAmount);
                     // Make sure "this" refers to the Vue instance
                     const interestRate = parseFloat(this.interestRate);
-                    const currentDate = new Date().toISOString().slice(0, 10);
-                    const endDate = new Date(currentDate);
-                    endDate.setDate(endDate.getDate() + loanTerm); // Add loanTerm days to the current date
-                    const formattedEndDate = endDate.toISOString().slice(0, 10);
+
                     // Update the API URL
                     const baseURL = 'http://127.0.0.1:5001';
 
@@ -363,11 +371,8 @@
                             },
                             body: JSON.stringify({
                                 InterestRate: interestRate,
-                                RepaymentAmount: repaymentAmount + ServiceFee,
+                                RepaymentAmount: repaymentAmount,
                                 OtherPartyId: customer_id,
-                                StartDate: currentDate,
-                                EndDate: formattedEndDate,
-                                TotalInterestAmount : repaymentAmount + ServiceFee - loanAmount,
                             }),
                         });
 

@@ -292,6 +292,10 @@ def update_loan(LoanId):
     new_interest_rate = data.get('InterestRate')
     new_repayment_amount = data.get('RepaymentAmount')
     new_other_party_id = data.get('OtherPartyId')  # Add this line
+    new_StartDate = data.get('StartDate')
+    new_EndDate = data.get('EndDate')
+    new_TotalInterestAmount = data.get('TotalInterestAmount')
+
 
     try:
         loan = Loan.query.filter_by(LoanId=LoanId).first()
@@ -309,6 +313,13 @@ def update_loan(LoanId):
             loan.RepaymentAmount = new_repayment_amount
         if new_other_party_id is not None:  # Add this block
             loan.OtherPartyId = new_other_party_id
+        if new_StartDate is not None:
+            loan.StartDate = new_StartDate
+        if new_EndDate is not None:
+            loan.EndDate = new_EndDate
+        if new_TotalInterestAmount is not None:
+            loan.TotalInterestAmount = new_TotalInterestAmount
+        
 
         db.session.commit()
 
