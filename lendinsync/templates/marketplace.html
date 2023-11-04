@@ -128,9 +128,11 @@
                                 <th scope="col">#</th>
                                 <th scope="col">Loan Amount</th>
                                 <th scope="col">Currency</th>
-                                <th scope="col">Term</th>
+                                <th scope="col">Term (Days)</th>
                                 <th scope="col">Collateral</th>
-
+                                <th scope="col">Interest Rate (%)</th>
+                                <th scope="col">Repayment Amount</th>
+                                <th scope="col">Application</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -141,7 +143,16 @@
                                 <td v-text="loan.LoanTerm"></td>
                                 <td v-text="loan.CollateralAmount"></td>
                                 <td>
-                                    <button class="btn btn-primary">Lend Now</button>
+                                    <input type="number" v-model="loan.InterestRate">
+                                </td>
+                                <td v-text="calculateRepaymentAmount(loan.LoanAmount, loan.InterestRate, loan.LoanTerm, loan.ServiceFee)"></td>
+
+                                <td>
+                                    <button class="btn btn-primary" data-toggle="modal" data-target="#lendNowModal"
+                                        data-loan-amount="loan.LoanAmount" data-loan-term="loan.LoanTerm"
+                                        data-collateral-amount="loan.CollateralAmount">
+                                        Lend Now
+                                    </button>
                                 </td>
                             </tr>
                         </tbody>
@@ -204,7 +215,6 @@
     <script src="/DBEAT1/lendinsync/assets/js/main.js"></script>
     <script>
         const customer_id = localStorage.getItem('username');
-        console.log(customer_id);
         const get_all_borrowed_loans = "http://localhost:5001/loan/borrowing";
         const get_all_lent_loans = "http://localhost:5001/loan/lending";
 
@@ -284,6 +294,22 @@
                     } catch (error) {
                         this.message = "Error fetching all borrowed loans: " + error;
                     }
+                },
+                calculateRepaymentAmount(loanAmount, interestRate, loanTerm, serviceFee) {
+                    // Convert input values to numbers
+                    const amount = parseFloat(loanAmount);
+                    const rate = parseFloat(interestRate);
+                    const term = parseFloat(loanTerm);
+                    const fee = parseFloat(serviceFee);
+
+                    if (isNaN(amount) || isNaN(rate) || isNaN(term) || isNaN(fee)) {
+                        return 0; // Return 0 or an appropriate value if any of the inputs are not valid numbers
+                    }
+
+                    // Calculate repayment amount based on loan amount, interest rate, loan term (in days), and service fee
+                    const dailyInterestRate = rate / 100 / 365; // Convert annual rate to daily rate
+                    const repaymentAmount = amount * (1 + dailyInterestRate * term) + fee;
+                    return repaymentAmount.toFixed(2);
                 },
                 async get_all_lent_loans() {
                     try {
@@ -453,6 +479,15 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
     <!-- Bootstrap JS -->
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+
+
+
+
+
+
+
+
 </body>
 
 </html>
