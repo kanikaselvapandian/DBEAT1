@@ -21,7 +21,7 @@ def run_flask_services():
 
     def start_process(command):
         if current_os == "Windows":
-            subprocess.Popen(f"start cmd /k {command}", shell=True)
+            subprocess.Popen(f"start cmd /k python {command}", shell=True)
         elif current_os == "Darwin":  # macOS
             subprocess.Popen(["python", command])
         else:
