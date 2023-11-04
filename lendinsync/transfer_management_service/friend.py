@@ -118,4 +118,4 @@ def createFriend(friend_id):
 
 
 if __name__ == '__main__':
-    app.run(port=8895)
+    app.run(port=8895, debug = True)

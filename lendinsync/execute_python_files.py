@@ -1,38 +1,50 @@
+import platform
 import subprocess
-import signal
 import os
+import time
 
-# List of Python files we need to run (app.py, services)
-flask_apps = {"app.py":5000, 
-                "transfer_management_service/wallet.py":7000, 
-                "transfer_management_service/transaction.py":8000, 
-                "transfer_management_service/friend.py":8895, 
-                "transfer_management_service/transfer_management.py":6100, 
-                "loans_service/loan.py":5001,
-                } 
+# Define your Flask services and their respective ports
+flask_processes = []
 
-# Dictionary to hold references to subprocesses
-processes = {}
+flask_services = {
+    "app.py": 5000, 
+    "transfer_management_service/wallet.py": 7000, 
+    "transfer_management_service/transaction.py": 8000, 
+    "transfer_management_service/friend.py": 8895, 
+    "transfer_management_service/transfer_management.py": 6100, 
+    "loans_service/loan.py": 5001,
+}
 
-def run_flask_apps(apps):
-    for file, port in apps.items():
-        print(f"Running {file} on port {port}...")
-        command = f"python {file} --port {port}"  # Assuming Flask apps accept a '--port' argument
-        process = subprocess.Popen(command, shell=True, preexec_fn=os.setsid)
-        processes[file] = process  # Store reference to subprocess
-        print(f"Started {file} on port {port} with PID {process.pid}")
+# Function to run Flask services
+def run_flask_services():
+    current_os = platform.system()
 
-def stop_flask_apps():
-    for file, process in processes.items():
-        print(f"Stopping {file}...")
-        os.killpg(os.getpgid(process.pid), signal.SIGTERM)  # Terminate the subprocess group
+    def start_process(command):
+        if current_os == "Windows":
+            subprocess.Popen(f"start cmd /k {command}", shell=True)
+        elif current_os == "Darwin":  # macOS
+            subprocess.Popen(["python", command])
+        else:
+            print("Unsupported operating system")
+            return None
+
+    try:
+        for service, port in flask_services.items():
+            command = service
+            process = start_process(command)
+            if process:
+                flask_processes.append(process)
+                # Give some time for the server to start before moving on to the next service
+                time.sleep(2)
+    except KeyboardInterrupt:
+        print("Stopping Flask services...")
 
 if __name__ == "__main__":
+    run_flask_services()
     try:
-        run_flask_apps(flask_apps)
-        # Allow the script to continue running, waiting for Ctrl + C to stop the processes
         while True:
-            pass
+            time.sleep(1)
     except KeyboardInterrupt:
-        print("\nStopping Flask applications...")
-        stop_flask_apps()
+        for process in flask_processes:
+            process.terminate()
+        print("Flask services stopped.")
