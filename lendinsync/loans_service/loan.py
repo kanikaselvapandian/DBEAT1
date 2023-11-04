@@ -295,6 +295,7 @@ def update_loan(LoanId):
     new_StartDate = data.get('StartDate')
     new_EndDate = data.get('EndDate')
     new_TotalInterestAmount = data.get('TotalInterestAmount')
+    new_StatusLevel = data.get('StatusLevel')
 
 
     try:
@@ -319,6 +320,8 @@ def update_loan(LoanId):
             loan.EndDate = new_EndDate
         if new_TotalInterestAmount is not None:
             loan.TotalInterestAmount = new_TotalInterestAmount
+        if new_StatusLevel is not None:
+            loan.StatusLevel = new_StatusLevel
         
 
         db.session.commit()
