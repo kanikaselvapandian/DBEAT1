@@ -313,7 +313,7 @@
                                 InterestRate: this.interest_rate,
                                 CollateralAmount: this.collateral_amount,
                                 LoanTerm: this.loan_term,
-                                ServiceFee: this.service_fee,
+                                ServiceFee: this.borrowing_service_fee,
                                 StatusLevel: "Borrowing"
                             });
 
@@ -329,7 +329,7 @@
                             try {
                                 const response = await fetch(url, postMethod);
                                 const data = await response.json();
-
+                                            
                                 switch (data.code) {
                                     case 201:
                                         // Handle success case
@@ -385,7 +385,7 @@
                                 LoanTerm: this.loan_term,
                                 CurrencyCode: this.selectedCurrency,
                                 TotalInterestAmount: this.total_interest_amount,
-                                ServiceFee: this.service_fee,
+                                ServiceFee: this.lending_service_fee,
                                 Revenue: this.revenue,
                                 StatusLevel: "Lending"
                             });
