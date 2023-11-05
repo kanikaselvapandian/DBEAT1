@@ -375,7 +375,7 @@
                             },
                             body: JSON.stringify({
                                 InterestRate: interestRate,
-                                RepaymentAmount: repaymentAmount + ServiceFee,
+                                RepaymentAmount: repaymentAmount,
                                 OtherPartyId: customer_id,
                                 StartDate: currentDate,
                                 EndDate: formattedEndDate,
@@ -423,14 +423,13 @@
                                 OtherPartyId: customer_id,
                                 StartDate: currentDate,
                                 EndDate: formattedEndDate,
-                                RepaymentAmount: repaymentAmount + ServiceFee,
+                                RepaymentAmount: repaymentAmount,
                                 StatusLevel: "LMatch",
                             }),
                         });
 
                         if (response.status === 200) {
                             console.log('Loan updated successfully');
-                            // Reload the page after successful loan update
                             location.reload();
                         } else {
                             console.error('Error updating loan');
