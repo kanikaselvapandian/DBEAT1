@@ -108,6 +108,7 @@
                         <table class="table table-striped text-center">
                             <thead>
                                 <tr>
+                                    <th>Loan ID</th>
                                     <th>Borrowed Amount</th>
                                     <th>Currency</th>
                                     <th>Repayment Amount</th>
@@ -117,6 +118,7 @@
                             </thead>
                             <tbody>
                                 <tr v-for="loan in customer_borrowed_loans">
+                                    <td v-text="loan.LoanId"></td>
                                     <td v-text="loan.LoanAmount"></td>
                                     <td v-text="loan.CurrencyCode"></td>
                                     <td v-text="loan.RepaymentAmount"></td>
@@ -130,8 +132,10 @@
                         <table class="table table-striped text-center">
                             <thead>
                                 <tr>
+                                    <th>Loan ID</th>
                                     <th>Investment Amount</th>
                                     <th>Currency</th>
+                                    <th>Interest Rate</th>
                                     <th>Revenue</th>
                                     <th>End Date</th>
                                     <th>Status</th>
@@ -139,8 +143,10 @@
                             </thead>
                             <tbody>
                                 <tr v-for="loan in customer_lent_loans">
+                                    <td v-text="loan.LoanId"></td>
                                     <td v-text="loan.InvestmentAmount"></td>
                                     <td v-text="loan.CurrencyCode"></td>
+                                    <td v-text="loan.InterestRate"></td>
                                     <td v-text="loan.Revenue"></td>
                                     <td v-text="loan.EndDate"></td>
                                     <td v-text="loan.StatusLevel"></td>
@@ -298,6 +304,7 @@
                             this.errorsFound = false;
                             const jsonData = JSON.stringify({
                                 CustomerId: this.customer_id,
+                                InvestmentAmount: this.loan_amount,
                                 CurrencyCode: this.selectedCurrency,
                                 LoanAmount: this.loan_amount,
                                 RepaymentAmount: this.repayment_amount,
@@ -369,6 +376,7 @@
                             this.errorsFound = false;
                             const jsonData = JSON.stringify({
                                 CustomerId: this.customer_id,
+                                LoanAmount: this.investment_amount,
                                 InvestmentAmount: this.investment_amount,
                                 InterestRate: this.interest_rate,
                                 RepaymentAmount: this.repayment_amount,

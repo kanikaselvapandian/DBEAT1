@@ -145,6 +145,7 @@ def create_borrowing_loan():
     CustomerId = data.get('CustomerId')
     collateral_amount = data.get('CollateralAmount')
     loan_amount = data.get('LoanAmount')
+    investment_amount = data.get('InvestmentAmount')
     currency_code = data.get('CurrencyCode')
     loan_term = data.get('LoanTerm')
     service_fee = data.get('ServiceFee')
@@ -155,7 +156,7 @@ def create_borrowing_loan():
         OtherPartyId=None,
         CollateralAmount=collateral_amount,
         LoanAmount=loan_amount,
-        InvestmentAmount=None,
+        InvestmentAmount=investment_amount,
         InterestRate=None,
         CurrencyCode=currency_code,
         TotalInterestAmount=None,
@@ -194,9 +195,11 @@ def create_lending_loan():
     data = request.get_json()  
     CustomerId = data.get('CustomerId')
     investment_amount = data.get('InvestmentAmount')
+    loan_amount = data.get('LoanAmount')
     interest_rate = data.get('InterestRate')
     currency_code = data.get('CurrencyCode')
     loan_term = data.get('LoanTerm')
+    repayment_amount = data.get('Revenue')
     service_fee = data.get('ServiceFee')
     total_interest_amount = data.get('TotalInterestAmount')
     revenue = data.get('Revenue')
@@ -206,13 +209,13 @@ def create_lending_loan():
         CustomerId=CustomerId,
         OtherPartyId=None,
         CollateralAmount=None,
-        LoanAmount=None,
+        LoanAmount=loan_amount,
         InvestmentAmount=investment_amount,
         InterestRate=interest_rate,
         CurrencyCode=currency_code,
         TotalInterestAmount=total_interest_amount,
         ServiceFee=service_fee,
-        RepaymentAmount=None,
+        RepaymentAmount=repayment_amount,
         Revenue=revenue,
         LoanTerm=loan_term,
         StartDate=None,
@@ -245,13 +248,14 @@ def create_lending_loan():
 # [GET] Fetch All borrowing loans based on CustomerId
 @app.route("/loan/borrowing/<string:CustomerId>")
 def get_all_borrowing_loans_by_customer_id(CustomerId):
-    loan_list = Loan.query.filter(Loan.CustomerId == CustomerId, Loan.StatusLevel.in_(["Borrowing", "BMatch"])).all()
-    if len(loan_list):
+    loan_list = Loan.query.filter(Loan.CustomerId == CustomerId, Loan.StatusLevel.in_(["Borrowing"])).all()
+    lmatch_loans = Loan.query.filter(Loan.OtherPartyId == CustomerId, Loan.StatusLevel == "LMatch").all()
+    if len(loan_list) or len(lmatch_loans):
         return jsonify(
             {
                 "code": 200,
                 "data": {
-                    "loans": [loan.json() for loan in loan_list]
+                    "loans": [loan.json() for loan in loan_list] + [loan.json() for loan in lmatch_loans]
                 }
             }
         )
@@ -259,7 +263,7 @@ def get_all_borrowing_loans_by_customer_id(CustomerId):
     return jsonify(
         {
             "code": 404,
-            "message": "There are no borrowing loans."
+            "message": "There are no borrowing loans or BMatch loans for the given CustomerId."
         }
     ), 404
 
@@ -267,13 +271,14 @@ def get_all_borrowing_loans_by_customer_id(CustomerId):
 # [GET] Fetch All lending loans based on CustomerId
 @app.route("/loan/lending/<string:CustomerId>")
 def get_all_lending_loans_by_customer_id(CustomerId):
-    loan_list = Loan.query.filter(Loan.CustomerId == CustomerId, Loan.StatusLevel.in_(["Lending", "LMatch"])).all()
-    if len(loan_list):
+    loan_list = Loan.query.filter(Loan.CustomerId == CustomerId, Loan.StatusLevel.in_(["Lending"])).all()
+    bmatch_loans = Loan.query.filter(Loan.OtherPartyId == CustomerId, Loan.StatusLevel == "BMatch").all()
+    if len(loan_list) or len(bmatch_loans):
         return jsonify(
             {
                 "code": 200,
                 "data": {
-                    "loans": [loan.json() for loan in loan_list]
+                    "loans": [loan.json() for loan in loan_list] + [loan.json() for loan in bmatch_loans]
                 }
             }
         )
@@ -281,7 +286,7 @@ def get_all_lending_loans_by_customer_id(CustomerId):
     return jsonify(
         {
             "code": 404,
-            "message": "There are no lending loans."
+            "message": "There are no lending loans or LMatch loans for the given CustomerId."
         }
     ), 404
 
@@ -291,6 +296,7 @@ def update_loan(LoanId):
     data = request.get_json()
     new_interest_rate = data.get('InterestRate')
     new_repayment_amount = data.get('RepaymentAmount')
+    new_revenue = data.get('RepaymentAmount')
     new_other_party_id = data.get('OtherPartyId')  # Add this line
     new_StartDate = data.get('StartDate')
     new_EndDate = data.get('EndDate')
@@ -312,6 +318,8 @@ def update_loan(LoanId):
             loan.InterestRate = new_interest_rate
         if new_repayment_amount is not None:
             loan.RepaymentAmount = new_repayment_amount
+        if new_revenue is not None:
+            loan.Revenue = new_revenue
         if new_other_party_id is not None:  # Add this block
             loan.OtherPartyId = new_other_party_id
         if new_StartDate is not None:
