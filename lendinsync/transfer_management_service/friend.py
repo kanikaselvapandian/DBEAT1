@@ -77,13 +77,13 @@ def get_all_friends(friend_id):
             }
         ), 404
     
+# This route expects 'friend_id' as part of the URL
 @app.route("/submit_friend/<string:friend_id>", methods=["POST"])
 def createFriend(friend_id):
     # Extract data from the form
-    friend_id = friend_id
-    friendee_id = request.form.get('friendee_id')
-    friendee_name = request.form.get('friendee_name1')
-    print(friendee_name)
+    data = request.get_json()
+    friendee_id = data.get('friendee_id')
+    friendee_name = data.get('friendee_name')
 
     # Create a new Friend instance
     friend = Friend(
@@ -97,25 +97,18 @@ def createFriend(friend_id):
         db.session.add(friend)
         db.session.commit()  # Commit the changes to the database
 
-        return jsonify(
-            {
-                "code": 201,
-                "data": friend.json(),
-                "message": "Friend added successfully to the database"
-            }
-        ), 201
+        return jsonify({
+            "code": 201,
+            "data": friend.json(),
+            "message": "Friend added successfully to the database"
+        }), 201
 
     except Exception as e:
         db.session.rollback()  # Rollback the transaction in case of an error
-        return jsonify(
-            {
-                "code": 500,
-                "message": "An error occurred while adding the friend to the database: " + str(e)
-            }
-        ), 500
-
-    
-
+        return jsonify({
+            "code": 500,
+            "message": "An error occurred while adding the friend to the database: " + str(e)
+        }), 500
 
 if __name__ == '__main__':
-    app.run(port=8895, debug = True)
+    app.run(port=8895, debug=True)

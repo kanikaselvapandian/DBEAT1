@@ -151,14 +151,14 @@ COMMIT;
 -- Friends
 -- Create database if it doesn't exist
 -- Create database if it doesn't exist for "friends" table
-CREATE DATABASE IF NOT EXISTS `lis_friends` DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
+CREATE DATABASE IF NOT EXISTS `lis_friend` DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
 
--- Use the "friends" database
-USE `lis_friends`;
+-- Use the "friend" database
+USE `lis_friend`;
 
 -- Table structure for the "friends" table
-DROP TABLE IF EXISTS `Friends`;
-CREATE TABLE IF NOT EXISTS `Friends` (
+DROP TABLE IF EXISTS `Friend`;
+CREATE TABLE IF NOT EXISTS `Friend` (
     `fid` INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
     `friend_id` VARCHAR(512),
     `friendee_id` VARCHAR(512),
@@ -166,7 +166,7 @@ CREATE TABLE IF NOT EXISTS `Friends` (
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8;
 
 -- Insert values into the "friends" table
-INSERT INTO `Friends` (friend_id, friendee_id, friendee_name) VALUES
+INSERT INTO `Friend` (friend_id, friendee_id, friendee_name) VALUES
 ('H123123', 'S9934651E', 'Derek'),
 ('H123123', 'A123456', 'Kanika'),
 ('A123456', 'H123123', 'Hui Min'),

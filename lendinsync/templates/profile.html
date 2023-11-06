@@ -131,22 +131,7 @@
       <div class="container" data-aos="fade-up">
         <div class="section-title">
           <h2>My Friends</h2>
-          <button class="btn btn-dark" onclick="openForm()">Add Friend</button>
-          <div class="form-popup" id="myForm" style="display: none;">
-              <form id="addFriendForm" method="POST">
-                  <h2>Add Friend</h2>
-          
-                  <label for="friendee_name1"><b>Name</b></label>
-                  <input id="friendee_name1" class="same-style" placeholder="Enter Friend Name" name="friendee_name1" required>
-          
-                  <label for="friendee_id"><b>Customer ID</b></label>
-                  <input id="friendee_id" class="same-style" type="text" placeholder="Enter Friend ID" name="friendee_id" required>
-          
-                  <button type="submit" class="btn">Submit</button>
-                  <!-- Add the Cancel button -->
-                  <button type="button" class="btn cancel-btn" onclick="closeForm()">Cancel</button>
-              </form>
-          </div>
+          <button class="btn btn-dark" data-bs-toggle="modal" data-bs-target="#createFriend">Add Friend</button>
         </div>
         <div class="row mt-4 mt-4 mx-3 " id="friendList">
             <!-- Friend cards will be appended here -->
@@ -227,6 +212,66 @@
                 </div>
                 <div class="modal-body d-flex flex-column align-items-center">
                     <h5>Unfortunately, we are unable to facilitate your transaction at the moment, please try again later</h5>
+                </div>                    
+                </div>
+            </div>
+        </div>
+        <div class="modal fade" id="createFriend" aria-hidden="true" aria-labelledby="createFriendLabel" tabindex="-1" data-bs-backdrop="true">
+            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="createFriendLabel">Add a Friend</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" style = "padding: 20px">
+                    <div class = "container">
+                        <form>
+                            <div class="form-group">
+                                <label for="name">Name</label>
+                                <input type="text" class="form-control" v-model="friend_name">
+                              </div>
+                              <div class="form-group">
+                                <label for="name">Friend's User ID</label>
+                                <input type="text" class="form-control" v-model="friend_id">
+                              </div>
+                            <button type="submit" class="btn btn-block my-3" style="background-color: #c0d0fa; color: black; width: 100%" @click="createFriend($event)">Submit</button>
+                        </form>
+                        <div v-if = "errorsFound">
+                            <hr>
+                            <div class="alert alert-danger" role="alert">
+                                <ul>
+                                    <li v-for="error in validation_errors" v-text = "error"></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">Close</button>
+                </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal fade" id="successModal" aria-hidden="true" aria-labelledby="successModalLabel" tabindex="-1" data-bs-backdrop="true">
+            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="successModalLabel">Success!</h1>
+                </div>
+                <div class="modal-body d-flex flex-column align-items-center">
+                    <h5>Successfully Created Friend!</h5>
+                </div>                    
+                </div>
+            </div>
+        </div>
+        <div class="modal fade" id="unsuccessfulModal" aria-hidden="true" aria-labelledby="unsuccessfulModalLabel" tabindex="-1" data-bs-backdrop="true">
+            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="unsuccessfulModalLabel">Not Successful</h1>
+                </div>
+                <div class="modal-body d-flex flex-column align-items-center">
+                    <h5>Unfortunately, we are unable to create your friend now, please try again later.</h5>
                 </div>                    
                 </div>
             </div>
@@ -357,6 +402,7 @@
             const create_transaction = "http://127.0.0.1:6100/transfer";
             const get_friends_by_customerid = "http://localhost:8895/friends/" + customer_id;
             const create_peer_transaction = "http://127.0.0.1:6100/peer_transfer";
+            const create_friend = "http://localhost:8895/submit_friend/A123456";
             const friend = Vue.createApp({
             data() {
                 return {
@@ -381,7 +427,9 @@
                 destinationfriend: null,
                 friend_wallets: [],
                 friend_wallets_received: false,
-                destination_friend_wallet: null
+                destination_friend_wallet: null,
+                friend_name: '',
+                friend_id: '',
                 };
             },
             methods: {
@@ -594,6 +642,69 @@
                     console.error('Error fetching wallets:', error);
                     this.message = 'Error fetching wallet data: ' + error;
                 }
+                },
+                async createFriend(event) {
+                    event.preventDefault();
+                    this.validation_errors = []
+                    if (this.friend_name == "") {   
+                        this.validation_errors.push("Please enter a name");
+                    }
+                    if (this.friend_id == "") {
+                        this.validation_errors.push("Please enter a friend's user ID"); 
+                    }
+                    if (this.validation_errors.length > 0) {
+                        this.errorsFound = true
+                        return;
+                    }
+                    else {
+                        this.validation_errors = [];
+                        this.errorsFound = false;
+                        const jsonData = JSON.stringify({
+                        friend_id: this.customer_id,
+                        friendee_id: this.friend_id,
+                        friendee_name: this.friend_name
+                        });
+                        const url = create_friend;
+                        const postMethod = {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: jsonData
+                        };
+                        try {
+                            const response = await fetch(url, postMethod);
+                            const data = await response.json();
+                    
+                            switch (data.code) {
+                                case 201:
+                                    // Close the createFriend Modal
+                                    $('#createFriend').modal('hide');
+                                    // Show success modal
+                                    $('#successModal').modal('show');
+                                    // Reload page after a delay (you can change the delay as needed)
+                                    setTimeout(() => {
+                                        window.location.reload();
+                                    }, 1000); // Example: Reload after 1 second (1000 milliseconds)
+                                    break;
+                                case 500:
+                                    this.message = data.message;
+                                    // Close the createFriend Modal
+                                    $('#createFriend').modal('hide');
+                                    // Show unsuccessful modal
+                                    $('#unsuccessfulModal').modal('show');
+                                    // Reload page after a delay (you can change the delay as needed)
+                                    setTimeout(() => {
+                                        window.location.reload();
+                                    }, 1000); // Example: Reload after 1 seconds (1000 milliseconds)
+                                    break;
+                                default:
+                                    throw `${data.code}: ${data.message}`;
+                            }
+                        } catch (error) {
+                            console.error('Error');
+                        }
+                    }
                 },
             },
             mounted() {
