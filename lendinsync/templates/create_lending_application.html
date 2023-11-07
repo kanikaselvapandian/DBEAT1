@@ -16,6 +16,8 @@
       
         <!-- Vendor CSS Files -->
         <link href="/DBEAT1/lendinsync/assets/vendor/aos/aos.css" rel="stylesheet">
+        <!-- jQuery -->
+        <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
         <link href="/DBEAT1/lendinsync/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
         <link href="/DBEAT1/lendinsync/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
         <link href="/DBEAT1/lendinsync/assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
@@ -171,6 +173,30 @@
                                     </ul>
                                 </div>
                             </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal fade" id="successModal" aria-hidden="true" aria-labelledby="successModalLabel" tabindex="-1" data-bs-backdrop="true">
+                <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                    <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="successModalLabel">Success!</h1>
+                    </div>
+                    <div class="modal-body d-flex flex-column align-items-center">
+                        <h5>Successfully Created Lending Application!</h5>
+                    </div>                    
+                    </div>
+                </div>
+            </div>
+            <div class="modal fade" id="unsuccessfulModal" aria-hidden="true" aria-labelledby="unsuccessfulModalLabel" tabindex="-1" data-bs-backdrop="true">
+                <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                    <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="unsuccessfulModalLabel">Not Successful</h1>
+                    </div>
+                    <div class="modal-body d-flex flex-column align-items-center">
+                        <h5>Unfortunately, we are unable to create your lending application now, please try again later</h5>
+                    </div>                    
                     </div>
                 </div>
             </div>
@@ -349,6 +375,8 @@
                                     case 201:
                                         // Handle success case
                                         console.log("Successfully created borrowing application");
+                                        // Show success modal
+                                        $('#successModal').modal('show');
                                         //Reload the page after a delay
                                         setTimeout(() => {
                                             window.location.reload();
@@ -356,6 +384,8 @@
                                         break;
                                     case 500:
                                         this.message = data.message;
+                                        // Show success modal
+                                        $('#unsuccessfulModal').modal('show');
                                         //Reload the page after a delay
                                         setTimeout(() => {
                                             window.location.reload();
@@ -420,7 +450,9 @@
                                 switch (data.code) {
                                     case 201:
                                         // Handle success case
-                                        console.log("Successfully created lending application");
+                                        console.log("Successfully created borrowing application");
+                                        // Show success modal
+                                        $('#successModal').modal('show');
                                         //Reload the page after a delay
                                         setTimeout(() => {
                                             window.location.reload();
@@ -428,6 +460,8 @@
                                         break;
                                     case 500:
                                         this.message = data.message;
+                                        // Show success modal
+                                        $('#unsuccessfulModal').modal('show');
                                         //Reload the page after a delay
                                         setTimeout(() => {
                                             window.location.reload();
