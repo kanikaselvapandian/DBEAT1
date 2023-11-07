@@ -132,15 +132,17 @@
                         <label for="loanAmount" class="form-label">Loan Amount</label>
                         <input type="number" v-model="loan_amount" class="form-control" id="loanAmount">
                     </div>
-                    <div class="form-group">
-                                <label for="currency">Currency:</label>
-                                <select v-model="selectedCurrency" class = "form-control" @change="getExchangeRate(selectedCurrency)">
-                                    <option v-for="currency in currency_info" :value="currency.CurrencyCode" v-text ="currency.CountryName + ' (' + currency.CurrencyCode + ')'">
-                                    </option>
-                                </select>
-                            </div>
                     <div class="mb-3">
-                        <label for="loanTerm" class="form-label">Loan Term</label>
+                        <div class="form-group">
+                            <label for="currency">Currency:</label>
+                            <select v-model="selectedCurrency" class = "form-control" @change="getExchangeRate(selectedCurrency)">
+                                <option v-for="currency in currency_info" :value="currency.CurrencyCode" v-text ="currency.CountryName + ' (' + currency.CurrencyCode + ')'">
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="loanTerm" class="form-label">Loan Term (in days)</label>
                         <input type="number" v-model="loan_term" class="form-control" id="loanTerm">
                     </div>
                     <div class="mb-3">
