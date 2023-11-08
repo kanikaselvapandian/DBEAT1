@@ -324,81 +324,6 @@
                         const data = await response.json();
                         this.exchange_rate = data.Content.ServiceResponse["FX_SpotRate_Read-Response"]["Rate"];
                     },
-                    async create_borrow_application(event){
-                        event.preventDefault();
-                        this.validation_errors = [];
-                        if (this.loan_amount.value <= 0){
-                            this.validation_errors.push("Loan amount must be greater than 0");
-                        }
-                        if (this.loan_amount.value > this.collateral_amount.value){
-                            this.validation_errors.push("Loan amount must be less than the collateral amount");
-                        }
-                        if (this.selectedCurrency === ""){
-                            this.validation_errors.push("Please select a currency");
-                        }
-                        if(this.loan_term.value <= 0){
-                            this.validation_errors.push("Loan term must be greater than 0");
-                        }
-                        if (this.validation_errors.length > 0) {
-                            this.errorsFound = true;
-                            return;
-                        }
-                        else {
-                            this.validation_errors = [];
-                            this.errorsFound = false;
-                            const jsonData = JSON.stringify({
-                                CustomerId: this.customer_id,
-                                CurrencyCode: this.selectedCurrency,
-                                LoanAmount: this.loan_amount,
-                                RepaymentAmount: this.repayment_amount,
-                                InterestRate: this.interest_rate,
-                                CollateralAmount: this.collateral_amount,
-                                LoanTerm: this.loan_term,
-                                ServiceFee: this.service_fee,
-                                StatusLevel: "Borrowing"
-                            });
-
-                            const url = create_borrow_application;
-                            const postMethod = {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/json'
-                                },
-                                body: jsonData
-                            };
-
-                            try {
-                                const response = await fetch(url, postMethod);
-                                const data = await response.json();
-
-                                switch (data.code) {
-                                    case 201:
-                                        // Handle success case
-                                        console.log("Successfully created borrowing application");
-                                        // Show success modal
-                                        $('#successModal').modal('show');
-                                        //Reload the page after a delay
-                                        setTimeout(() => {
-                                            window.location.reload();
-                                        }, 1000);
-                                        break;
-                                    case 500:
-                                        this.message = data.message;
-                                        // Show success modal
-                                        $('#unsuccessfulModal').modal('show');
-                                        //Reload the page after a delay
-                                        setTimeout(() => {
-                                            window.location.reload();
-                                        }, 1000);
-                                        break;
-                                    default:
-                                        throw `${data.code}: ${data.message}`;
-                                }
-                            } catch (error) {
-                                console.error('Error');
-                            }
-                        }
-                    },
                     async create_lending_application(event){
                         event.preventDefault();
                         this.validation_errors = [];
@@ -429,7 +354,7 @@
                                 LoanTerm: this.loan_term,
                                 CurrencyCode: this.selectedCurrency,
                                 TotalInterestAmount: this.total_interest_amount,
-                                ServiceFee: this.service_fee,
+                                ServiceFee: this.lending_service_fee,
                                 Revenue: this.revenue,
                                 StatusLevel: "Lending"
                             });

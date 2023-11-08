@@ -314,16 +314,16 @@
                     async create_borrow_application(event){
                         event.preventDefault();
                         this.validation_errors = [];
-                        if (this.loan_amount.value <= 0){
+                        if (this.loan_amount <= 0){
                             this.validation_errors.push("Loan amount must be greater than 0");
                         }
-                        if (this.loan_amount.value > this.collateral_amount.value){
+                        if (this.loan_amount > this.collateral_amount){
                             this.validation_errors.push("Loan amount must be less than the collateral amount");
                         }
                         if (this.selectedCurrency === ""){
                             this.validation_errors.push("Please select a currency");
                         }
-                        if(this.loan_term.value <= 0){
+                        if(this.loan_term <= 0){
                             this.validation_errors.push("Loan term must be greater than 0");
                         }
                         if (this.validation_errors.length > 0) {
