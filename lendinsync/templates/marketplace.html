@@ -55,9 +55,12 @@
             margin-right: 10px;
             /* Optional: Adjust the margin between cards */
         }
+
         #hero {
-            height: 50vh; /* Adjust the value as needed */
+            height: 50vh;
+            /* Adjust the value as needed */
         }
+
         body {
             display: flex;
             flex-direction: column;
@@ -70,10 +73,12 @@
         }
 
         #footer {
-            background-color: #f8f9fa; /* Replace with your preferred color */
+            background-color: #f8f9fa;
+            /* Replace with your preferred color */
             width: 100%;
             text-align: center;
-            padding: 20px 0; /* Adjust the padding as needed */
+            padding: 20px 0;
+            /* Adjust the padding as needed */
             position: sticky;
             bottom: 0;
         }
@@ -126,7 +131,7 @@
         <div class="container position-relative" data-aos="fade-up" data-aos-delay="100">
             <div class="row justify-content-center">
                 <div class="col-xl-7 col-lg-9 text-center">
-                <h1>Marketplace</h1>
+                    <h1>Marketplace</h1>
                 </div>
             </div>
         </div>
@@ -181,6 +186,21 @@
                                     </button>
                                 </td>
                             </tr>
+                            <div class="modal fade" id="successLendModal" aria-hidden="true"
+                                aria-labelledby="successModalLabel" tabindex="-1" data-bs-backdrop="true">
+                                <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h1 class="modal-title fs-5" id="successModalLabel">Success!</h1>
+                                        </div>
+                                        <div class="modal-body d-flex flex-column align-items-center">
+                                            <h5>Your loan application has been successful!</h5>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+
 
 
 
@@ -214,6 +234,19 @@
                                     </button>
                                 </td>
                             </tr>
+                            <div class="modal fade" id="successBorrowModal" aria-hidden="true"
+                            aria-labelledby="successModalLabel" tabindex="-1" data-bs-backdrop="true">
+                            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h1 class="modal-title fs-5" id="successModalLabel">Success!</h1>
+                                    </div>
+                                    <div class="modal-body d-flex flex-column align-items-center">
+                                        <h5>Your borrow application has been successful!</h5>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                         </tbody>
                     </table>
                 </div>
@@ -324,6 +357,8 @@
             },
             methods: {
 
+
+
                 async get_all_borrowed_loans() {
                     try {
                         const response = await fetch(get_all_borrowed_loans);
@@ -411,7 +446,11 @@
 
                         if (response.status === 200) {
                             console.log('Loan updated successfully');
-                            location.reload();
+                            $('#successLendModal').modal('show');
+                            setTimeout(function () {
+                                window.location.reload();
+                            }, 2000);
+
                         } else {
                             console.error('Error updating loan');
                         }
@@ -455,7 +494,10 @@
 
                         if (response.status === 200) {
                             console.log('Loan updated successfully');
-                            location.reload();
+                            $('#successBorrowModal').modal('show');
+                            setTimeout(function () {
+                                window.location.reload();
+                            }, 2000);
                         } else {
                             console.error('Error updating loan');
                         }
