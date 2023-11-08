@@ -167,17 +167,22 @@
           <p>View and Manage your wallets today!</p>
         </div>
         <div class="col-md-12">
-          <div class="card-deck-scroll">
-              <div class="card" v-for="wallet in customer_wallets">
-                  <div class="card-body">
-                      <h5 class="card-title" v-text="wallet.CurrencyCode"></h5>
-                      <p class="card-text">
-                          Amount: <span v-text="wallet.Amount"></span> <br>
-                      </p>
+          <div v-if = "wallets_empty">
+              <h4 style = "text-align: center">No digital wallets found. Create one today!</h4>
+          </div>
+          <div v-else>
+              <div class="card-deck-scroll">
+                  <div class="card" v-for="wallet in customer_wallets">
+                      <div class="card-body">
+                          <h5 class="card-title" v-text="wallet.CurrencyCode"></h5>
+                          <p class="card-text">
+                              Amount: <span v-text="wallet.Amount"></span> <br>
+                          </p>
+                      </div>
                   </div>
               </div>
           </div>
-      </div>
+        </div>
       </div>
     </section><!-- End Testimonials Section -->    
 
@@ -382,11 +387,35 @@ async function checkLocalStorageAndRedirect() {
   <!-- Template Main JS File -->
   <script src="/DBEAT1/lendinsync/assets/js/main.js"></script>
   <script>
-      const customer_id = "A123456";
+      
+
+  </script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Assuming 'username' and 'pin' are obtained securely, not shown here for security
+        const username = localStorage.getItem('username'); // You should get the username securely, perhaps from a session variable
+        const pin = localStorage.getItem('pin');// PIN should be obtained securely, perhaps through a form with POST method
+
+        const url = `http://tbankonline.com/SMUtBank_API/Gateway?Header={"serviceName":"getCustomerDetails","userID":"${username}","PIN":"${pin}","OTP":"999999"}`;
+
+fetch(url)
+    .then(response => response.json())
+    .then(data => {
+        console.log(data);
+
+        // Select the HTML elements
+        const nameElement = document.querySelector('#ownName');
+        nameElement.textContent = data.Content.ServiceResponse.CDMCustomer.givenName
+      })
+                .catch(error => console.error(error));
+        });
+    function logout() {
+        localStorage.clear();
+        window.location.href = "/";
+    }
+      const customer_id = localStorage.getItem('username');
       const get_wallets_by_customerid = "http://127.0.0.1:7000/wallet/" + customer_id;
       const get_transactions_by_customerid = "http://127.0.0.1:8000/transaction/" + customer_id;
-      const deposit_account = "0000010505"
-      const deposit_account_balance = "40000"
 
       const homePage = Vue.createApp({
         data() {
@@ -400,9 +429,8 @@ async function checkLocalStorageAndRedirect() {
             currency_info: [],
             selectedCurrency: "",
             customer_id: customer_id,
-            deposit_account: deposit_account,
             exchange_rate: 0,
-            deposit_account_balance: deposit_account_balance,
+            wallets_empty: false,
             };
         },
         methods: {
@@ -413,6 +441,7 @@ async function checkLocalStorageAndRedirect() {
 
                 if (data.code === 404) {
                 this.message = data.message;
+                this.wallets_empty = true;
                 } else {
                 this.customer_wallets = data.data.wallet; 
                 this.wallets_received = true;
@@ -454,30 +483,6 @@ async function checkLocalStorageAndRedirect() {
         });
       const vm = homePage.mount('#homePage');
 
-  </script>
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-        // Assuming 'username' and 'pin' are obtained securely, not shown here for security
-        const username = localStorage.getItem('username'); // You should get the username securely, perhaps from a session variable
-        const pin = localStorage.getItem('pin');// PIN should be obtained securely, perhaps through a form with POST method
-
-        const url = `http://tbankonline.com/SMUtBank_API/Gateway?Header={"serviceName":"getCustomerDetails","userID":"${username}","PIN":"${pin}","OTP":"999999"}`;
-
-fetch(url)
-    .then(response => response.json())
-    .then(data => {
-        console.log(data);
-
-        // Select the HTML elements
-        const nameElement = document.querySelector('#ownName');
-        nameElement.textContent = data.Content.ServiceResponse.CDMCustomer.givenName
-      })
-                .catch(error => console.error(error));
-        });
-    function logout() {
-        localStorage.clear();
-        window.location.href = "/";
-    }
 </script>
 
 </body>

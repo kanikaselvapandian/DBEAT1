@@ -1,57 +1,71 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="utf-8">
-        <meta content="width=device-width, initial-scale=1.0" name="viewport">
-      
-        <title>Home</title>
-        <meta content="" name="description">
-        <meta content="" name="keywords">
-      
-        <!-- Favicons -->
-        <link href="/DBEAT1/lendinsync/assets/img/favicon.jpg" rel="icon">
-      
-        <!-- Google Fonts -->
-        <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Raleway:300,300i,400,400i,500,500i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
-      
-        <!-- Vendor CSS Files -->
-        <link href="/DBEAT1/lendinsync/assets/vendor/aos/aos.css" rel="stylesheet">
-        <!-- jQuery -->
-        <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
-        <link href="/DBEAT1/lendinsync/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-        <link href="/DBEAT1/lendinsync/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
-        <link href="/DBEAT1/lendinsync/assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
-        <link href="/DBEAT1/lendinsync/assets/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
-        <link href="/DBEAT1/lendinsync/assets/vendor/remixicon/remixicon.css" rel="stylesheet">
-        <link href="/DBEAT1/lendinsync/assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
-      
-        <!-- Vue 3 -->
-        <script src='https://cdn.jsdelivr.net/npm/vue@3.0.2/dist/vue.global.js'></script>
-      
-        <!-- Template Main CSS File -->
-        <link href="/DBEAT1/lendinsync/assets/css/style.css" rel="stylesheet">
-      
-        <style>
-          .card {
-              background-color: #c0d0fa;
-          }
-          .card-deck-scroll {
-              display: flex;
-              flex-wrap: nowrap;
-              overflow-x: auto;
-              scrollbar-width: thin; /* Optional: Adjust scrollbar width */
-              width: 100%; /* Ensures full width within the container */
-          }
-          .card {
-              flex: 0 0 250px; /* Fixed width for each card */
-              margin-right: 10px; /* Optional: Adjust the margin between cards */
-          }
-          [v-cloak] {
-              display: none;
-          }
-          #hero {
-            height: 50vh; /* Adjust the value as needed */
+
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+
+    <title>Home</title>
+    <meta content="" name="description">
+    <meta content="" name="keywords">
+
+    <!-- Favicons -->
+    <link href="/DBEAT1/lendinsync/assets/img/favicon.jpg" rel="icon">
+
+    <!-- Google Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Raleway:300,300i,400,400i,500,500i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i"
+        rel="stylesheet">
+
+    <!-- Vendor CSS Files -->
+    <link href="/DBEAT1/lendinsync/assets/vendor/aos/aos.css" rel="stylesheet">
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.7.1.js"
+        integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
+    <link href="/DBEAT1/lendinsync/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/DBEAT1/lendinsync/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+    <link href="/DBEAT1/lendinsync/assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
+    <link href="/DBEAT1/lendinsync/assets/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
+    <link href="/DBEAT1/lendinsync/assets/vendor/remixicon/remixicon.css" rel="stylesheet">
+    <link href="/DBEAT1/lendinsync/assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
+
+    <!-- Vue 3 -->
+    <script src='https://cdn.jsdelivr.net/npm/vue@3.0.2/dist/vue.global.js'></script>
+
+    <!-- Template Main CSS File -->
+    <link href="/DBEAT1/lendinsync/assets/css/style.css" rel="stylesheet">
+
+    <style>
+        .card {
+            background-color: #c0d0fa;
         }
+
+        .card-deck-scroll {
+            display: flex;
+            flex-wrap: nowrap;
+            overflow-x: auto;
+            scrollbar-width: thin;
+            /* Optional: Adjust scrollbar width */
+            width: 100%;
+            /* Ensures full width within the container */
+        }
+
+        .card {
+            flex: 0 0 250px;
+            /* Fixed width for each card */
+            margin-right: 10px;
+            /* Optional: Adjust the margin between cards */
+        }
+
+        [v-cloak] {
+            display: none;
+        }
+
+        #hero {
+            height: 50vh;
+            /* Adjust the value as needed */
+        }
+
         body {
             display: flex;
             flex-direction: column;
@@ -64,408 +78,354 @@
         }
 
         #footer {
-            background-color: #f8f9fa; /* Replace with your preferred color */
+            background-color: #f8f9fa;
+            /* Replace with your preferred color */
             width: 100%;
             text-align: center;
-            padding: 20px 0; /* Adjust the padding as needed */
+            padding: 20px 0;
+            /* Adjust the padding as needed */
             position: sticky;
             bottom: 0;
         }
-      </style>
-      
-        <!-- =======================================================
+    </style>
+
+    <!-- =======================================================
         * Template Name: OnePage
         * Updated: Sep 18 2023 with Bootstrap v5.3.2
         * Template URL: https://bootstrapmade.com/onepage-multipurpose-bootstrap-template/
         * Author: BootstrapMade.com
         * License: https://bootstrapmade.com/license/
         ======================================================== -->
-      </head>
-      
-      <body>
-        <!-- ======= Header ======= -->
-        <header id="header" class="fixed-top">
-          <div class="container d-flex align-items-center justify-content-between">
+</head>
+
+<body>
+    <!-- ======= Header ======= -->
+    <header id="header" class="fixed-top">
+        <div class="container d-flex align-items-center justify-content-between">
             <div>
-              <img src="/DBEAT1/lendinsync/assets/img/favicon.jpg" width="50" height="50" style="display: inline-block;"><h1 class="logo" style="display: inline-block;"><a href="/home">LendInSync</a></h1>
+                <img src="/DBEAT1/lendinsync/assets/img/favicon.jpg" width="50" height="50"
+                    style="display: inline-block;">
+                <h1 class="logo" style="display: inline-block;"><a href="/home">LendInSync</a></h1>
             </div>
-      
+
             <nav id="navbar" class="navbar">
                 <ul>
-                  <li><a class="nav-link scrollto" href="/home">Home</a></li>
-                  <li><a class="nav-link scrollto" href="/wallet">Wallets</a></li>
-                  <li><a class="nav-link scrollto" href="/marketplace">Marketplace</a></li>
-                  <li><a class="nav-link scrollto" href="/my_loans">My Loans</a></li>
-                  <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle active" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                      Create Application
-                    </a>
-                    <ul class="dropdown-menu">
-                      <li><a class="dropdown-item" href="/loan/borrowing/">Create Borrow Application</a></li>
-                      <li><a class="dropdown-item" href="/loan/lending/">Create Lending Application</a></li>
-                    </ul>
-                  </li>
-                  <li><a class="nav-link scrollto" href="/profile">Profile</a></li>
-                  <li><a class="nav-link scrollto"href="/" onclick="logout()">Logout</a></li>
+                    <li><a class="nav-link scrollto" href="/home">Home</a></li>
+                    <li><a class="nav-link scrollto" href="/wallet">Wallets</a></li>
+                    <li><a class="nav-link scrollto" href="/marketplace">Marketplace</a></li>
+                    <li><a class="nav-link scrollto" href="/my_loans">My Loans</a></li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle active" href="#" role="button" data-bs-toggle="dropdown"
+                            aria-expanded="false">
+                            Create Application
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="/loan/borrowing/">Create Borrow Application</a></li>
+                            <li><a class="dropdown-item" href="/loan/lending/">Create Lending Application</a></li>
+                        </ul>
+                    </li>
+                    <li><a class="nav-link scrollto" href="/profile">Profile</a></li>
+                    <li><a class="nav-link scrollto" href="/" onclick="logout()">Logout</a></li>
                 </ul>
                 <i class="bi bi-list mobile-nav-toggle"></i>
-              </nav><!-- .navbar -->
-          </div>
-        </header><!-- End Header -->
-        <!-- ======= Hero Section ======= -->
-        <section id="hero" class="d-flex align-items-center">
-            <div class="container position-relative" data-aos="fade-up" data-aos-delay="100">
-                <div class="row justify-content-center">
-                    <div class="col-xl-7 col-lg-9 text-center">
+            </nav><!-- .navbar -->
+        </div>
+    </header><!-- End Header -->
+    <!-- ======= Hero Section ======= -->
+    <section id="hero" class="d-flex align-items-center">
+        <div class="container position-relative" data-aos="fade-up" data-aos-delay="100">
+            <div class="row justify-content-center">
+                <div class="col-xl-7 col-lg-9 text-center">
                     <h1>Create Borrow Application</h1>
-                    </div>
                 </div>
             </div>
-        </section><!-- End Hero -->
-        <main id="loan">
-            <div class="container" id="loan">
-                <form>
-                    <legend>Create Borrow Application</legend>
-                    <div class="mb-3 pt-2">
-                        <label for="collateralAmount" class="form-label">Collateral Amount</label>
-                        <input type="number" v-model="collateral_amount" class="form-control" id="collateralAmount" aria-describedby="collateralAmount">
-                    </div>
-                    <div class="mb-3">
-                        <label for="loanAmount" class="form-label">Loan Amount</label>
-                        <input type="number" v-model="loan_amount" class="form-control" id="loanAmount">
-                    </div>
-                    <div class="mb-3">
-                        <div class="form-group">
-                            <label for="currency">Currency:</label>
-                            <select v-model="selectedCurrency" class = "form-control" @change="getExchangeRate(selectedCurrency)">
-                                <option v-for="currency in currency_info" :value="currency.CurrencyCode" v-text ="currency.CountryName + ' (' + currency.CurrencyCode + ')'">
-                                </option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="mb-3">
-                        <label for="loanTerm" class="form-label">Loan Term (in days)</label>
-                        <input type="number" v-model="loan_term" class="form-control" id="loanTerm">
-                    </div>
-                    <div class="mb-3">
-                        <label for="borrowingServiceFee" class="form-label">Service Fee</label>
-                        <input disabled type="number" v-model="borrowing_service_fee" class="form-control" id="borrowingServiceFee">
-                        
-                    </div>
-                    <button type="submit" id="submit" class="btn btn-block my-3" style="background-color: #c0d0fa; color: black; width: 100%" @click="create_borrow_application($event)">Submit</button>
-                </form>
-                <div v-if = "errorsFound">
-                    <hr>
-                    <div class="alert alert-danger" role="alert">
-                        <ul>
-                            <li v-for="error in validation_errors" v-text="error"></li>
-                        </ul>
+        </div>
+    </section><!-- End Hero -->
+    <main id="loan">
+        <div class="container" id="loan">
+            <form>
+                <legend>Create Borrow Application</legend>
+                <div class="mb-3 pt-2">
+                    <label for="collateralAmount" class="form-label">Collateral Amount</label>
+                    <input type="number" v-model="collateral_amount" class="form-control" id="collateralAmount"
+                        aria-describedby="collateralAmount">
+                </div>
+                <div class="mb-3">
+                    <label for="loanAmount" class="form-label">Loan Amount</label>
+                    <input type="number" v-model="loan_amount" class="form-control" id="loanAmount">
+                </div>
+                <div class="mb-3">
+                    <div class="form-group">
+                        <label for="currency">Currency:</label>
+                        <select v-model="selectedCurrency" class="form-control"
+                            @change="getExchangeRate(selectedCurrency)">
+                            <option v-for="currency in currency_info" :value="currency.CurrencyCode"
+                                v-text="currency.CountryName + ' (' + currency.CurrencyCode + ')'">
+                            </option>
+                        </select>
                     </div>
                 </div>
+                <div class="mb-3">
+                    <label for="loanTerm" class="form-label">Loan Term (in days)</label>
+                    <input type="number" v-model="loan_term" class="form-control" id="loanTerm">
+                </div>
+                <div class="mb-3">
+                    <label for="borrowingServiceFee" class="form-label">Service Fee</label>
+                    <input disabled type="number" v-model="borrowing_service_fee" class="form-control"
+                        id="borrowingServiceFee">
+
+                </div>
+                <button type="submit" id="submit" class="btn btn-block my-3"
+                    style="background-color: #c0d0fa; color: black; width: 100%"
+                    @click="create_borrow_application($event)">Submit</button>
+            </form>
+            <div v-if="errorsFound">
+                <hr>
+                <div class="alert alert-danger" role="alert">
+                    <ul>
+                        <li v-for="error in validation_errors" v-text="error"></li>
+                    </ul>
+                </div>
             </div>
-            <div class="modal fade" id="successModal" aria-hidden="true" aria-labelledby="successModalLabel" tabindex="-1" data-bs-backdrop="true">
-                <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
-                    <div class="modal-content">
+        </div>
+        <div class="modal fade" id="successModal" aria-hidden="true" aria-labelledby="successModalLabel" tabindex="-1"
+            data-bs-backdrop="true">
+            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                <div class="modal-content">
                     <div class="modal-header">
                         <h1 class="modal-title fs-5" id="successModalLabel">Success!</h1>
                     </div>
                     <div class="modal-body d-flex flex-column align-items-center">
                         <h5>Successfully Created Borrow Application!</h5>
-                    </div>                    
                     </div>
                 </div>
             </div>
-            <div class="modal fade" id="unsuccessfulModal" aria-hidden="true" aria-labelledby="unsuccessfulModalLabel" tabindex="-1" data-bs-backdrop="true">
-                <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
-                    <div class="modal-content">
+        </div>
+        <div class="modal fade" id="unsuccessfulModal" aria-hidden="true" aria-labelledby="unsuccessfulModalLabel"
+            tabindex="-1" data-bs-backdrop="true">
+            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                <div class="modal-content">
                     <div class="modal-header">
                         <h1 class="modal-title fs-5" id="unsuccessfulModalLabel">Not Successful</h1>
                     </div>
                     <div class="modal-body d-flex flex-column align-items-center">
-                        <h5>Unfortunately, we are unable to create your borrow application now, please try again later</h5>
-                    </div>                    
+                        <h5>Unfortunately, we are unable to create your borrow application now, please try again later
+                        </h5>
                     </div>
                 </div>
             </div>
-        </main><!-- End #main -->
-        <!-- ======= Footer ======= -->
-        <footer id="footer">
-            <div class="container d-md-flex py-4">
+        </div>
+    </main><!-- End #main -->
+    <!-- ======= Footer ======= -->
+    <footer id="footer">
+        <div class="container d-md-flex py-4">
             <div class="me-md-auto text-center text-md-start">
                 <div class="copyright">
-                &copy; Copyright <strong><span>LendInSync</span></strong>. All Rights Reserved
+                    &copy; Copyright <strong><span>LendInSync</span></strong>. All Rights Reserved
                 </div>
                 <div class="credits">
-                <!-- All the links in the footer should remain intact. -->
-                <!-- You can delete the links only if you purchased the pro version. -->
-                <!-- Licensing information: https://bootstrapmade.com/license/ -->
-                <!-- Purchase the pro version with working PHP/AJAX contact form: https://bootstrapmade.com/onepage-multipurpose-bootstrap-template/ -->
-                Designed by <a href="https://bootstrapmade.com/">BootstrapMade</a>
+                    <!-- All the links in the footer should remain intact. -->
+                    <!-- You can delete the links only if you purchased the pro version. -->
+                    <!-- Licensing information: https://bootstrapmade.com/license/ -->
+                    <!-- Purchase the pro version with working PHP/AJAX contact form: https://bootstrapmade.com/onepage-multipurpose-bootstrap-template/ -->
+                    Designed by <a href="https://bootstrapmade.com/">BootstrapMade</a>
                 </div>
             </div>
-            </div>
-        </footer><!-- End Footer -->
+        </div>
+    </footer><!-- End Footer -->
 
-        <div id="preloader"></div>
-        <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+    <div id="preloader"></div>
+    <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i
+            class="bi bi-arrow-up-short"></i></a>
 
-        <!-- Vendor JS Files -->
-        <script src="/DBEAT1/lendinsync/assets/vendor/purecounter/purecounter_vanilla.js"></script>
-        <script src="/DBEAT1/lendinsync/assets/vendor/aos/aos.js"></script>
-        <script src="/DBEAT1/lendinsync/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-        <script src="/DBEAT1/lendinsync/assets/vendor/glightbox/js/glightbox.min.js"></script>
-        <script src="/DBEAT1/lendinsync/assets/vendor/isotope-layout/isotope.pkgd.min.js"></script>
-        <script src="/DBEAT1/lendinsync/assets/vendor/swiper/swiper-bundle.min.js"></script>
-        <script src="/DBEAT1/lendinsync/assets/vendor/php-email-form/validate.js"></script>
+    <!-- Vendor JS Files -->
+    <script src="/DBEAT1/lendinsync/assets/vendor/purecounter/purecounter_vanilla.js"></script>
+    <script src="/DBEAT1/lendinsync/assets/vendor/aos/aos.js"></script>
+    <script src="/DBEAT1/lendinsync/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="/DBEAT1/lendinsync/assets/vendor/glightbox/js/glightbox.min.js"></script>
+    <script src="/DBEAT1/lendinsync/assets/vendor/isotope-layout/isotope.pkgd.min.js"></script>
+    <script src="/DBEAT1/lendinsync/assets/vendor/swiper/swiper-bundle.min.js"></script>
+    <script src="/DBEAT1/lendinsync/assets/vendor/php-email-form/validate.js"></script>
 
-        <!-- Template Main JS File -->
-        <script src="/DBEAT1/lendinsync/assets/js/main.js"></script>
-        <script>
-            const customer_id = localStorage.getItem('username');
-            const get_borrowed_loans_by_customer_id = "http://127.0.0.1:5001/loan/borrowing/" + customer_id;
-            const get_lent_loans_by_customer_id = "http://127.0.0.1:5001/loan/lending/" + customer_id;
-            const create_borrow_application = "http://127.0.0.1:5001/loan/borrowing/";
-            const create_lending_application = "http://127.0.0.1:5001/loan/lending/";
+    <!-- Template Main JS File -->
+    <script src="/DBEAT1/lendinsync/assets/js/main.js"></script>
+    <script>
+        const customer_id = localStorage.getItem('username');
+        const get_borrowed_loans_by_customer_id = "http://127.0.0.1:5001/loan/borrowing/" + customer_id;
+        const get_lent_loans_by_customer_id = "http://127.0.0.1:5001/loan/lending/" + customer_id;
+        const create_borrow_application = "http://127.0.0.1:5001/loan/borrowing/";
+        const create_lending_application = "http://127.0.0.1:5001/loan/lending/";
 
-            const loan = Vue.createApp({
-                data() {
-                    return {
-                        customer_borrowed_loans: [],
-                        customer_lent_loans: [],
-                        message: "",
-                        customer_id: customer_id,
-                        loan_amount: 0,
-                        collateral_amount: 0,
-                        investment_amount: 0,
-                        loan_term: 0,
-                        currency_info: [],
-                        selectedCurrency: "",
-                        exchange_rate: 0,
-                        interest_rate: 0,
-                        service_fee: 0,
-                        repayment_amount: 0,
-                        StatusLevel: "",
-                        borrowing_service_fee: 0,
-                        lending_service_fee: 0,
-                        validation_errors: [],
-                        errorsFound: false
-                    };
+        const loan = Vue.createApp({
+            data() {
+                return {
+                    customer_borrowed_loans: [],
+                    customer_lent_loans: [],
+                    message: "",
+                    customer_id: customer_id,
+                    loan_amount: 0,
+                    collateral_amount: 0,
+                    investment_amount: 0,
+                    loan_term: 0,
+                    currency_info: [],
+                    selectedCurrency: "",
+                    exchange_rate: 0,
+                    interest_rate: 0,
+                    service_fee: 0,
+                    repayment_amount: 0,
+                    StatusLevel: "",
+                    borrowing_service_fee: 0,
+                    lending_service_fee: 0,
+                    validation_errors: [],
+                    errorsFound: false
+                };
+            },
+            computed: {
+                total_interest_amount() {
+                    const totalInterest = parseFloat(this.investment_amount) * (this.interest_rate / 100) * (this.loan_term / 365);
+                    return parseFloat(totalInterest.toFixed(2)); // Round to 2 decimal places
                 },
-                computed: {
-                    total_interest_amount() {
-                        const totalInterest = parseFloat(this.investment_amount) * (this.interest_rate / 100) * (this.loan_term / 365);
-                        return parseFloat(totalInterest.toFixed(2)); // Round to 2 decimal places
-                    },
-                    revenue() {
-                        const investmentAmount = parseFloat(this.investment_amount);
-                        const revenue = this.total_interest_amount + investmentAmount;
-                        return parseFloat(revenue.toFixed(2)); // Round to 2 decimal places
-                    },
+                revenue() {
+                    const investmentAmount = parseFloat(this.investment_amount);
+                    const revenue = this.total_interest_amount + investmentAmount;
+                    return parseFloat(revenue.toFixed(2)); // Round to 2 decimal places
                 },
-                watch: {
-                    loan_amount: function (newLoanAmount, oldLoanAmount) {
-                        // Compute the service fee based on the newLoanAmount
-                        this.borrowing_service_fee = newLoanAmount * 0.01; 
-                    },
-                    investment_amount: function (newInvestmentAmount, oldInvestmentAmount) {
-                        // Compute the service fee based on the newInvestmentAmount
-                        this.lending_service_fee = newInvestmentAmount * 0.01; 
-                    },
+            },
+            watch: {
+                loan_amount: function (newLoanAmount, oldLoanAmount) {
+                    // Compute the service fee based on the newLoanAmount
+                    this.borrowing_service_fee = newLoanAmount * 0.01;
                 },
-                methods: {
-                    async get_my_borrowed_loans(){
+                investment_amount: function (newInvestmentAmount, oldInvestmentAmount) {
+                    // Compute the service fee based on the newInvestmentAmount
+                    this.lending_service_fee = newInvestmentAmount * 0.01;
+                },
+            },
+            methods: {
+                async get_my_borrowed_loans() {
+                    try {
+                        const response = await fetch(get_borrowed_loans_by_customer_id);
+                        const data = await response.json();
+
+                        if (data.code === 404) {
+                            this.message = data.message;
+                        } else {
+                            this.customer_borrowed_loans = data.data.loans;
+                        }
+                    } catch (error) {
+                        this.message = "Error fetching my borrowed loans: " + error;
+                    }
+                },
+                async get_my_lent_loans() {
+                    try {
+                        const response = await fetch(get_lent_loans_by_customer_id);
+                        const data = await response.json();
+
+                        if (data.code === 404) {
+                            this.message = data.message;
+                        } else {
+                            this.customer_lent_loans = data.data.loans;
+                        }
+                    } catch (error) {
+                        this.message = "Error fetching my lent loans: " + error;
+                    }
+                },
+                async getCurrencyCodes() {
+                    const response = await fetch('http://tbankonline.com/SMUtBank_API/Gateway?Header={"serviceName": "getCurrencyList", "userID": "", "PIN": "", "OTP": ""}&Content={"baseCurrency": "SGD", "quoteCurrency": "USD"}');
+                    const data = await response.json();
+                    this.currency_info = data.Content.ServiceResponse.CurrencyList.Currency;
+                },
+                async getExchangeRate(currency_code) {
+                    const response = await fetch(`http://tbankonline.com/SMUtBank_API/Gateway?Header={"serviceName": "getExchangeRate", "userID": "", "PIN": "", "OTP": ""}&Content={"baseCurrency": "SGD", "quoteCurrency": "${currency_code}"}`);
+                    const data = await response.json();
+                    this.exchange_rate = data.Content.ServiceResponse["FX_SpotRate_Read-Response"]["Rate"];
+                },
+                async create_borrow_application(event) {
+                    event.preventDefault();
+                    this.validation_errors = [];
+                    this.loan_amount = parseFloat(this.loan_amount);
+                    this.collateral_amount = parseFloat(this.collateral_amount);
+                    if (this.loan_amount <= 0) {
+                        this.validation_errors.push("Loan amount must be greater than 0");
+                    }
+                    if (this.loan_amount > this.collateral_amount) {
+                        this.validation_errors.push("Loan amount must be less than the collateral amount");
+                    }
+                    if (this.selectedCurrency === "") {
+                        this.validation_errors.push("Please select a currency");
+                    }
+                    if (this.loan_term <= 0) {
+                        this.validation_errors.push("Loan term must be greater than 0");
+                    }
+                    if (this.validation_errors.length > 0) {
+                        this.errorsFound = true;
+                        return;
+                    }
+                    else {
+                        this.validation_errors = [];
+                        this.errorsFound = false;
+                        const jsonData = JSON.stringify({
+                            CustomerId: this.customer_id,
+                            CurrencyCode: this.selectedCurrency,
+                            LoanAmount: this.loan_amount,
+                            RepaymentAmount: this.repayment_amount,
+                            InterestRate: this.interest_rate,
+                            CollateralAmount: this.collateral_amount,
+                            LoanTerm: this.loan_term,
+                            ServiceFee: this.borrowing_service_fee,
+                            StatusLevel: "Borrowing"
+                        });
+
+                        const url = create_borrow_application;
+                        const postMethod = {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: jsonData
+                        };
+
                         try {
-                            const response = await fetch(get_borrowed_loans_by_customer_id);
+                            const response = await fetch(url, postMethod);
                             const data = await response.json();
 
-                            if (data.code === 404) {
-                                this.message = data.message;
-                            } else {
-                                this.customer_borrowed_loans = data.data.loans;
+                            switch (data.code) {
+                                case 201:
+                                    // Handle success case
+                                    console.log("Successfully created borrowing application");
+                                    // Show success modal
+                                    $('#successModal').modal('show');
+                                    //Reload the page after a delay
+                                    setTimeout(() => {
+                                        window.location.reload();
+                                    }, 1000);
+                                    break;
+                                case 500:
+                                    this.message = data.message;
+                                    // Show success modal
+                                    $('#unsuccessfulModal').modal('show');
+                                    //Reload the page after a delay
+                                    setTimeout(() => {
+                                        window.location.reload();
+                                    }, 1000);
+                                    break;
+                                default:
+                                    throw `${data.code}: ${data.message}`;
                             }
                         } catch (error) {
-                            this.message = "Error fetching my borrowed loans: " + error;
-                        }
-                    },
-                    async get_my_lent_loans(){
-                        try {
-                            const response = await fetch(get_lent_loans_by_customer_id);
-                            const data = await response.json();
-
-                            if (data.code === 404) {
-                                this.message = data.message;
-                            } else {
-                                this.customer_lent_loans = data.data.loans;
-                            }
-                        } catch (error) {
-                            this.message = "Error fetching my lent loans: " + error;
-                        }
-                    },
-                    async getCurrencyCodes(){
-                        const response = await fetch('http://tbankonline.com/SMUtBank_API/Gateway?Header={"serviceName": "getCurrencyList", "userID": "", "PIN": "", "OTP": ""}&Content={"baseCurrency": "SGD", "quoteCurrency": "USD"}');
-                        const data = await response.json();
-                        this.currency_info = data.Content.ServiceResponse.CurrencyList.Currency;
-                    },
-                    async getExchangeRate(currency_code){
-                        const response = await fetch(`http://tbankonline.com/SMUtBank_API/Gateway?Header={"serviceName": "getExchangeRate", "userID": "", "PIN": "", "OTP": ""}&Content={"baseCurrency": "SGD", "quoteCurrency": "${currency_code}"}`);
-                        const data = await response.json();
-                        this.exchange_rate = data.Content.ServiceResponse["FX_SpotRate_Read-Response"]["Rate"];
-                    },
-                    async create_borrow_application(event){
-                        event.preventDefault();
-                        this.validation_errors = [];
-                        if (this.loan_amount <= 0){
-                            this.validation_errors.push("Loan amount must be greater than 0");
-                        }
-                        if (this.loan_amount > this.collateral_amount){
-                            this.validation_errors.push("Loan amount must be less than the collateral amount");
-                        }
-                        if (this.selectedCurrency === ""){
-                            this.validation_errors.push("Please select a currency");
-                        }
-                        if(this.loan_term <= 0){
-                            this.validation_errors.push("Loan term must be greater than 0");
-                        }
-                        if (this.validation_errors.length > 0) {
-                            this.errorsFound = true;
-                            return;
-                        }
-                        else {
-                            this.validation_errors = [];
-                            this.errorsFound = false;
-                            const jsonData = JSON.stringify({
-                                CustomerId: this.customer_id,
-                                CurrencyCode: this.selectedCurrency,
-                                LoanAmount: this.loan_amount,
-                                RepaymentAmount: this.repayment_amount,
-                                InterestRate: this.interest_rate,
-                                CollateralAmount: this.collateral_amount,
-                                LoanTerm: this.loan_term,
-                                ServiceFee: this.borrowing_service_fee,
-                                StatusLevel: "Borrowing"
-                            });
-
-                            const url = create_borrow_application;
-                            const postMethod = {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/json'
-                                },
-                                body: jsonData
-                            };
-
-                            try {
-                                const response = await fetch(url, postMethod);
-                                const data = await response.json();
-
-                                switch (data.code) {
-                                    case 201:
-                                        // Handle success case
-                                        console.log("Successfully created borrowing application");
-                                        // Show success modal
-                                        $('#successModal').modal('show');
-                                        //Reload the page after a delay
-                                        setTimeout(() => {
-                                            window.location.reload();
-                                        }, 1000);
-                                        break;
-                                    case 500:
-                                        this.message = data.message;
-                                        // Show success modal
-                                        $('#unsuccessfulModal').modal('show');
-                                        //Reload the page after a delay
-                                        setTimeout(() => {
-                                            window.location.reload();
-                                        }, 1000);
-                                        break;
-                                    default:
-                                        throw `${data.code}: ${data.message}`;
-                                }
-                            } catch (error) {
-                                console.error('Error');
-                            }
-                        }
-                    },
-                    async create_lending_application(event){
-                        event.preventDefault();
-                        this.validation_errors = [];
-                        if (this.investment_amount <= 0){
-                            this.validation_errors.push("Investment amount must be greater than 0");
-                        }
-                        if (this.loan_term <= 0){
-                            this.validation_errors.push("Loan term must be greater than 0");
-                        }
-                        if (this.interest_rate <= 0){
-                            this.validation_errors.push("Interest rate must be greater than 0");
-                        }
-                        if (this.selectedCurrency === ""){
-                            this.validation_errors.push("Please select a currency");
-                        }
-                        if (this.validation_errors.length > 0) {
-                            this.errorsFound = true;
-                            return;
-                        }
-                        else {
-                            this.validation_errors = [];
-                            this.errorsFound = false;
-                            const jsonData = JSON.stringify({
-                                CustomerId: this.customer_id,
-                                InvestmentAmount: this.investment_amount,
-                                InterestRate: this.interest_rate,
-                                RepaymentAmount: this.repayment_amount,
-                                LoanTerm: this.loan_term,
-                                CurrencyCode: this.selectedCurrency,
-                                TotalInterestAmount: this.total_interest_amount,
-                                ServiceFee: this.service_fee,
-                                Revenue: this.revenue,
-                                StatusLevel: "Lending"
-                            });
-
-                            const url = create_lending_application;
-                            const postMethod = {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/json'
-                                },
-                                body: jsonData
-                            };
-
-                            try {
-                                const response = await fetch(url, postMethod);
-                                const data = await response.json();
-
-                                switch (data.code) {
-                                    case 201:
-                                        // Handle success case
-                                        console.log("Successfully created lending application");
-                                        //Reload the page after a delay
-                                        setTimeout(() => {
-                                            window.location.reload();
-                                        }, 1000);
-                                        break;
-                                    case 500:
-                                        this.message = data.message;
-                                        //Reload the page after a delay
-                                        setTimeout(() => {
-                                            window.location.reload();
-                                        }, 1000);
-                                        break;
-                                    default:
-                                        throw `${data.code}: ${data.message}`;
-                                }
-                            } catch (error) {
-                                console.error('Error');
-                            }
+                            console.error('Error');
                         }
                     }
                 },
-                created() {
-                    this.get_my_borrowed_loans();
-                    this.get_my_lent_loans();
-                    this.getCurrencyCodes();
-                },
-            });
-            const vm = loan.mount('#loan');
-        </script>
-    </body>
+            },
+            created() {
+                this.get_my_borrowed_loans();
+                this.get_my_lent_loans();
+                this.getCurrencyCodes();
+            },
+        });
+        const vm = loan.mount('#loan');
+    </script>
+</body>
+
 </html>
