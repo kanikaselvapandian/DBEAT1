@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-
+<!-- hi -->
 <head>
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
@@ -350,7 +350,12 @@
         const pin = localStorage.getItem('pin');
         const friends_url = `http://127.0.0.1:8895/friends/${username}`;
         fetch(friends_url)
-            .then(response => response.json())
+            .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok ' + response.statusText);
+        }
+        return response.json();
+    })
             .then(data => {
                 console.log(data); // Log the data to check if it's retrieved successfully
 
@@ -421,7 +426,7 @@
             const create_transaction = "http://127.0.0.1:6100/transfer";
             const get_friends_by_customerid = "http://localhost:8895/friends/" + customer_id;
             const create_peer_transaction = "http://127.0.0.1:6100/peer_transfer";
-            const create_friend = "http://localhost:8895/submit_friend/A123456";
+            const create_friend = "http://localhost:8895/submit_friend";
             const friend = Vue.createApp({
             data() {
                 return {
@@ -683,7 +688,7 @@
                         friendee_id: this.friend_id,
                         friendee_name: this.friend_name
                         });
-                        const url = create_friend;
+                        const url = create_friend+ "/" + this.customer_id;
                         const postMethod = {
                             method: 'POST',
                             headers: {
