@@ -662,7 +662,6 @@ async function checkLocalStorageAndRedirect() {
      fetch(customer_url)
          .then(response => response.json())
          .then(data => {
-             console.log(data);
              let accounts = data.Content.ServiceResponse.AccountList.account;
              let accountIdString = '';
              let balanceString = '';
@@ -810,9 +809,7 @@ async function checkLocalStorageAndRedirect() {
                 this.checkWalletsSelection();
                 },
                 checkWalletsSelection() {
-                    console.log("checking")
                     if (this.sourcewallet && this.destinationwallet) {
-                        console.log("checking!")
                         this.getWalletExchange();
                     }
                     else if (this.sourcewallet && this.destination_friend_wallet){
@@ -820,19 +817,12 @@ async function checkLocalStorageAndRedirect() {
                     }
                 },
                 async getWalletExchange() {
-                    console.log("here");
-                    console.log(this.sourcewallet);
-                    console.log(this.destinationwallet);
                     if (this.sourcewallet && this.destinationwallet) {
-                        console.log("Both wallets have been selected")
                         const response = await fetch(`http://tbankonline.com/SMUtBank_API/Gateway?Header={"serviceName": "getExchangeRate", "userID": "", "PIN": "", "OTP": ""}&Content={"baseCurrency": "${this.sourcewallet.CurrencyCode}", "quoteCurrency": "${this.destinationwallet.CurrencyCode}"}`);
                         const data = await response.json();
-                        console.log(data)
                         this.exchange_rate = data.Content.ServiceResponse["FX_SpotRate_Read-Response"]["Rate"];
-                        console.log(this.exchange_rate);
                     } 
                     else if (this.sourcewallet && this.destination_friend_wallet){
-                        console.log("Both wallets have been selected");
                         const response = await fetch(`http://tbankonline.com/SMUtBank_API/Gateway?Header={"serviceName": "getExchangeRate", "userID": "", "PIN": "", "OTP": ""}&Content={"baseCurrency": "${this.sourcewallet.CurrencyCode}", "quoteCurrency": "${this.destination_friend_wallet.CurrencyCode}"}`);
                         const data = await response.json();
                         this.exchange_rate = data.Content.ServiceResponse["FX_SpotRate_Read-Response"]["Rate"];
@@ -883,7 +873,6 @@ async function checkLocalStorageAndRedirect() {
                                 switch (data.code) {
                                     case 201:
                                         // Handle success case
-                                        console.log("Successfully created wallet");
                                         // Close the createWalletModal
                                         $('#createWalletModal').modal('hide');
                                         // Show success modal
@@ -949,7 +938,6 @@ async function checkLocalStorageAndRedirect() {
                     }
                     else if (WalletTransaction == false && this.sourcewallet == null && PeerTransaction == false) {
                         if (parseFloat(this.wallet_amount) > parseFloat(this.deposit_account_balance)) {
-                            console.log(parseFloat(this.wallet_amount) - parseFloat(this.deposit_account_balance))
                             this.validation_errors.push("Insufficient funds in deposit account");
                         }
                         if (this.wallet_amount <= 0 || this.wallet_amount == "") {
@@ -1025,9 +1013,6 @@ async function checkLocalStorageAndRedirect() {
                             this.validation_errors.push("Please select a source wallet");
                         }
                         if (this.validation_errors.length > 0) {
-                            console.log(this.wallet_amount)
-                            console.log(this.sourcewallet.Amount)
-                            console.log(this.validation_errors)
                             this.errorsFound = true
                             return;
                         }
@@ -1088,7 +1073,6 @@ async function checkLocalStorageAndRedirect() {
                     try {
                         const response = await fetch(url, postMethod);
                         const data = await response.json();
-                        console.log(data)
                         switch (data.code) {
                             case 201:
                                 // Handle success case
@@ -1147,7 +1131,6 @@ async function checkLocalStorageAndRedirect() {
                     try {
                         const response = await fetch(url, postMethod);
                         const data = await response.json();
-                        console.log(data)
                         return data
                     } 
                     catch (error) {
@@ -1179,7 +1162,6 @@ async function checkLocalStorageAndRedirect() {
                     try {
                         const response = await fetch(url, postMethod);
                         const data = await response.json();
-                        console.log(data)
                         return data
                     } 
                     catch (error) {
@@ -1210,7 +1192,6 @@ async function checkLocalStorageAndRedirect() {
                     try {
                         const response = await fetch(url, postMethod);
                         const data = await response.json();
-                        console.log(data)
                         switch (data.code) {
                             case 201:
                                 // Handle success case
