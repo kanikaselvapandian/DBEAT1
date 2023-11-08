@@ -167,17 +167,22 @@
           <p>View and Manage your wallets today!</p>
         </div>
         <div class="col-md-12">
-          <div class="card-deck-scroll">
-              <div class="card" v-for="wallet in customer_wallets">
-                  <div class="card-body">
-                      <h5 class="card-title" v-text="wallet.CurrencyCode"></h5>
-                      <p class="card-text">
-                          Amount: <span v-text="wallet.Amount"></span> <br>
-                      </p>
+          <div v-if = "wallets_empty">
+              <h4 style = "text-align: center">No digital wallets found. Create one today!</h4>
+          </div>
+          <div v-else>
+              <div class="card-deck-scroll">
+                  <div class="card" v-for="wallet in customer_wallets">
+                      <div class="card-body">
+                          <h5 class="card-title" v-text="wallet.CurrencyCode"></h5>
+                          <p class="card-text">
+                              Amount: <span v-text="wallet.Amount"></span> <br>
+                          </p>
+                      </div>
                   </div>
               </div>
           </div>
-      </div>
+        </div>
       </div>
     </section><!-- End Testimonials Section -->    
 
@@ -436,6 +441,7 @@ fetch(url)
 
                 if (data.code === 404) {
                 this.message = data.message;
+                this.wallets_empty = true;
                 } else {
                 this.customer_wallets = data.data.wallet; 
                 this.wallets_received = true;
