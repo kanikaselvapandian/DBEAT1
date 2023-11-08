@@ -302,7 +302,8 @@ def update_loan(LoanId):
     new_EndDate = data.get('EndDate')
     new_TotalInterestAmount = data.get('TotalInterestAmount')
     new_StatusLevel = data.get('StatusLevel')
-
+    formatted_start_date = datetime.strptime(new_StartDate, "%Y-%m-%dT%H:%M:%S.%fZ")
+    formatted_end_date = datetime.strptime(new_EndDate, "%Y-%m-%dT%H:%M:%S.%fZ")
 
     try:
         loan = Loan.query.filter_by(LoanId=LoanId).first()
@@ -323,9 +324,9 @@ def update_loan(LoanId):
         if new_other_party_id is not None:  # Add this block
             loan.OtherPartyId = new_other_party_id
         if new_StartDate is not None:
-            loan.StartDate = new_StartDate
+            loan.StartDate = formatted_start_date
         if new_EndDate is not None:
-            loan.EndDate = new_EndDate
+            loan.EndDate = formatted_end_date
         if new_TotalInterestAmount is not None:
             loan.TotalInterestAmount = new_TotalInterestAmount
         if new_StatusLevel is not None:
