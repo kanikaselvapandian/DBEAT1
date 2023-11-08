@@ -1,6 +1,6 @@
 # IS444 DBEA G2T1
 <a>
-    <img src="/" title="lendinsync" alt="lendinsync" style="height: 150px">
+    <img src="/lendinsync/assets/img/favicon.jpg" title="lendinsync" alt="lendinsync" style="height: 200px">
 </a>
 
 ## Project Solution Overview
@@ -24,6 +24,21 @@ LendInSync aims to revolutionise the landscape of modern financial services. Off
 
 - Switch on WAMP/MAMP
 
-- Navigate to `http://localhost/phpMyAdmin` and import the database from `LendInSync Database.sql`
-- Navigate to 
+- Navigate to `http://localhost/phpMyAdmin` and import the database from `/lendinsync/LendInSync Database.sql`
+- Navigate to `/lendinsync/execute_python_files.py` and run the file
+    ````
+    python execute_python_files.py
+    ````
 - Open your browser and navigate to `http://127.0.0.1:5000/`
+
+## Key Features
+
+1. [Multi-Currency Wallet] Create a Multi-Currency Wallet
+2. [Multi-Currency Wallet] Transfer money between wallets based on exchange rate
+3. [Multi-Currency Wallet] Transfer money to and from your CASA account and your wallet based on exchange rate
+4. [Multi-Currency Wallet] Add a friend and transfer money between your and your friend’s wallets
+5. [Peer-to-Peer Lending] Peer-to-Peer Lending Marketplace
+6. [Peer-to-Peer Lending] Browser Application Form
+7. [Peer-to-Peer Lending] Lender Application Form
+8. [Peer-to-Peer Lending] View your borrowed and lent loans
+
