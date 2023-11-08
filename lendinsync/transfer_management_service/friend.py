@@ -14,15 +14,15 @@ try:
     app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('dbURL')
     if app.config['SQLALCHEMY_DATABASE_URI'] == None:
         if platform == "darwin":
-            app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://root:root@localhost:3306/lis_friend'
+            app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://root:root@localhost:3306/lis_friends'
         else:
-            app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://root@localhost:3306/lis_friend'
+            app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://root@localhost:3306/lis_friends'
 
 except KeyError:
 	if platform == "darwin":
-		app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://root:root@localhost:3306/lis_friend'
+		app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://root:root@localhost:3306/lis_friends'
 	else:
-		app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://root@localhost:3306/lis_friend'
+		app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://root@localhost:3306/lis_friends'
 
 # Disable modification tracking if unnecessary as it requires extra memory
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -35,7 +35,7 @@ db = SQLAlchemy(app)
 CORS(app) 
 
 class Friend(db.Model):
-    __tablename__ = 'Friend'
+    __tablename__ = 'Friends'
 
     # Define database columns
     fid = db.Column(db.Integer, primary_key=True)
