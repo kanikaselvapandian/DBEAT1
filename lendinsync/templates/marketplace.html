@@ -278,7 +278,7 @@
     <script src="/DBEAT1/lendinsync/assets/js/main.js"></script>
     <script>
         const customer_id = localStorage.getItem('username');
-        console.log(customer_id);
+        // console.log(customer_id);
         const get_all_borrowed_loans = "http://localhost:5001/loan/borrowing";
         const get_all_lent_loans = "http://localhost:5001/loan/lending";
 
@@ -390,7 +390,7 @@
                     // Calculate repayment amount based on loan amount, interest rate, loan term (in days), and service fee
                     const dailyInterestRate = rate / 100 / 365; // Convert annual rate to daily rate
                     const repaymentAmount = (dailyInterestRate * term * amount) + amount + fee;
-                    console.log("Repayment Amount:", repaymentAmount);
+                    // console.log("Repayment Amount:", repaymentAmount);
                     return repaymentAmount.toFixed(2);
                 },
                 async get_all_lent_loans() {
@@ -415,7 +415,7 @@
                     const loanTerm = loan.LoanTerm;
                     const collateralAmount = loan.CollateralAmount;
                     const ServiceFee = loan.ServiceFee;
-                    console.log(ServiceFee)
+                    // console.log(ServiceFee)
 
                     const interestRate = parseFloat(loan.interestRate); // Get the interest rate specific to the loan
 
